@@ -63,4 +63,14 @@ final class SearchResultCell: UICollectionViewCell {
             $0.edges.equalToSuperview()
         }
     }
+    
+    override func prepareForReuse() {
+        bookTitleLabel.text = nil
+        authorLabel.text = nil
+        bookPriceLabel.text = nil
+    }
+    
+    func configure(with book: Book) {
+        
+    }
 }
