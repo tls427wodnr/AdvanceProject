@@ -10,6 +10,11 @@ import SnapKit
 
 final class BookSearchViewController: UIViewController, UISearchBarDelegate {
     private let bookSearchBar = BookSearchBar()
+    
+    private lazy var bookSearchResultCollectionView: UICollectionView = {
+        let cv = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
+        return cv
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -49,6 +54,10 @@ final class BookSearchViewController: UIViewController, UISearchBarDelegate {
         bookSearchBar.searchBar.text = ""
         bookSearchBar.searchBar.resignFirstResponder()
         bookSearchBar.setCancelButtonVisible(false)
+    }
+    
+    private func createLayout() -> UICollectionViewLayout {
+        return UICollectionViewCompositionalLayout(section: <#T##NSCollectionLayoutSection#>)
     }
 }
 
