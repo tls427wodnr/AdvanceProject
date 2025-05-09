@@ -32,7 +32,7 @@ final class SearchResultCell: UICollectionViewCell {
     
     private let bookInfoStackView: UIStackView = {
         let stackView = UIStackView()
-        stackView.axis = .vertical
+        stackView.axis = .horizontal
         stackView.spacing = 4
         return stackView
     }()
@@ -71,6 +71,8 @@ final class SearchResultCell: UICollectionViewCell {
     }
     
     func configure(with book: Book) {
-        
+        bookTitleLabel.text = book.title
+        authorLabel.text = book.authors
+        bookPriceLabel.text = book.salePrice
     }
 }
