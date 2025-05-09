@@ -11,6 +11,6 @@ struct Book {
     let title: String
     let authors: String
     let salePrice: String
-    let thumbnailURL: URL?
+    let thumbnailURL: String
     let contents: String?
 }

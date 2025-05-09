@@ -28,7 +28,7 @@ struct BookResponseDTO: Decodable {
     let title: String
     let authors: [String]
     let salePrice: String
-    let thumbnail: String?
+    let thumbnail: String
     let contents: String?
     
     enum CodingKeys: String, CodingKey {
@@ -44,7 +44,7 @@ extension BookResponseDTO {
             title: title,
             authors: authors.joined(separator: ", "),
             salePrice: salePrice,
-            thumbnailURL: URL(string: thumbnail ?? ""),
+            thumbnailURL: thumbnail,
             contents: contents
         )
     }
