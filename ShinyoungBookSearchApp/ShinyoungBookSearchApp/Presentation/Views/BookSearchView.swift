@@ -21,7 +21,6 @@ final class BookSearchView: UIView {
         let button = UIButton(type: .system)
         button.setTitle("취소", for: .normal)
         button.isHidden = true
-        button.alpha = 0
         return button
     }()
     
@@ -65,7 +64,6 @@ final class BookSearchView: UIView {
     func setCancelButtonVisible(_ visible: Bool) {
         if visible {
             cancelButton.isHidden = false
-            cancelButton.alpha = 0
             cancelButton.transform = CGAffineTransform(translationX: 20, y: 0)
             
             searchBarTrailingToSuperview?.deactivate()
@@ -73,7 +71,6 @@ final class BookSearchView: UIView {
             
             UIView.animate(withDuration: 0.35, delay: 0, options: [.curveEaseOut]) {
                 self.layoutIfNeeded()
-                self.cancelButton.alpha = 1
                 self.cancelButton.transform = .identity
             }
         } else {
@@ -82,7 +79,6 @@ final class BookSearchView: UIView {
             
             UIView.animate(withDuration: 0.35, delay: 0, options: [.curveEaseIn], animations: {
                 self.layoutIfNeeded()
-                self.cancelButton.alpha = 0
                 self.cancelButton.transform = CGAffineTransform(translationX: 20, y: 0)
             }) { _ in
                 self.cancelButton.isHidden = true
