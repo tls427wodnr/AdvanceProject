@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 
 final class BookSearchViewController: UIViewController, UISearchBarDelegate {
-    private let bookSearchView = BookSearchView()
+    private let bookSearchBar = BookSearchBar()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,36 +24,36 @@ final class BookSearchViewController: UIViewController, UISearchBarDelegate {
         view.backgroundColor = .white
         
         [
-            bookSearchView
+            bookSearchBar
         ].forEach { view.addSubview($0) }
         
-        bookSearchView.setCancelButtonVisible(false)
+        bookSearchBar.setCancelButtonVisible(false)
     }
     
     private func setupConstraints() {
-        bookSearchView.snp.makeConstraints {
+        bookSearchBar.snp.makeConstraints {
             $0.top.bottom.equalTo(view.safeAreaLayoutGuide)
             $0.leading.trailing.equalTo(view).inset(16)
         }
     }
     
     private func setupSearchBar() {
-        bookSearchView.searchBar.delegate = self
+        bookSearchBar.searchBar.delegate = self
     }
     
     private func setupActions() {
-        bookSearchView.cancelButton.addTarget(self, action: #selector(cancelButtonDidTap), for: .touchUpInside)
+        bookSearchBar.cancelButton.addTarget(self, action: #selector(cancelButtonDidTap), for: .touchUpInside)
     }
     
     @objc private func cancelButtonDidTap() {
-        bookSearchView.searchBar.text = ""
-        bookSearchView.searchBar.resignFirstResponder()
-        bookSearchView.setCancelButtonVisible(false)
+        bookSearchBar.searchBar.text = ""
+        bookSearchBar.searchBar.resignFirstResponder()
+        bookSearchBar.setCancelButtonVisible(false)
     }
 }
 
 extension BookSearchViewController {
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
-        bookSearchView.setCancelButtonVisible(true)
+        bookSearchBar.setCancelButtonVisible(true)
     }
 }

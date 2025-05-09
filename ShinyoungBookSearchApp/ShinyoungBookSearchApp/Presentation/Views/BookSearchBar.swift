@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-final class BookSearchView: UIView {
+final class BookSearchBar: UIView {
     let searchBar: UISearchBar = {
         let sb = UISearchBar()
         sb.searchTextField.backgroundColor = .systemGray6
