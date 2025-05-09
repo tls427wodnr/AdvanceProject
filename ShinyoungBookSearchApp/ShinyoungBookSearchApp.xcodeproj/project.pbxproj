@@ -20,7 +20,7 @@
 		28219C902DCDBF38003A2401 /* Exceptions for "ShinyoungBookSearchApp" folder in "ShinyoungBookSearchApp" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Info.plist,
+				Application/Info.plist,
 			);
 			target = 28219C7A2DCDBF37003A2401 /* ShinyoungBookSearchApp */;
 		};
