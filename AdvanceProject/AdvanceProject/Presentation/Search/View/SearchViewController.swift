@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  SearchViewController.swift
 //  AdvanceProject
 //
 //  Created by 양원식 on 5/9/25.
@@ -7,7 +7,13 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class SearchViewController: UIViewController {
+    
+    let searchView = SearchView()
+    
+    override func loadView() {
+        self.view = searchView
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -16,4 +22,3 @@ class ViewController: UIViewController {
 
 
 }
-
