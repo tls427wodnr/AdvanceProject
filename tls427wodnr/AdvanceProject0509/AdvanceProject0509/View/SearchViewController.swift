@@ -114,5 +114,11 @@ final class SearchViewController: UIViewController {
                 self?.present(alert, animated: true)
             })
             .disposed(by: disposeBag)
+        
+        collectionView.rx.modelSelected(BookItem.self)
+            .subscribe(onNext: { [weak self] book in
+                print("선택된 책: \(book.title)")
+            })
+            .disposed(by: disposeBag)
     }
 }
