@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  BookSearchViewController.swift
 //  ShinyoungBookSearchApp
 //
 //  Created by shinyoungkim on 5/9/25.
@@ -7,13 +7,12 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class BookSearchViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+
+        view.backgroundColor = .systemGray
     }
 
-
 }
-
