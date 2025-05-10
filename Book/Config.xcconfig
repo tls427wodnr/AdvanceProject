@@ -1,0 +1,11 @@
+//
+//  Config.xcconfig
+//  Book
+//
+//  Created by 권순욱 on 5/10/25.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+APIKey = 6fdf87073bd94b8ef4b85e8b3a7008c7
