@@ -8,7 +8,7 @@
 import Foundation
 
 struct BookSearchResponse: Decodable {
-    let meta: Meta
+    let meta: Meta?
     let documents: [BookResponseDTO]
 }
 
@@ -27,7 +27,7 @@ struct Meta: Decodable {
 struct BookResponseDTO: Decodable {
     let title: String
     let authors: [String]
-    let salePrice: String
+    let salePrice: Int
     let thumbnail: String
     let contents: String?
     
@@ -43,7 +43,7 @@ extension BookResponseDTO {
         Book(
             title: title,
             authors: authors.joined(separator: ", "),
-            salePrice: salePrice,
+            salePrice: "\(salePrice)원",
             thumbnailURL: thumbnail,
             contents: contents
         )

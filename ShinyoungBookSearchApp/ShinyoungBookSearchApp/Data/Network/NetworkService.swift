@@ -43,6 +43,8 @@ class NetworkService {
                     let decodedData = try JSONDecoder().decode(T.self, from: data)
                     observer(.success(decodedData))
                 } catch {
+                    print("Decoding 실패")
+                    print("JSON: \(String(data: data, encoding: .utf8) ?? "nil")")
                     observer(.failure(NetworkError.decodingFail))
                 }
             }.resume()
