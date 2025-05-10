@@ -63,7 +63,7 @@ final class BookSearchViewController: UIViewController, UISearchBarDelegate {
         }
         
         bookSearchResultCollectionView.snp.makeConstraints {
-            $0.top.equalTo(bookSearchBar.snp.bottom)
+            $0.top.equalTo(bookSearchBar.snp.bottom).offset(32)
             $0.leading.trailing.equalTo(view).inset(16)
             $0.bottom.equalTo(view.safeAreaLayoutGuide)
         }

@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import Kingfisher
 
 final class BookDetailView: UIView {
     private let bookTitleLabel: UILabel = {
@@ -133,7 +134,7 @@ final class BookDetailView: UIView {
     func configure(with book: Book) {
         bookTitleLabel.text = book.title
         bookAuthorLabel.text = book.authors
-        bookImageView.image = UIImage(named: book.thumbnailURL)
+        bookImageView.kf.setImage(with: URL(string: book.thumbnailURL))
         bookPriceLabel.text = book.salePrice
         bookDescriptionLabel.text = book.contents
     }

@@ -13,20 +13,20 @@ final class SearchResultCell: UICollectionViewCell {
     
     private let bookTitleLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 17, weight: .medium)
+        label.font = .systemFont(ofSize: 16, weight: .regular)
         return label
     }()
     
     private let authorLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 13, weight: .regular)
+        label.font = .systemFont(ofSize: 12, weight: .regular)
         label.textColor = .secondaryLabel
         return label
     }()
     
     private let bookPriceLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 13, weight: .regular)
+        label.font = .systemFont(ofSize: 12, weight: .regular)
         return label
     }()
     
