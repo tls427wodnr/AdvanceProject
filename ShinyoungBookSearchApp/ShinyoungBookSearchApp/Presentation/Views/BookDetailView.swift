@@ -44,8 +44,6 @@ final class BookDetailView: UIView {
         let button = UIButton(type: .system)
         button.setTitle("닫기", for: .normal)
         button.setTitleColor(.black, for: .normal)
-        button.layer.borderWidth = 1
-        button.layer.borderColor = UIColor.lightGray.cgColor
         return button
     }()
     
@@ -61,6 +59,7 @@ final class BookDetailView: UIView {
         let sv = UIStackView()
         sv.axis = .horizontal
         sv.spacing = 8
+        sv.distribution = .fillEqually
         return sv
     }()
     
@@ -122,10 +121,6 @@ final class BookDetailView: UIView {
         bookDescriptionLabel.snp.makeConstraints {
             $0.top.equalTo(bookPriceLabel.snp.bottom)
             $0.centerX.equalToSuperview()
-        }
-        
-        dismissButton.snp.makeConstraints {
-            $0.width.equalTo(80)
         }
         
         buttonStackView.snp.makeConstraints {
