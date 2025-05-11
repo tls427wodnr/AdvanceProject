@@ -61,18 +61,58 @@ final class SearchViewController: UIViewController {
         ])
     }
 
+    // MARK: - Bindings
+
+    private func bindViewModel() {
+        
+        let input = SearchViewModel.Input(
+            query: searchBar.rx.text.orEmpty
+                .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
+                .distinctUntilChanged()
+        )
+
+        let output = viewModel.transform(input: input)
+
+        output.books
+            .drive(collectionView.rx.items(
+                cellIdentifier: BookCell.identifier,
+                cellType: BookCell.self
+            )) { _, item, cell in
+                cell.configure(with: item)
+            }
+            .disposed(by: disposeBag)
+
+        output.error
+            .emit(onNext: { [weak self] error in
+                let alert = UIAlertController(
+                    title: "에러",
+                    message: error.localizedDescription,
+                    preferredStyle: .alert
+                )
+                alert.addAction(UIAlertAction(title: "확인", style: .default))
+                self?.present(alert, animated: true)
+            })
+            .disposed(by: disposeBag)
+
+        collectionView.rx.modelSelected(BookItem.self)
+            .subscribe(onNext: { book in
+                print("선택된 책: \(book.title)")
+            })
+            .disposed(by: disposeBag)
+    }
+
     // MARK: - Layout
 
     private func createLayout() -> UICollectionViewLayout {
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .estimated(60)
+            heightDimension: .estimated(100)
         )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
 
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .estimated(60)
+            heightDimension: .estimated(100)
         )
         let group = NSCollectionLayoutGroup.vertical(
             layoutSize: groupSize,
@@ -84,41 +124,5 @@ final class SearchViewController: UIViewController {
         section.contentInsets = .init(top: 10, leading: 10, bottom: 10, trailing: 10)
 
         return UICollectionViewCompositionalLayout(section: section)
-    }
-
-    // MARK: - Bindings
-
-    private func bindViewModel() {
-        searchBar.rx.text.orEmpty
-            .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
-            .distinctUntilChanged()
-            .bind(to: viewModel.query)
-            .disposed(by: disposeBag)
-
-        viewModel.books
-            .observe(on: MainScheduler.instance)
-            .bind(to: collectionView.rx.items(cellIdentifier: BookCell.identifier, cellType: BookCell.self)) { index, item, cell in
-                cell.configure(with: item)
-            }
-            .disposed(by: disposeBag)
-        
-        viewModel.error
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] error in
-                let alert = UIAlertController(
-                    title: "에러",
-                    message: error.localizedDescription,
-                    preferredStyle: .alert
-                )
-                alert.addAction(UIAlertAction(title: "확인", style: .default))
-                self?.present(alert, animated: true)
-            })
-            .disposed(by: disposeBag)
-        
-        collectionView.rx.modelSelected(BookItem.self)
-            .subscribe(onNext: { [weak self] book in
-                print("선택된 책: \(book.title)")
-            })
-            .disposed(by: disposeBag)
     }
 }

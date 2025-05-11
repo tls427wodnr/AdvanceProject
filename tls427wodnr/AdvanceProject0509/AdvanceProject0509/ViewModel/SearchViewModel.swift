@@ -10,20 +10,29 @@ import RxSwift
 import RxCocoa
 
 final class SearchViewModel {
-    let query = PublishRelay<String>()
-    
-    let books = BehaviorRelay<[BookItem]>(value: [])
-    let error = PublishRelay<Error>()
-    
+
+    // MARK: - Input / Output
+
+    struct Input {
+        let query: Observable<String>
+    }
+
+    struct Output {
+        let books: Driver<[BookItem]>
+        let error: Signal<Error>
+    }
+
+    // MARK: - Properties
+
+    private let booksRelay = BehaviorRelay<[BookItem]>(value: [])
+    private let errorRelay = PublishRelay<Error>()
     private let disposeBag = DisposeBag()
     private let networkManager = NetworkManager.shared
-    
-    init() {
-        bindQueryToFetchBooks()
-    }
-    
-    private func bindQueryToFetchBooks() {
-        query
+
+    // MARK: - Transform
+
+    func transform(input: Input) -> Output {
+        input.query
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .distinctUntilChanged()
             .flatMapLatest { [weak self] query -> Observable<[BookItem]> in
@@ -32,12 +41,17 @@ final class SearchViewModel {
                     return .just([])
                 }
                 return self.networkManager.fetchBooksAPI(query: query, start: 1)
-                    .catch { error in
-                        self.error.accept(error)
+                    .catch { [weak self] error in
+                        self?.errorRelay.accept(error)
                         return .just([])
                     }
             }
-            .bind(to: books)
+            .bind(to: booksRelay)
             .disposed(by: disposeBag)
+
+        return Output(
+            books: booksRelay.asDriver(),
+            error: errorRelay.asSignal()
+        )
     }
 }
