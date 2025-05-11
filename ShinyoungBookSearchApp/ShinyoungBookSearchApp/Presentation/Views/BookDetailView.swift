@@ -12,34 +12,43 @@ import Kingfisher
 final class BookDetailView: UIView {
     private let bookTitleLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 20, weight: .bold)
+        label.font = .systemFont(ofSize: 18, weight: .bold)
+        label.numberOfLines = 0
         return label
     }()
     
-    private let bookAuthorLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 17, weight: .regular)
-        return label
+    private let authorStackView: UIStackView = {
+        let sv = UIStackView()
+        sv.axis = .horizontal
+        sv.spacing = 8
+        sv.alignment = .leading
+        return sv
     }()
     
     private let bookImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 10
         return imageView
     }()
     
     private let bookPriceLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 17, weight: .regular)
+        label.font = .systemFont(ofSize: 14, weight: .medium)
         return label
     }()
     
     private let bookDescriptionLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 0
-        label.font = .systemFont(ofSize: 17, weight: .regular)
+        label.font = .systemFont(ofSize: 14, weight: .regular)
+        label.textColor = .secondaryLabel
         return label
     }()
+    
+    private let scrollView = UIScrollView()
+    private let contentView = UIView()
     
     let dismissButton: UIButton = {
         let button = UIButton(type: .system)
@@ -89,39 +98,58 @@ final class BookDetailView: UIView {
         ].forEach { buttonStackView.addArrangedSubview($0) }
         
         [
-            bookTitleLabel,
-            bookAuthorLabel,
             bookImageView,
-            bookPriceLabel,
+            authorStackView,
+            bookTitleLabel,
             bookDescriptionLabel,
+            bookPriceLabel,
+        ].forEach { contentView.addSubview($0) }
+        
+        scrollView.addSubview(contentView)
+        
+        [
+            scrollView,
             buttonStackView
         ].forEach { addSubview($0) }
     }
     
     private func setupConstraints() {
-        bookTitleLabel.snp.makeConstraints {
-            $0.top.equalToSuperview()
-            $0.centerX.equalToSuperview()
+        scrollView.snp.makeConstraints {
+            $0.top.leading.trailing.equalToSuperview()
+            $0.bottom.equalTo(buttonStackView.snp.top)
         }
-        
-        bookAuthorLabel.snp.makeConstraints {
-            $0.top.equalTo(bookTitleLabel.snp.bottom)
-            $0.centerX.equalToSuperview()
+
+        contentView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+            $0.width.equalTo(scrollView)
         }
         
         bookImageView.snp.makeConstraints {
-            $0.top.equalTo(bookAuthorLabel.snp.bottom)
-            $0.centerX.equalToSuperview()
+            $0.top.equalToSuperview().offset(24)
+            $0.leading.trailing.equalToSuperview().inset(64)
+            $0.height.equalTo(bookImageView.snp.width).multipliedBy(1.45)
         }
         
-        bookPriceLabel.snp.makeConstraints {
-            $0.top.equalTo(bookImageView.snp.bottom)
-            $0.centerX.equalToSuperview()
+        authorStackView.snp.makeConstraints {
+            $0.top.equalTo(bookImageView.snp.bottom).offset(20)
+            $0.leading.equalToSuperview().inset(24)
+            $0.trailing.lessThanOrEqualToSuperview().inset(24)
+        }
+        
+        bookTitleLabel.snp.makeConstraints {
+            $0.top.equalTo(authorStackView.snp.bottom).offset(12)
+            $0.leading.trailing.equalToSuperview().inset(26)
         }
         
         bookDescriptionLabel.snp.makeConstraints {
-            $0.top.equalTo(bookPriceLabel.snp.bottom)
-            $0.centerX.equalToSuperview()
+            $0.top.equalTo(bookTitleLabel.snp.bottom).offset(8)
+            $0.leading.trailing.equalToSuperview().inset(26)
+        }
+        
+        bookPriceLabel.snp.makeConstraints {
+            $0.top.equalTo(bookDescriptionLabel.snp.bottom).offset(16)
+            $0.leading.trailing.equalToSuperview().inset(26)
+            $0.bottom.equalTo(contentView).inset(24)
         }
         
         buttonStackView.snp.makeConstraints {
@@ -133,9 +161,39 @@ final class BookDetailView: UIView {
     
     func configure(with book: Book) {
         bookTitleLabel.text = book.title
-        bookAuthorLabel.text = book.authors
         bookImageView.kf.setImage(with: URL(string: book.thumbnailURL))
         bookPriceLabel.text = book.salePrice
         bookDescriptionLabel.text = book.contents
+        
+        authorStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+
+        let authors = book.authors.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }
+        authors.forEach { name in
+            let label = PaddingLabel()
+            label.text = name
+            label.font = .systemFont(ofSize: 14, weight: .regular)
+            label.textColor = .white
+            label.backgroundColor = .black
+            label.layer.cornerRadius = 16
+            label.clipsToBounds = true
+            label.textInsets = UIEdgeInsets(top: 7, left: 12, bottom: 7, right: 12)
+            authorStackView.addArrangedSubview(label)
+        }
+    }
+}
+
+final class PaddingLabel: UILabel {
+    var textInsets = UIEdgeInsets.zero {
+        didSet { invalidateIntrinsicContentSize() }
+    }
+
+    override func drawText(in rect: CGRect) {
+        super.drawText(in: rect.inset(by: textInsets))
+    }
+
+    override var intrinsicContentSize: CGSize {
+        let size = super.intrinsicContentSize
+        return CGSize(width: size.width + textInsets.left + textInsets.right,
+                      height: size.height + textInsets.top + textInsets.bottom)
     }
 }

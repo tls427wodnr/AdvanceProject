@@ -43,9 +43,15 @@ extension BookResponseDTO {
         Book(
             title: title,
             authors: authors.joined(separator: ", "),
-            salePrice: "\(salePrice)원",
+            salePrice: "₩" + formatPrice(salePrice),
             thumbnailURL: thumbnail,
             contents: contents
         )
+    }
+
+    private func formatPrice(_ price: Int) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        return formatter.string(from: NSNumber(value: price)) ?? "\(price)"
     }
 }
