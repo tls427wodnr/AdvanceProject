@@ -12,7 +12,7 @@ import RxCocoa
 final class SearchViewModel {
     let query = PublishRelay<String>()
     
-    let books = PublishRelay<[BookItem]>()
+    let books = BehaviorRelay<[BookItem]>(value: [])
     let error = PublishRelay<Error>()
     
     private let disposeBag = DisposeBag()
