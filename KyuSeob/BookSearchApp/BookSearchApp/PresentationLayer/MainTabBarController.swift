@@ -15,10 +15,19 @@ final class MainTabBarController: UITabBarController {
     }
 
     private func setupTabs() {
+        self.tabBar.backgroundColor = .systemBackground
         self.tabBar.tintColor = .init(hex: "000000")
         self.tabBar.unselectedItemTintColor = .init(hex: "999999")
 
-        let firstVC = MainViewController()
+        let firstVC = MainViewController(
+            viewModel: MainViewModel(
+                searchBooksUseCase: SearchBooksUseCase(
+                    bookRepository: BookRepository(
+                        networkService: NetworkService()
+                    )
+                )
+            )
+        )
         firstVC.tabBarItem = UITabBarItem(title: "검색", image: .init(systemName: "magnifyingglass"), tag: 0)
 
         let secondVC = MyBooksViewController()
