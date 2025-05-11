@@ -1,5 +1,5 @@
 //
-//  Book+CoreDataProperties.swift
+//  BookEntity+CoreDataProperties.swift
 //  ShinyoungBookSearchApp
 //
 //  Created by shinyoungkim on 5/11/25.
@@ -10,10 +10,10 @@ import Foundation
 import CoreData
 
 
-extension Book {
+extension BookEntity {
 
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<Book> {
-        return NSFetchRequest<Book>(entityName: "Book")
+    @nonobjc public class func fetchRequest() -> NSFetchRequest<BookEntity> {
+        return NSFetchRequest<BookEntity>(entityName: "BookEntity")
     }
 
     @NSManaged public var title: String?
@@ -24,6 +24,6 @@ extension Book {
 
 }
 
-extension Book : Identifiable {
+extension BookEntity : Identifiable {
 
 }
