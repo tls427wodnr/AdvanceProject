@@ -21,19 +21,21 @@ final class SearchResultCell: UICollectionViewCell {
         let label = UILabel()
         label.font = .systemFont(ofSize: 12, weight: .regular)
         label.textColor = .secondaryLabel
+        label.setContentCompressionResistancePriority(.required, for: .horizontal)
         return label
     }()
     
     private let bookPriceLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 12, weight: .regular)
+        label.setContentCompressionResistancePriority(.required, for: .horizontal)
         return label
     }()
     
     private let bookInfoStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
-        stackView.spacing = 4
+        stackView.spacing = 8
         return stackView
     }()
     
@@ -60,7 +62,7 @@ final class SearchResultCell: UICollectionViewCell {
     
     private func setupConstraints() {
         bookInfoStackView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.edges.equalToSuperview().inset(2)
         }
     }
     

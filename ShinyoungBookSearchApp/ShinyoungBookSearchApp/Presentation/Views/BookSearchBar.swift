@@ -64,26 +64,17 @@ final class BookSearchBar: UIView {
     func setCancelButtonVisible(_ visible: Bool) {
         if visible {
             cancelButton.isHidden = false
-            cancelButton.transform = CGAffineTransform(translationX: 20, y: 0)
-            
+
             searchBarTrailingToSuperview?.deactivate()
             searchBarTrailingToCancelButton?.activate()
-            
-            UIView.animate(withDuration: 0.35, delay: 0, options: [.curveEaseOut]) {
-                self.layoutIfNeeded()
-                self.cancelButton.transform = .identity
-            }
+
+            self.layoutIfNeeded()
         } else {
             searchBarTrailingToCancelButton?.deactivate()
             searchBarTrailingToSuperview?.activate()
-            
-            UIView.animate(withDuration: 0.35, delay: 0, options: [.curveEaseIn], animations: {
-                self.layoutIfNeeded()
-                self.cancelButton.transform = CGAffineTransform(translationX: 20, y: 0)
-            }) { _ in
-                self.cancelButton.isHidden = true
-                self.cancelButton.transform = .identity
-            }
+
+            self.layoutIfNeeded()
+            cancelButton.isHidden = true
         }
     }
 }

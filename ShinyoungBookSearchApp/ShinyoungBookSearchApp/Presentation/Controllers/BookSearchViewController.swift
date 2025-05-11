@@ -103,7 +103,7 @@ final class BookSearchViewController: UIViewController, UISearchBarDelegate {
         
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .estimated(48)
+            heightDimension: .estimated(40)
         )
         let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
         
