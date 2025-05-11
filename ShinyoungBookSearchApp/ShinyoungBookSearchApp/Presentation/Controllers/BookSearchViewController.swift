@@ -135,6 +135,7 @@ extension BookSearchViewController {
         guard let query = searchBar.text, !query.isEmpty else { return }
         viewModel.searchBooks(with: query)
         searchBar.resignFirstResponder()
+        bookSearchBar.setCancelButtonVisible(false)
     }
 }
 
