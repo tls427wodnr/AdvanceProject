@@ -22,9 +22,7 @@ class MainViewModel {
 
     private func bind() {
         dummyButtonTapped
-            .subscribe(onNext: {
-                self.showDetailView.accept(())
-            })
+            .bind(to: showDetailView)
             .disposed(by: disposeBag)
     }
 
