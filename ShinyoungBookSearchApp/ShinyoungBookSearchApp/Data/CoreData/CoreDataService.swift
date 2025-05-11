@@ -11,9 +11,9 @@ import UIKit
 import RxSwift
 
 enum CoreDataError: Error {
-    case serviceDeallocated
     case entityNotFound
     case saveFailed(Error)
+    case fetchFailed(Error)
 }
 
 final class CoreDataService {
@@ -56,6 +56,22 @@ final class CoreDataService {
                 observer(.success(()))
             } catch {
                 observer(.failure(CoreDataError.saveFailed(error)))
+            }
+            
+            return Disposables.create()
+        }
+    }
+    
+    func fetchSavedBooks() -> Single<[Book]> {
+        return Single.create { observer in
+            let request: NSFetchRequest<BookEntity> = BookEntity.fetchRequest()
+            
+            do {
+                let entities = try self.context.fetch(request)
+                let books = entities.map { $0.toDomain() }
+                observer(.success(books))
+            } catch {
+                observer(.failure(CoreDataError.fetchFailed(error)))
             }
             
             return Disposables.create()

@@ -27,3 +27,15 @@ extension BookEntity {
 extension BookEntity : Identifiable {
 
 }
+
+extension BookEntity {
+    func toDomain() -> Book {
+        Book(
+            title: self.title ?? "",
+            authors: self.authors ?? "",
+            salePrice: self.salePrice ?? "",
+            thumbnailURL: self.thumbnailURL ?? "",
+            contents: self.contents
+        )
+    }
+}
