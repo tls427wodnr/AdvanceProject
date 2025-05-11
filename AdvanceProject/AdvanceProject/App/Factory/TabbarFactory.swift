@@ -8,9 +8,6 @@
 import Foundation
 
 final class TabbarFactory {
-    func makeHomeFactory() -> HomeFactory {
-        return HomeFactory()
-    }
 
     func makeSearchFactory() -> SearchFactory {
         return SearchFactory()

@@ -28,8 +28,8 @@ final class TabbarCoordinator: Coordinator {
     }
     
     func start() {
-        let homeNC = UINavigationController()
         let searchNC = UINavigationController()
+        let homeNC = UINavigationController()
         let storedBooksNC = UINavigationController()
         
         // 탭바 스타일 설정
@@ -49,16 +49,10 @@ final class TabbarCoordinator: Coordinator {
         // 선택 안 된 아이템 색상 (검은색 또는 회색)
         tabbarController.tabBar.unselectedItemTintColor = .gray
         
-        [homeNC, searchNC, storedBooksNC].forEach { NC in
+        [searchNC, homeNC, storedBooksNC].forEach { NC in
             NC.navigationBar.tintColor = .white
             NC.navigationItem.backButtonTitle = ""
         }
-        
-        let homeCoordinator = HomeCoordinator(
-            navigationController: homeNC,
-            factory: factory.makeHomeFactory(),
-            parent: self
-        )
         
         let searchCoordinator = SearchCoordinator(
             navigationController: searchNC,
@@ -72,23 +66,22 @@ final class TabbarCoordinator: Coordinator {
             parent: self
         )
         
-        homeCoordinator.start()
         searchCoordinator.start()
         storedBooksCoordinator.start()
         
-        childCoordinators = [homeCoordinator, searchCoordinator, storedBooksCoordinator]
-        tabbarController.setViewControllers([homeNC, searchNC, storedBooksNC], animated: false)
-        
-        homeNC.tabBarItem = UITabBarItem(
-            title: "홈",
-            image: UIImage(systemName: "house"),
-            selectedImage: UIImage(systemName: "house.fill")
-        )
+        childCoordinators = [searchCoordinator, storedBooksCoordinator]
+        tabbarController.setViewControllers([searchNC, storedBooksNC], animated: false)
         
         searchNC.tabBarItem = UITabBarItem(
             title: "책 검색",
             image: UIImage(systemName: "magnifyingglass"),
             selectedImage: UIImage(systemName: "magnifyingglass.fill")
+        )
+        
+        homeNC.tabBarItem = UITabBarItem(
+            title: "홈",
+            image: UIImage(systemName: "house"),
+            selectedImage: UIImage(systemName: "house.fill")
         )
         
         storedBooksNC.tabBarItem = UITabBarItem(
