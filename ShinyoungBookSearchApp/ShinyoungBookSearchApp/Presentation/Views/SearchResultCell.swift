@@ -32,11 +32,18 @@ final class SearchResultCell: UICollectionViewCell {
         return label
     }()
     
-    private let bookInfoStackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .horizontal
-        stackView.spacing = 8
-        return stackView
+    private let infoStackView: UIStackView = {
+        let sv = UIStackView()
+        sv.axis = .horizontal
+        sv.spacing = 8
+        return sv
+    }()
+    
+    private let containerStackView: UIStackView = {
+        let sv = UIStackView()
+        sv.axis = .horizontal
+        sv.spacing = 8
+        return sv
     }()
     
     override init(frame: CGRect) {
@@ -53,15 +60,19 @@ final class SearchResultCell: UICollectionViewCell {
     private func setupViews() {
         [
             bookTitleLabel,
+            infoStackView
+        ].forEach { containerStackView.addArrangedSubview($0) }
+        
+        [
             authorLabel,
             bookPriceLabel
-        ].forEach { bookInfoStackView.addArrangedSubview($0) }
+        ].forEach { infoStackView.addArrangedSubview($0) }
         
-        [bookInfoStackView].forEach { addSubview($0) }
+        [containerStackView].forEach { addSubview($0) }
     }
     
     private func setupConstraints() {
-        bookInfoStackView.snp.makeConstraints {
+        containerStackView.snp.makeConstraints {
             $0.edges.equalToSuperview().inset(2)
         }
     }
