@@ -6,10 +6,14 @@
 //
 
 import UIKit
+import RxSwift
 
 class MainViewController: UIViewController {
 
     private let mainView = MainView()
+    private let viewModel = MainViewModel()
+
+    private let disposeBag = DisposeBag()
 
     override func loadView() {
         view = mainView
@@ -18,7 +22,21 @@ class MainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
+        bind()
     }
 
+}
+
+private extension MainViewController {
+    private func bind() {
+        mainView.dummyBtnTapped
+            .bind(to: viewModel.dummyButtonTapped)
+            .disposed(by: disposeBag)
+
+        viewModel.showDetailView
+            .subscribe(onNext: {
+                let detailViewController = BookDetailViewController()
+                self.navigationController?.pushViewController(detailViewController, animated: true)
+            }).disposed(by: disposeBag)
+    }
 }

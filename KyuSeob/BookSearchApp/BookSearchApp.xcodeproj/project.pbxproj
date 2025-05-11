@@ -6,6 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		9520E3D22DD0AAE400B92EA2 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 9520E3D12DD0AAE400B92EA2 /* RxCocoa */; };
+		9520E3D42DD0AAE400B92EA2 /* RxRelay in Frameworks */ = {isa = PBXBuildFile; productRef = 9520E3D32DD0AAE400B92EA2 /* RxRelay */; };
+		9520E3D72DD0AAF000B92EA2 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9520E3D62DD0AAF000B92EA2 /* SnapKit */; };
+		9520E3DA2DD0AAF900B92EA2 /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 9520E3D92DD0AAF900B92EA2 /* Then */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		9520E3942DD07B2200B92EA2 /* BookSearchApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BookSearchApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +43,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9520E3D72DD0AAF000B92EA2 /* SnapKit in Frameworks */,
+				9520E3D42DD0AAE400B92EA2 /* RxRelay in Frameworks */,
+				9520E3D22DD0AAE400B92EA2 /* RxCocoa in Frameworks */,
+				9520E3DA2DD0AAF900B92EA2 /* Then in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +89,10 @@
 			);
 			name = BookSearchApp;
 			packageProductDependencies = (
+				9520E3D12DD0AAE400B92EA2 /* RxCocoa */,
+				9520E3D32DD0AAE400B92EA2 /* RxRelay */,
+				9520E3D62DD0AAF000B92EA2 /* SnapKit */,
+				9520E3D92DD0AAF900B92EA2 /* Then */,
 			);
 			productName = BookSearchApp;
 			productReference = 9520E3942DD07B2200B92EA2 /* BookSearchApp.app */;
@@ -107,6 +122,11 @@
 			);
 			mainGroup = 9520E38B2DD07B2200B92EA2;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				9520E3D02DD0AAE400B92EA2 /* XCRemoteSwiftPackageReference "RxSwift" */,
+				9520E3D52DD0AAF000B92EA2 /* XCRemoteSwiftPackageReference "SnapKit" */,
+				9520E3D82DD0AAF900B92EA2 /* XCRemoteSwiftPackageReference "Then" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 9520E3952DD07B2200B92EA2 /* Products */;
 			projectDirPath = "";
@@ -333,6 +353,56 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		9520E3D02DD0AAE400B92EA2 /* XCRemoteSwiftPackageReference "RxSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ReactiveX/RxSwift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.9.0;
+			};
+		};
+		9520E3D52DD0AAF000B92EA2 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.7.1;
+			};
+		};
+		9520E3D82DD0AAF900B92EA2 /* XCRemoteSwiftPackageReference "Then" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/devxoul/Then.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		9520E3D12DD0AAE400B92EA2 /* RxCocoa */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9520E3D02DD0AAE400B92EA2 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxCocoa;
+		};
+		9520E3D32DD0AAE400B92EA2 /* RxRelay */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9520E3D02DD0AAE400B92EA2 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxRelay;
+		};
+		9520E3D62DD0AAF000B92EA2 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9520E3D52DD0AAF000B92EA2 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+		9520E3D92DD0AAF900B92EA2 /* Then */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9520E3D82DD0AAF900B92EA2 /* XCRemoteSwiftPackageReference "Then" */;
+			productName = Then;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 9520E38C2DD07B2200B92EA2 /* Project object */;
 }
