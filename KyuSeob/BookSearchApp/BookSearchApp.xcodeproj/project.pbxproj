@@ -11,10 +11,12 @@
 		9520E3D42DD0AAE400B92EA2 /* RxRelay in Frameworks */ = {isa = PBXBuildFile; productRef = 9520E3D32DD0AAE400B92EA2 /* RxRelay */; };
 		9520E3D72DD0AAF000B92EA2 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9520E3D62DD0AAF000B92EA2 /* SnapKit */; };
 		9520E3DA2DD0AAF900B92EA2 /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 9520E3D92DD0AAF900B92EA2 /* Then */; };
+		9520E54B2DD0C73900B92EA2 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 9520E54A2DD0C73900B92EA2 /* Config.xcconfig */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		9520E3942DD07B2200B92EA2 /* BookSearchApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BookSearchApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9520E54A2DD0C73900B92EA2 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -56,6 +58,7 @@
 		9520E38B2DD07B2200B92EA2 = {
 			isa = PBXGroup;
 			children = (
+				9520E54A2DD0C73900B92EA2 /* Config.xcconfig */,
 				9520E3962DD07B2200B92EA2 /* BookSearchApp */,
 				9520E3952DD07B2200B92EA2 /* Products */,
 			);
@@ -142,6 +145,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9520E54B2DD0C73900B92EA2 /* Config.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -160,6 +164,7 @@
 /* Begin XCBuildConfiguration section */
 		9520E3AB2DD07B2300B92EA2 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9520E54A2DD0C73900B92EA2 /* Config.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -216,6 +221,7 @@
 		};
 		9520E3AD2DD07B2300B92EA2 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9520E54A2DD0C73900B92EA2 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
