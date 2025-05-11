@@ -36,7 +36,7 @@ final class CoreDataService {
     func save(book: Book) -> Single<Void> {
         return Single.create { observer in
             guard let entity = NSEntityDescription.entity(
-                forEntityName: "BookEntity",
+                forEntityName: BookEntity.className,
                 in: self.context
             ) else {
                 observer(.failure(CoreDataError.entityNotFound))
@@ -45,11 +45,11 @@ final class CoreDataService {
             
             let newBook = NSManagedObject(entity: entity, insertInto: self.context)
             
-            newBook.setValue(book.title, forKey: "title")
-            newBook.setValue(book.authors, forKey: "authors")
-            newBook.setValue(book.thumbnailURL, forKey: "thumbnailURL")
-            newBook.setValue(book.salePrice, forKey: "salePrice")
-            newBook.setValue(book.contents, forKey: "contents")
+            newBook.setValue(book.title, forKey: BookEntity.Key.title)
+            newBook.setValue(book.authors, forKey: BookEntity.Key.authors)
+            newBook.setValue(book.thumbnailURL, forKey: BookEntity.Key.thumbnailURL)
+            newBook.setValue(book.salePrice, forKey: BookEntity.Key.salePrice)
+            newBook.setValue(book.contents, forKey: BookEntity.Key.contents)
             
             do {
                 try self.context.save()
