@@ -13,6 +13,7 @@ final class SavedBooksViewModel {
     
     let savedBooksSubject = BehaviorSubject(value: [Book]())
     let deleteAllBooksSubject = BehaviorSubject(value: false)
+    let deletebookSubject = BehaviorSubject(value: false)
     
     func fetchSavedBooks() {
         CoreDataService.shared.fetchSavedBooks()
@@ -31,6 +32,16 @@ final class SavedBooksViewModel {
                 self?.deleteAllBooksSubject.onNext(true)
             }, onFailure: { [weak self] error in
                 self?.deleteAllBooksSubject.onError(error)
+            }).disposed(by: disposeBag)
+    }
+    
+    func deleteBook(title: String) {
+        CoreDataService.shared.deleteBook(title: title)
+            .observe(on: MainScheduler.instance)
+            .subscribe(onSuccess: { [weak self] in
+                self?.deletebookSubject.onNext(true)
+            }, onFailure: { [weak self] error in
+                self?.deletebookSubject.onError(error)
             }).disposed(by: disposeBag)
     }
 }

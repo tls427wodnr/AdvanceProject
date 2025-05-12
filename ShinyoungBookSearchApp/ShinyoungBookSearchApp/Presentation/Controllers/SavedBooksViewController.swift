@@ -15,14 +15,13 @@ class SavedBooksViewController: UIViewController {
     private let disposeBag = DisposeBag()
     private let viewModel = SavedBooksViewModel()
     
-    private lazy var savedBooksCollectionView: UICollectionView = {
-        let cv = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
-        cv.register(
-            SearchResultCell.self,
-            forCellWithReuseIdentifier: SearchResultCell.id
-        )
-        cv.dataSource = self
-        return cv
+    private lazy var savedBooksTableView: UITableView = {
+        let tv = UITableView()
+        tv.delegate = self
+        tv.dataSource = self
+        tv.register(SavedBookListCell.self, forCellReuseIdentifier: SavedBookListCell.id)
+        tv.separatorStyle = .none
+        return tv
     }()
 
     override func viewDidLoad() {
@@ -44,7 +43,7 @@ class SavedBooksViewController: UIViewController {
     private func setupViews() {
         [
             savedBooksHeader,
-            savedBooksCollectionView
+            savedBooksTableView
         ].forEach { view.addSubview($0) }
     }
     
@@ -55,7 +54,7 @@ class SavedBooksViewController: UIViewController {
             $0.height.equalTo(44)
         }
         
-        savedBooksCollectionView.snp.makeConstraints {
+        savedBooksTableView.snp.makeConstraints {
             $0.top.equalTo(savedBooksHeader.snp.bottom)
             $0.directionalHorizontalEdges.bottom.equalToSuperview().inset(16)
         }
@@ -74,7 +73,7 @@ class SavedBooksViewController: UIViewController {
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] books in
                 self?.books = books
-                self?.savedBooksCollectionView.reloadData()
+                self?.savedBooksTableView.reloadData()
             }, onError: { error in
                 print(error)
             }).disposed(by: disposeBag)
@@ -84,29 +83,17 @@ class SavedBooksViewController: UIViewController {
             .subscribe(onNext: { [weak self] isDeletedAll in
                 if isDeletedAll {
                     self?.books = []
-                    self?.savedBooksCollectionView.reloadData()
+                    self?.savedBooksTableView.reloadData()
                 }
             }).disposed(by: disposeBag)
-    }
-    
-    private func createLayout() -> UICollectionViewLayout {
-        let itemSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0),
-            heightDimension: .fractionalHeight(1.0)
-        )
-        let item = NSCollectionLayoutItem(layoutSize: itemSize)
         
-        let groupSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0),
-            heightDimension: .estimated(40)
-        )
-        let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
-        
-        let section = NSCollectionLayoutSection(group: group)
-        section.interGroupSpacing = 8
-        section.contentInsets = .init(top: 8, leading: 8, bottom: 8, trailing: 8)
-        
-        return UICollectionViewCompositionalLayout(section: section)
+        viewModel.deletebookSubject
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] isDeleted in
+                if isDeleted {
+                    self?.savedBooksTableView.reloadData()
+                }
+            }).disposed(by: disposeBag)
     }
     
     @objc private func deleteAllBooksButtonDidTap() {
@@ -114,21 +101,41 @@ class SavedBooksViewController: UIViewController {
     }
 }
 
-extension SavedBooksViewController: UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+extension SavedBooksViewController: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return books.count
     }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: SearchResultCell.id,
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(
+            withIdentifier: SavedBookListCell.id,
             for: indexPath
-        ) as? SearchResultCell else {
-            return UICollectionViewCell()
+        ) as? SavedBookListCell else {
+            return UITableViewCell()
         }
-        
+
         cell.configure(with: books[indexPath.row])
         
         return cell
+    }
+}
+
+extension SavedBooksViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath)
+    -> UISwipeActionsConfiguration? {
+        let deleteAction = UIContextualAction(style: .destructive, title: "삭제") { [weak self] _, _, completion in
+            guard let self = self else { return }
+            let book = self.books[indexPath.row]
+            self.viewModel.deleteBook(title: book.title)
+            self.books.remove(at: indexPath.row)
+            savedBooksTableView.deleteRows(at: [indexPath], with: .automatic)
+            completion(true)
+        }
+
+        return UISwipeActionsConfiguration(actions: [deleteAction])
     }
 }

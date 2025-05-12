@@ -95,4 +95,26 @@ final class CoreDataService {
             return Disposables.create()
         }
     }
+    
+    func deleteBook(title: String) -> Single<Void> {
+        return Single.create { observer in
+            let request: NSFetchRequest<BookEntity> = BookEntity.fetchRequest()
+            request.predicate = NSPredicate(format: "title == %@", title)
+            
+            do {
+                let result = try self.context.fetch(request)
+                
+                for data in result as [NSManagedObject] {
+                    self.context.delete(data)
+                }
+                
+                try self.context.save()
+                observer(.success(()))
+            } catch {
+                observer(.failure(CoreDataError.deleteFailed(error)))
+            }
+            
+            return Disposables.create()
+        }
+    }
 }
