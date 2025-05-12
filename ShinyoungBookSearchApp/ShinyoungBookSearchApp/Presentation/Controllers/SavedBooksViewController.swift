@@ -66,6 +66,12 @@ class SavedBooksViewController: UIViewController {
             action: #selector(deleteAllBooksButtonDidTap),
             for: .touchUpInside
         )
+        
+        savedBooksHeader.addButton.addTarget(
+            self,
+            action: #selector(addButtonDidTap),
+            for: .touchUpInside
+        )
     }
     
     private func bindViewModel() {
@@ -100,6 +106,15 @@ class SavedBooksViewController: UIViewController {
     
     @objc private func deleteAllBooksButtonDidTap() {
         viewModel.deleteAllBooks()
+    }
+    
+    @objc private func addButtonDidTap() {
+        tabBarController?.selectedIndex = 0
+        
+        if let searchVC = tabBarController?.viewControllers?.first as? UINavigationController,
+           let bookSearchVC = searchVC.viewControllers.first as? BookSearchViewController {
+            bookSearchVC.focusSearchBar()
+        }
     }
 }
 
@@ -139,3 +154,4 @@ extension SavedBooksViewController: UITableViewDelegate {
         return UISwipeActionsConfiguration(actions: [deleteAction])
     }
 }
+

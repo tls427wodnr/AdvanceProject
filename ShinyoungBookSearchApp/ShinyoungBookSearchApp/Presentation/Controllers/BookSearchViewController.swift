@@ -124,6 +124,10 @@ final class BookSearchViewController: UIViewController, UISearchBarDelegate {
         
         return UICollectionViewCompositionalLayout(section: section)
     }
+    
+    func focusSearchBar() {
+        bookSearchBar.searchBar.becomeFirstResponder()
+    }
 }
 
 extension BookSearchViewController {
