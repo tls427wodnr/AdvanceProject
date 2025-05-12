@@ -16,13 +16,12 @@ class BookDetailBottomSheetViewController: UIViewController {
     private let buttonContainerView = UIView()
     
     private let imageView: UIImageView = {
-        let iv = UIImageView()
-        iv.contentMode = .scaleAspectFit
-        iv.layer.cornerRadius = 8
-        iv.clipsToBounds = true
-        iv.widthAnchor.constraint(equalToConstant: 150).isActive = true
-        iv.heightAnchor.constraint(equalToConstant: 220).isActive = true
-        return iv
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.layer.cornerRadius = 8
+        imageView.clipsToBounds = true
+        imageView.heightAnchor.constraint(equalToConstant: 220).isActive = true
+        return imageView
     }()
     
     private let titleLabel: UILabel = {
