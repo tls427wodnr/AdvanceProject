@@ -121,9 +121,22 @@ final class SearchViewController: UIViewController {
         
         let searchOutput = searchViewModel.transform(input: searchInput)
         
+        let bookSelection = collectionView.rx.itemSelected
+            .withLatestFrom(collectionView.rx.modelSelected(BookItem.self)) { ($0, $1) }
+            .filter { [weak self] indexPath, _ in
+                guard let self = self else { return false }
+                return {
+                    if case .search = self.dataSource[indexPath.section] {
+                        return true
+                    }
+                    return false
+                }()
+            }
+            .map { $0.1 }
+        
         let recentInput = RecentBookListViewModel.Input(
             loadTrigger: .just(()),
-            addBook: collectionView.rx.modelSelected(BookItem.self).asObservable()
+            addBook: bookSelection.asObservable()
         )
         let recentOutput = recentViewModel.transform(input: recentInput)
         
