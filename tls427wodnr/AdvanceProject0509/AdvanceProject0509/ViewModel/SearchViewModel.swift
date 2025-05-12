@@ -11,12 +11,14 @@ import RxCocoa
 
 final class SearchViewModel {
 
-    // MARK: - Input / Output
+    // MARK: - Input
 
     struct Input {
         let query: Observable<String>
     }
 
+    // MARK: - Output
+    
     struct Output {
         let books: Driver<[BookItem]>
         let error: Signal<Error>
