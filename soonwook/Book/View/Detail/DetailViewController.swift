@@ -8,16 +8,34 @@
 import UIKit
 
 class DetailViewController: UIViewController {
+    private let detailView = DetailView()
+    private let viewModel: DetailViewModel
+    
+    init(viewModel: DetailViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func loadView() {
+        view = detailView
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .white
+        bindViewModel()
         
-        navigationItem.title = "Detail"
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .close, target: self, action: #selector(dismissDatailView))
+        viewModel.action?(.onAppear)
     }
     
-    @objc func dismissDatailView() {
-        dismiss(animated: true)
+    private func bindViewModel() {
+        viewModel.bindBook { [weak self] book in
+            guard let self, let book else { return }
+            detailView.configure(with: book)
+        }
     }
 }

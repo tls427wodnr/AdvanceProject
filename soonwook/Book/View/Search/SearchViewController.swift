@@ -104,7 +104,8 @@ extension SearchViewController: UICollectionViewDataSource {
 
 extension SearchViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let viewController = UINavigationController(rootViewController: DetailViewController())
+        let viewModel = DetailViewModel(book: viewModel.state.books[indexPath.item])
+        let viewController = DetailViewController(viewModel: viewModel)
         present(viewController, animated: true)
     }
 }
