@@ -31,7 +31,8 @@ final class SearchViewController: UIViewController {
 
     // MARK: - Properties
 
-    private let viewModel = SearchViewModel()
+    private let searchViewModel = SearchViewModel()
+    private let recentViewModel = RecentBookListViewModel()
     private let disposeBag = DisposeBag()
 
     // MARK: - Lifecycle
@@ -75,15 +76,15 @@ final class SearchViewController: UIViewController {
 
     private func bindViewModel() {
         
-        let input = SearchViewModel.Input(
+        let searchInput = SearchViewModel.Input(
             query: searchBar.rx.text.orEmpty
                 .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
                 .distinctUntilChanged()
         )
 
-        let output = viewModel.transform(input: input)
+        let searchOutput = searchViewModel.transform(input: searchInput)
 
-        output.books
+        searchOutput.books
             .drive(collectionView.rx.items(
                 cellIdentifier: BookCollectionViewCell.identifier,
                 cellType: BookCollectionViewCell.self
@@ -92,7 +93,7 @@ final class SearchViewController: UIViewController {
             }
             .disposed(by: disposeBag)
 
-        output.error
+        searchOutput.error
             .emit(onNext: { [weak self] error in
                 let alert = UIAlertController(
                     title: "에러",

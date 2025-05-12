@@ -31,11 +31,11 @@ final class BookListViewModel {
     private let booksRelay = BehaviorRelay<[BookItem]>(value: [])
     private let errorRelay = PublishRelay<String>()
     private let disposeBag = DisposeBag()
-    private let coreDataManager: CoreDataManager
+    private let coreDataManager: BookDataManager
 
     // MARK: - Init
 
-    init(coreDataManager: CoreDataManager = .shared) {
+    init(coreDataManager: BookDataManager = .shared) {
         self.coreDataManager = coreDataManager
     }
 

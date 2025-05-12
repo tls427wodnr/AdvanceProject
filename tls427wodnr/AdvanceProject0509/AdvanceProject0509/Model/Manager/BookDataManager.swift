@@ -9,9 +9,9 @@ import Foundation
 import CoreData
 import RxSwift
 
-final class CoreDataManager {
+final class BookDataManager {
     
-    static let shared = CoreDataManager()
+    static let shared = BookDataManager()
     
     private let persistentContainer: NSPersistentContainer
     private var context: NSManagedObjectContext {

@@ -27,7 +27,7 @@ final class BookDetailBottomSheetViewModel {
     // MARK: - Properties
 
     private let book: BookItem
-    private let coreDataManager: CoreDataManager
+    private let coreDataManager: BookDataManager
     private let disposeBag = DisposeBag()
 
     private let addedRelay = PublishRelay<Void>()
@@ -35,7 +35,7 @@ final class BookDetailBottomSheetViewModel {
 
     // MARK: - Init
 
-    init(book: BookItem, coreDataManager: CoreDataManager = .shared) {
+    init(book: BookItem, coreDataManager: BookDataManager = .shared) {
         self.book = book
         self.coreDataManager = coreDataManager
     }
