@@ -82,3 +82,4 @@ final class SearchView: UIView {
         }
     }
 }
+

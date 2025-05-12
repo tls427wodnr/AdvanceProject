@@ -81,10 +81,6 @@ final class BookCell: UICollectionViewCell {
     func configure(with book: Book) {
         titleLabel.text = book.title
         publisherLabel.text = book.publisher
-
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        let priceString = formatter.string(from: NSNumber(value: book.price)) ?? "0"
-        priceLabel.text = "\(priceString)원"
+        priceLabel.text = "\(book.price.formattedWithComma())원"
     }
 }
