@@ -96,7 +96,17 @@ final class SearchViewController: UIViewController {
 
         collectionView.rx.modelSelected(BookItem.self)
             .subscribe(onNext: { book in
-                print("선택된 책: \(book.title)")
+                let bottomSheetVC = BookDetailBottomSheetViewController()
+                bottomSheetVC.configure(with: book)
+                bottomSheetVC.modalPresentationStyle = .pageSheet
+
+                if let sheet = bottomSheetVC.sheetPresentationController {
+                    sheet.detents = [.large()]
+                    sheet.selectedDetentIdentifier = .large
+                    sheet.prefersGrabberVisible = true
+                }
+
+                self.present(bottomSheetVC, animated: true, completion: nil)
             })
             .disposed(by: disposeBag)
     }
