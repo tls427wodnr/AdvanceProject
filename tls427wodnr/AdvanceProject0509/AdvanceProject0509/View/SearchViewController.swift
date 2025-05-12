@@ -25,7 +25,7 @@ final class SearchViewController: UIViewController {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = .systemBackground
-        collectionView.register(BookCell.self, forCellWithReuseIdentifier: BookCell.identifier)
+        collectionView.register(BookCollectionViewCell.self, forCellWithReuseIdentifier: BookCollectionViewCell.identifier)
         return collectionView
     }()
 
@@ -75,8 +75,8 @@ final class SearchViewController: UIViewController {
 
         output.books
             .drive(collectionView.rx.items(
-                cellIdentifier: BookCell.identifier,
-                cellType: BookCell.self
+                cellIdentifier: BookCollectionViewCell.identifier,
+                cellType: BookCollectionViewCell.self
             )) { _, item, cell in
                 cell.configure(with: item)
             }

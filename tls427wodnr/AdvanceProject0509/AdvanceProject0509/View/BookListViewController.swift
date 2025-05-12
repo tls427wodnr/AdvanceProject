@@ -41,10 +41,13 @@ class BookListViewController: UIViewController {
         )
         
         let output = viewModel.transform(input: input)
-        
+                
         output.books
-            .drive(tableView.rx.items(cellIdentifier: "Cell")) { index, item, cell in
-                cell.textLabel?.text = "\(item.title) - \(item.author)"
+            .drive(tableView.rx.items(
+                cellIdentifier: BookTableViewCell.identifier,
+                cellType: BookTableViewCell.self
+            )) { _, item, cell in
+                cell.configure(with: item)
             }
             .disposed(by: disposeBag)
         
@@ -76,7 +79,7 @@ class BookListViewController: UIViewController {
             tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
         
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
+        tableView.register(BookTableViewCell.self, forCellReuseIdentifier: BookTableViewCell.identifier)
     }
     
     private func setupNavigationBar() {
