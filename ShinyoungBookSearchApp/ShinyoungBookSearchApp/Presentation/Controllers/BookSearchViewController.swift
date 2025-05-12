@@ -9,11 +9,27 @@ import UIKit
 import SnapKit
 import RxSwift
 
+enum BookSection: Int, CaseIterable {
+    case recent
+    case searchResult
+
+    var headerTitle: String {
+        switch self {
+        case .recent: return "최근 본 책"
+        case .searchResult: return "검색 결과"
+        }
+    }
+}
+
 final class BookSearchViewController: UIViewController, UISearchBarDelegate {
     private let bookSearchBar = BookSearchBar()
     
     private lazy var bookSearchResultCollectionView: UICollectionView = {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
+        cv.register(
+            RecentBookCell.self,
+            forCellWithReuseIdentifier: RecentBookCell.id
+        )
         cv.register(
             SearchResultCell.self,
             forCellWithReuseIdentifier: SearchResultCell.id
@@ -108,35 +124,73 @@ final class BookSearchViewController: UIViewController, UISearchBarDelegate {
         bookSearchBar.setCancelButtonVisible(false)
     }
     
-    private func createLayout() -> UICollectionViewLayout {
-        let itemSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0),
-            heightDimension: .fractionalHeight(1.0)
-        )
-        let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        
-        let groupSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0),
-            heightDimension: .estimated(40)
-        )
-        let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
-        
-        let section = NSCollectionLayoutSection(group: group)
-        section.interGroupSpacing = 8
-        section.contentInsets = .init(top: 8, leading: 8, bottom: 8, trailing: 8)
-        
-        let headerSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0),
-            heightDimension: .estimated(44)
-        )
-        let header = NSCollectionLayoutBoundarySupplementaryItem(
-            layoutSize: headerSize,
-            elementKind: UICollectionView.elementKindSectionHeader,
-            alignment: .top
-        )
-        section.boundarySupplementaryItems = [header]
-        
-        return UICollectionViewCompositionalLayout(section: section)
+    private func createLayout() -> UICollectionViewCompositionalLayout {
+        return UICollectionViewCompositionalLayout { sectionIndex, _ in
+            guard let section = BookSection(rawValue: sectionIndex) else { return nil }
+            
+            switch section {
+            case .recent:
+                let itemSize = NSCollectionLayoutSize(
+                    widthDimension: .absolute(60),
+                    heightDimension: .absolute(60)
+                )
+                let item = NSCollectionLayoutItem(layoutSize: itemSize)
+                
+                let groupSize = NSCollectionLayoutSize(
+                    widthDimension: .estimated(60 * 5),
+                    heightDimension: .absolute(80)
+                )
+                let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+                group.interItemSpacing = .fixed(12)
+                
+                let sectionLayout = NSCollectionLayoutSection(group: group)
+                sectionLayout.orthogonalScrollingBehavior = .continuous
+                sectionLayout.contentInsets = .init(top: 8, leading: 8, bottom: 8, trailing: 8)
+                
+                let headerSize = NSCollectionLayoutSize(
+                    widthDimension: .fractionalWidth(1.0),
+                    heightDimension: .estimated(44)
+                )
+                let header = NSCollectionLayoutBoundarySupplementaryItem(
+                    layoutSize: headerSize,
+                    elementKind: UICollectionView.elementKindSectionHeader,
+                    alignment: .top
+                )
+                sectionLayout.boundarySupplementaryItems = [header]
+                
+                return sectionLayout
+
+            case .searchResult:
+                let itemSize = NSCollectionLayoutSize(
+                    widthDimension: .fractionalWidth(1.0),
+                    heightDimension: .estimated(40)
+                )
+                let item = NSCollectionLayoutItem(layoutSize: itemSize)
+                
+                let groupSize = NSCollectionLayoutSize(
+                    widthDimension: .fractionalWidth(1.0),
+                    heightDimension: .estimated(40)
+                )
+                let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
+                
+                let section = NSCollectionLayoutSection(group: group)
+                section.interGroupSpacing = 8
+                section.contentInsets = .init(top: 8, leading: 8, bottom: 8, trailing: 8)
+                
+                let headerSize = NSCollectionLayoutSize(
+                    widthDimension: .fractionalWidth(1.0),
+                    heightDimension: .estimated(44)
+                )
+                let header = NSCollectionLayoutBoundarySupplementaryItem(
+                    layoutSize: headerSize,
+                    elementKind: UICollectionView.elementKindSectionHeader,
+                    alignment: .top
+                )
+                section.boundarySupplementaryItems = [header]
+                
+                return section
+            }
+        }
     }
     
     func focusSearchBar() {
@@ -158,21 +212,38 @@ extension BookSearchViewController {
 }
 
 extension BookSearchViewController: UICollectionViewDataSource {
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return BookSection.allCases.count
+    }
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return favoriteBooks.count
+        guard let section = BookSection(rawValue: section) else { return 0 }
+        switch section {
+        case .recent: return recentBooks.count
+        case .searchResult: return favoriteBooks.count
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: SearchResultCell.id,
-            for: indexPath
-        ) as? SearchResultCell else {
-            return UICollectionViewCell()
+        guard let section = BookSection(rawValue: indexPath.section) else { return UICollectionViewCell() }
+
+        switch section {
+        case .recent:
+            let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: RecentBookCell.id,
+                for: indexPath
+            ) as! RecentBookCell
+            cell.configure(with: recentBooks[indexPath.item].thumbnailURL)
+            return cell
+
+        case .searchResult:
+            let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: SearchResultCell.id,
+                for: indexPath
+            ) as! SearchResultCell
+            cell.configure(with: favoriteBooks[indexPath.item])
+            return cell
         }
-        
-        cell.configure(with: favoriteBooks[indexPath.row])
-        
-        return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
@@ -188,7 +259,14 @@ extension BookSearchViewController: UICollectionViewDataSource {
             return UICollectionReusableView()
         }
         
-        headerView.titleLabel.text = "검색 결과"
+        if let section = BookSection(rawValue: indexPath.section) {
+            switch section {
+            case .recent:
+                headerView.titleLabel.text = "최근 본 책"
+            case .searchResult:
+                headerView.titleLabel.text = "검색 결과"
+            }
+        }
         
         return headerView
     }
@@ -196,6 +274,12 @@ extension BookSearchViewController: UICollectionViewDataSource {
 
 extension BookSearchViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let section = BookSection(rawValue: indexPath.section) else { return }
+
+        if section == .recent {
+            return
+        }
+        
         let detailVC = BookDetailViewController(book: favoriteBooks[indexPath.item])
         detailVC.modalPresentationStyle = .pageSheet
         detailVC.onDismiss = {
