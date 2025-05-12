@@ -7,4 +7,15 @@
         <attribute name="thumbnailURL" optional="YES" attributeType="String"/>
         <attribute name="title" optional="YES" attributeType="String"/>
     </entity>
+    <entity name="RecentBookEntity" representedClassName="RecentBookEntity" syncable="YES">
+        <attribute name="authors" optional="YES" attributeType="String"/>
+        <attribute name="contents" optional="YES" attributeType="String"/>
+        <attribute name="salePrice" optional="YES" attributeType="String"/>
+        <attribute name="thumbnailURL" optional="YES" attributeType="String"/>
+        <attribute name="title" optional="YES" attributeType="String"/>
+        <attribute name="viewedDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <fetchIndex name="byPropertyIndex">
+            <fetchIndexElement property="viewedDate" type="Binary" order="ascending"/>
+        </fetchIndex>
+    </entity>
 </model>

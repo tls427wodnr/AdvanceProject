@@ -12,6 +12,7 @@ final class BookSearchViewModel {
     private let disposeBag = DisposeBag()
     
     let bookSearchResultsSubject = BehaviorSubject(value: [Book]())
+    let recentBooksSubject = BehaviorSubject(value: [Book]())
     
     private let networkService = NetworkService.shared
     
@@ -28,6 +29,16 @@ final class BookSearchViewModel {
                 self?.bookSearchResultsSubject.onNext(books)
             }, onFailure: { [weak self] error in
                 self?.bookSearchResultsSubject.onError(error)
+            }).disposed(by: disposeBag)
+    }
+    
+    func fetchRecentBooks() {
+        CoreDataService.shared.fetchRecentBooks()
+            .observe(on: MainScheduler.instance)
+            .subscribe(onSuccess: { [weak self] books in
+                self?.recentBooksSubject.onNext(books)
+            }, onFailure: { [weak self] error in
+                self?.recentBooksSubject.onError(error)
             }).disposed(by: disposeBag)
     }
 }

@@ -37,6 +37,7 @@ final class BookDetailViewController: UIViewController {
         bookDetailView.configure(with: book)
         setupActions()
         bindViewModel()
+        viewModel.saveRecentBook(with: book)
     }
     
     private func setupViews() {
@@ -55,7 +56,7 @@ final class BookDetailViewController: UIViewController {
     }
     
     private func bindViewModel() {
-        viewModel.isSavedBookSubject
+        viewModel.isSavedFavoriteBookSubject
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] isSaved in
                 if isSaved {
@@ -75,6 +76,6 @@ final class BookDetailViewController: UIViewController {
     }
     
     @objc private func saveButtonDidTap() {
-        viewModel.saveBook(with: book)
+        viewModel.saveFavoriteBook(with: book)
     }
 }

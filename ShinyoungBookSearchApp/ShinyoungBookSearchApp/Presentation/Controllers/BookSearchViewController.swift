@@ -32,7 +32,8 @@ final class BookSearchViewController: UIViewController, UISearchBarDelegate {
     
     private let disposeBag = DisposeBag()
     
-    private var books = [Book]()
+    private var favoriteBooks = [Book]()
+    private var recentBooks = [Book]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -41,7 +42,11 @@ final class BookSearchViewController: UIViewController, UISearchBarDelegate {
         setupConstraints()
         setupSearchBar()
         setupActions()
-        bind()
+        bindViewModel()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        viewModel.fetchRecentBooks()
     }
     
     private func setupViews() {
@@ -77,11 +82,20 @@ final class BookSearchViewController: UIViewController, UISearchBarDelegate {
         bookSearchBar.cancelButton.addTarget(self, action: #selector(cancelButtonDidTap), for: .touchUpInside)
     }
     
-    private func bind() {
+    private func bindViewModel() {
         viewModel.bookSearchResultsSubject
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] books in
-                self?.books = books
+                self?.favoriteBooks = books
+                self?.bookSearchResultCollectionView.reloadData()
+            }, onError: { error in
+                print(error)
+            }).disposed(by: disposeBag)
+        
+        viewModel.recentBooksSubject
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] books in
+                self?.recentBooks = books
                 self?.bookSearchResultCollectionView.reloadData()
             }, onError: { error in
                 print(error)
@@ -145,7 +159,7 @@ extension BookSearchViewController {
 
 extension BookSearchViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return books.count
+        return favoriteBooks.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -156,7 +170,7 @@ extension BookSearchViewController: UICollectionViewDataSource {
             return UICollectionViewCell()
         }
         
-        cell.configure(with: books[indexPath.row])
+        cell.configure(with: favoriteBooks[indexPath.row])
         
         return cell
     }
@@ -182,7 +196,7 @@ extension BookSearchViewController: UICollectionViewDataSource {
 
 extension BookSearchViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let detailVC = BookDetailViewController(book: books[indexPath.item])
+        let detailVC = BookDetailViewController(book: favoriteBooks[indexPath.item])
         detailVC.modalPresentationStyle = .pageSheet
         detailVC.onDismiss = {
             let alert = UIAlertController(title: "완료", message: "책이 저장되었습니다.", preferredStyle: .alert)

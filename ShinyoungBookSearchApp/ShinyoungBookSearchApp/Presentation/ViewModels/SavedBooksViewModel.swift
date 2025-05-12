@@ -16,7 +16,7 @@ final class SavedBooksViewModel {
     let deletebookSubject = PublishSubject<Int>()
     
     func fetchSavedBooks() {
-        CoreDataService.shared.fetchSavedBooks()
+        CoreDataService.shared.fetchFavoriteBooks()
             .observe(on: MainScheduler.instance)
             .subscribe(onSuccess: { [weak self] books in
                 self?.savedBooksSubject.onNext(books)
