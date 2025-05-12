@@ -89,10 +89,12 @@ class SavedBooksViewController: UIViewController {
         
         viewModel.deletebookSubject
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] isDeleted in
-                if isDeleted {
-                    self?.savedBooksTableView.reloadData()
-                }
+            .subscribe(onNext: { [weak self] index in
+                self?.books.remove(at: index)
+                self?.savedBooksTableView.deleteRows(
+                    at: [IndexPath(row: index, section: 0)],
+                    with: .automatic
+                )
             }).disposed(by: disposeBag)
     }
     
@@ -130,9 +132,7 @@ extension SavedBooksViewController: UITableViewDelegate {
         let deleteAction = UIContextualAction(style: .destructive, title: "삭제") { [weak self] _, _, completion in
             guard let self = self else { return }
             let book = self.books[indexPath.row]
-            self.viewModel.deleteBook(title: book.title)
-            self.books.remove(at: indexPath.row)
-            savedBooksTableView.deleteRows(at: [indexPath], with: .automatic)
+            self.viewModel.deleteBook(index: indexPath.row, title: book.title)
             completion(true)
         }
 
