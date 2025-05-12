@@ -138,14 +138,14 @@ final class BookSearchViewController: UIViewController, UISearchBarDelegate {
                 
                 let groupSize = NSCollectionLayoutSize(
                     widthDimension: .estimated(60 * 5),
-                    heightDimension: .absolute(80)
+                    heightDimension: .absolute(60)
                 )
                 let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-                group.interItemSpacing = .fixed(12)
                 
-                let sectionLayout = NSCollectionLayoutSection(group: group)
-                sectionLayout.orthogonalScrollingBehavior = .continuous
-                sectionLayout.contentInsets = .init(top: 8, leading: 8, bottom: 8, trailing: 8)
+                let section = NSCollectionLayoutSection(group: group)
+                section.orthogonalScrollingBehavior = .continuous
+                section.interGroupSpacing = 8
+                section.contentInsets = .init(top: 12, leading: 8, bottom: 28, trailing: 8)
                 
                 let headerSize = NSCollectionLayoutSize(
                     widthDimension: .fractionalWidth(1.0),
@@ -156,9 +156,10 @@ final class BookSearchViewController: UIViewController, UISearchBarDelegate {
                     elementKind: UICollectionView.elementKindSectionHeader,
                     alignment: .top
                 )
-                sectionLayout.boundarySupplementaryItems = [header]
                 
-                return sectionLayout
+                section.boundarySupplementaryItems = [header]
+                
+                return section
 
             case .searchResult:
                 let itemSize = NSCollectionLayoutSize(
@@ -217,10 +218,10 @@ extension BookSearchViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        guard let section = BookSection(rawValue: section) else { return 0 }
-        switch section {
+        switch BookSection(rawValue: section) {
         case .recent: return recentBooks.count
         case .searchResult: return favoriteBooks.count
+        case .none: return 0
         }
     }
     
