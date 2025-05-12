@@ -65,7 +65,8 @@ private extension MainViewController {
     }
 
     func setStyle() {
-        view.backgroundColor = .systemBackground // TODO: - 트러블슈팅 기록용
+        view.backgroundColor = .systemBackground
+        searchBar.backgroundColor = .systemBackground
         navigationController?.navigationBar.isHidden = true
     }
 
