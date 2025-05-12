@@ -29,7 +29,13 @@ final class SearchViewModel {
     private let booksRelay = BehaviorRelay<[BookItem]>(value: [])
     private let errorRelay = PublishRelay<Error>()
     private let disposeBag = DisposeBag()
-    private let networkManager = NetworkManager.shared
+    private let networkManager: NetworkManager
+    
+    // MARK: - Init
+
+    init(networkManager: NetworkManager = .shared) {
+        self.networkManager = networkManager
+    }
 
     // MARK: - Transform
 

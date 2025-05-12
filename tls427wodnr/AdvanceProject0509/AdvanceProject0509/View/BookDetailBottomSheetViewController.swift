@@ -6,10 +6,16 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 class BookDetailBottomSheetViewController: UIViewController {
     
-    // MARK: - UI
+    // MARK: - Properties
+    
+    private var viewModel: BookDetailBottomSheetViewModel!
+    private let addTrigger = PublishRelay<Void>()
+    private let disposeBag = DisposeBag()
     
     private let scrollView = UIScrollView()
     private let contentStackView = UIStackView()
@@ -84,11 +90,13 @@ class BookDetailBottomSheetViewController: UIViewController {
         view.backgroundColor = .systemBackground
         setupLayout()
         setupButtonActions()
+        bindViewModel()
     }
     
     // MARK: - Configuration
     
     func configure(with item: BookItem) {
+        viewModel = BookDetailBottomSheetViewModel(book: item)
         titleLabel.text = item.title
         authorLabel.text = item.author
         publisherLabel.text = item.publisher
@@ -102,6 +110,27 @@ class BookDetailBottomSheetViewController: UIViewController {
                 }
             }.resume()
         }
+    }
+    
+    // MARK: - Bindings
+    
+    private func bindViewModel() {
+        let input = BookDetailBottomSheetViewModel.Input(addTrigger: addTrigger.asObservable())
+        let output = viewModel.transform(input: input)
+
+        output.added
+            .drive(onNext: { [weak self] in
+                self?.dismiss(animated: true)
+            })
+            .disposed(by: disposeBag)
+
+        output.error
+            .drive(onNext: { [weak self] message in
+                let alert = UIAlertController(title: "에러", message: message, preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "확인", style: .default))
+                self?.present(alert, animated: true)
+            })
+            .disposed(by: disposeBag)
     }
     
     // MARK: - Layout
@@ -171,10 +200,10 @@ class BookDetailBottomSheetViewController: UIViewController {
     }
 
     @objc private func handleCloseTapped() {
-        print("handleCloseTapped")
+        dismiss(animated: true)
     }
 
     @objc private func handleAddTapped() {
-        print("handleAddTapped")
+        addTrigger.accept(())
     }
 }
