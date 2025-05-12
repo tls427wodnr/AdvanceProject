@@ -180,6 +180,11 @@ extension BookSearchViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let detailVC = BookDetailViewController(book: books[indexPath.item])
         detailVC.modalPresentationStyle = .pageSheet
+        detailVC.onDismiss = {
+            let alert = UIAlertController(title: "완료", message: "책이 저장되었습니다.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "확인", style: .default))
+            self.present(alert, animated: true)
+        }
         present(detailVC, animated: true)
     }
 }

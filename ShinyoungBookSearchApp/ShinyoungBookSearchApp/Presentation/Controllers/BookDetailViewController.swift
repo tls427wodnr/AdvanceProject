@@ -7,11 +7,18 @@
 
 import UIKit
 import SnapKit
+import RxSwift
 
 final class BookDetailViewController: UIViewController {
     private let book: Book
     
     private let bookDetailView = BookDetailView()
+    
+    private let viewModel = BookDetailViewModel()
+    
+    private let disposeBag = DisposeBag()
+    
+    var onDismiss: (() -> Void)?
     
     init(book: Book) {
         self.book = book
@@ -29,6 +36,7 @@ final class BookDetailViewController: UIViewController {
         setupConstraints()
         bookDetailView.configure(with: book)
         setupActions()
+        bindViewModel()
     }
     
     private func setupViews() {
@@ -46,11 +54,27 @@ final class BookDetailViewController: UIViewController {
         bookDetailView.saveButton.addTarget(self, action: #selector(saveButtonDidTap), for: .touchUpInside)
     }
     
+    private func bindViewModel() {
+        viewModel.isSavedBookSubject
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] isSaved in
+                if isSaved {
+                    self?.dismiss(animated: true, completion: {
+                        self?.onDismiss?()
+                    })
+                } else {
+                    let alert = UIAlertController(title: "실패", message: "책 저장에 실패했습니다.", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "확인", style: .default))
+                    self?.present(alert, animated: true)
+                }
+            }).disposed(by: disposeBag)
+    }
+    
     @objc private func dismissButtonDidTap() {
         dismiss(animated: true)
     }
     
     @objc private func saveButtonDidTap() {
-        print("saveButton")
+        viewModel.saveBook(with: book)
     }
 }
