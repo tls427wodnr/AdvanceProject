@@ -59,12 +59,23 @@ final class BookDetailViewController: UIViewController {
 
     @objc private func didTapAdd() {
         animateAddButton()
-        view.showToast(message: "장바구니에 담겼습니다")
-        
-        Observable<Int>.timer(.seconds(1), scheduler: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] _ in
-                self?.viewModel.didTapAddBook()
+
+        viewModel.tryAddBook()
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] isNew in
+                guard let self = self else { return }
+                if isNew {
+                    self.view.showToast(message: "장바구니에 담겼습니다")
+                    Observable<Int>.timer(.seconds(1), scheduler: MainScheduler.instance)
+                        .subscribe(onNext: { [weak self] _ in
+                            self?.viewModel.didTapAddBook()
+                        })
+                        .disposed(by: self.disposeBag)
+                } else {
+                    self.view.showToast(message: "이미 담은 책입니다")
+                }
             })
             .disposed(by: disposeBag)
+
     }
 }
