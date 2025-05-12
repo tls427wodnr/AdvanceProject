@@ -40,6 +40,7 @@ final class SearchViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         bindViewModel()
+        bindFocusTrigger()
     }
 
     private func setupUI() {
@@ -62,6 +63,15 @@ final class SearchViewController: UIViewController {
     }
 
     // MARK: - Bindings
+    
+    private func bindFocusTrigger() {
+        SearchFocusEvent.shared.focusTrigger
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] in
+                self?.searchBar.becomeFirstResponder()
+            })
+            .disposed(by: disposeBag)
+    }
 
     private func bindViewModel() {
         

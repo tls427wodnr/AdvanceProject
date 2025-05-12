@@ -25,7 +25,6 @@ class BookListViewController: UIViewController {
         setupNavigationBar()
         setupTableView()
         bindViewModel()
-        loadTrigger.accept(())
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -115,6 +114,9 @@ class BookListViewController: UIViewController {
     }
     
     @objc private func addTapped() {
-        print("addTapped")
+        tabBarController?.selectedIndex = 0
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            SearchFocusEvent.shared.focusTrigger.accept(())
+        }
     }
 }
