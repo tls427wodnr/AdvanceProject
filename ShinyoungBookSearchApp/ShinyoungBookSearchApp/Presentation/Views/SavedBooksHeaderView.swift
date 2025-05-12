@@ -16,7 +16,7 @@ final class SavedBooksHeaderView: UIView {
         return label
     }()
     
-    let allDeleteButton: UIButton = {
+    let deleteAllBooksButton: UIButton = {
         let button = UIButton(type: .system)
         let image = UIImage(systemName: "trash")
         button.setImage(image, for: .normal)
@@ -46,7 +46,7 @@ final class SavedBooksHeaderView: UIView {
     private func setupViews() {
         [
             titleLabel,
-            allDeleteButton,
+            deleteAllBooksButton,
             addButton
         ].forEach { addSubview($0) }
     }
@@ -57,7 +57,7 @@ final class SavedBooksHeaderView: UIView {
             $0.centerY.equalToSuperview()
         }
         
-        allDeleteButton.snp.makeConstraints {
+        deleteAllBooksButton.snp.makeConstraints {
             $0.trailing.equalTo(addButton.snp.leading).offset(-16)
             $0.centerY.equalToSuperview()
         }

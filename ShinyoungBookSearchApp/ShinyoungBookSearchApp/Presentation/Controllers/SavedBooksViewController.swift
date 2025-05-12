@@ -30,6 +30,7 @@ class SavedBooksViewController: UIViewController {
 
         setupViews()
         setupConstraints()
+        setupActions()
         bindViewModel()
         viewModel.fetchSavedBooks()
     }
@@ -60,6 +61,14 @@ class SavedBooksViewController: UIViewController {
         }
     }
     
+    private func setupActions() {
+        savedBooksHeader.deleteAllBooksButton.addTarget(
+            self,
+            action: #selector(deleteAllBooksButtonDidTap),
+            for: .touchUpInside
+        )
+    }
+    
     private func bindViewModel() {
         viewModel.savedBooksSubject
             .observe(on: MainScheduler.instance)
@@ -68,6 +77,15 @@ class SavedBooksViewController: UIViewController {
                 self?.savedBooksCollectionView.reloadData()
             }, onError: { error in
                 print(error)
+            }).disposed(by: disposeBag)
+        
+        viewModel.deleteAllBooksSubject
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] isDeletedAll in
+                if isDeletedAll {
+                    self?.books = []
+                    self?.savedBooksCollectionView.reloadData()
+                }
             }).disposed(by: disposeBag)
     }
     
@@ -90,7 +108,10 @@ class SavedBooksViewController: UIViewController {
         
         return UICollectionViewCompositionalLayout(section: section)
     }
-
+    
+    @objc private func deleteAllBooksButtonDidTap() {
+        viewModel.deleteAllBooks()
+    }
 }
 
 extension SavedBooksViewController: UICollectionViewDataSource {

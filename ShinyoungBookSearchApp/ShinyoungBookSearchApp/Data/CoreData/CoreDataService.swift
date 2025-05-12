@@ -14,6 +14,7 @@ enum CoreDataError: Error {
     case entityNotFound
     case saveFailed(Error)
     case fetchFailed(Error)
+    case deleteFailed(Error)
 }
 
 final class CoreDataService {
@@ -72,6 +73,23 @@ final class CoreDataService {
                 observer(.success(books))
             } catch {
                 observer(.failure(CoreDataError.fetchFailed(error)))
+            }
+            
+            return Disposables.create()
+        }
+    }
+    
+    func deleteAllBooks() -> Single<Void> {
+        return Single.create { observer in
+            let request: NSFetchRequest<NSFetchRequestResult> = BookEntity.fetchRequest()
+            let deleteRequest = NSBatchDeleteRequest(fetchRequest: request)
+            
+            do {
+                try self.context.execute(deleteRequest)
+                try self.context.save()
+                observer(.success(()))
+            } catch {
+                observer(.failure(CoreDataError.deleteFailed(error)))
             }
             
             return Disposables.create()
