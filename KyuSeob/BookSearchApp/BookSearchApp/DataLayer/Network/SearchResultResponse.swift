@@ -27,7 +27,7 @@ struct Meta: Codable {
 struct Document: Codable {
     let title: String
     let contents: String
-    let url: String
+    let thumbnail: String
     let authors: [String]
     let price: Int
 }
