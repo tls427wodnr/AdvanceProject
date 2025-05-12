@@ -121,7 +121,7 @@ private extension MainViewController {
 
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .absolute(100)
+            heightDimension: .absolute(150)
         )
 
         let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
@@ -176,7 +176,9 @@ extension MainViewController: UICollectionViewDataSource {
 
 extension MainViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let detailViewController = BookDetailViewController()
-        self.navigationController?.pushViewController(detailViewController, animated: true)
+        let detailBookViewModel = BookDetailViewModel(book: searchResultBooks[indexPath.item])
+        let detailViewController = BookDetailViewController(bookDetailViewModel: detailBookViewModel)
+        detailViewController.modalPresentationStyle = .pageSheet
+        self.present(detailViewController, animated: true)
     }
 }
