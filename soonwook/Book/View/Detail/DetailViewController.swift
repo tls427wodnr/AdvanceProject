@@ -30,6 +30,8 @@ class DetailViewController: UIViewController {
         bindViewModel()
         
         viewModel.action?(.onAppear)
+        
+        detailView.delegate = self
     }
     
     private func bindViewModel() {
@@ -37,5 +39,16 @@ class DetailViewController: UIViewController {
             guard let self, let book else { return }
             detailView.configure(with: book)
         }
+    }
+}
+
+extension DetailViewController: DetailViewDelegate {
+    func cancelButtonTapped() {
+        dismiss(animated: true)
+    }
+    
+    func addButtonTapped() {
+        viewModel.action?(.addToCart)
+        showAlert(title: "장바구니 담기 완료", message: "선택한 상품이 장바구니에 추가되었습니다.")
     }
 }

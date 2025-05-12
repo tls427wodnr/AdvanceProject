@@ -10,6 +10,7 @@ import Foundation
 final class DetailViewModel: ViewModelProtocol {
     enum Action {
         case onAppear
+        case addToCart
     }
     
     struct State {
@@ -40,6 +41,8 @@ final class DetailViewModel: ViewModelProtocol {
             switch action {
             case .onAppear:
                 state.book = self.book
+            case .addToCart:
+                print("Add to cart: \(book.title)")
             }
         }
     }
