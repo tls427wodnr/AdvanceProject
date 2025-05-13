@@ -29,7 +29,6 @@ class SavedBooksViewController: UIViewController {
 
         setupViews()
         setupConstraints()
-        setupActions()
         bindViewModel()
     }
     
@@ -59,42 +58,30 @@ class SavedBooksViewController: UIViewController {
         }
     }
     
-    private func setupActions() {
-        savedBooksHeader.deleteAllBooksButton.addTarget(
-            self,
-            action: #selector(deleteAllBooksButtonDidTap),
-            for: .touchUpInside
-        )
-        
-        savedBooksHeader.addButton.addTarget(
-            self,
-            action: #selector(addButtonDidTap),
-            for: .touchUpInside
-        )
-    }
-    
     private func bindViewModel() {
-        viewModel.savedBooksSubject
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] books in
+        viewModel.savedBooksDriver
+            .drive(onNext: { [weak self] books in
                 self?.books = books
                 self?.savedBooksTableView.reloadData()
-            }, onError: { error in
-                print(error)
-            }).disposed(by: disposeBag)
-    }
-    
-    @objc private func deleteAllBooksButtonDidTap() {
-        viewModel.deleteAllBooks()
-    }
-    
-    @objc private func addButtonDidTap() {
-        tabBarController?.selectedIndex = 0
+            })
+            .disposed(by: disposeBag)
         
-        if let searchVC = tabBarController?.viewControllers?.first as? UINavigationController,
-           let bookSearchVC = searchVC.viewControllers.first as? BookSearchViewController {
-            bookSearchVC.focusSearchBar()
-        }
+        savedBooksHeader.addButton.rx.tap
+            .bind(onNext: { [weak self] in
+                self?.tabBarController?.selectedIndex = 0
+                
+                if let searchVC = self?.tabBarController?.viewControllers?.first as? UINavigationController,
+                   let bookSearchVC = searchVC.viewControllers.first as? BookSearchViewController {
+                    bookSearchVC.focusSearchBar()
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        savedBooksHeader.deleteAllBooksButton.rx.tap
+            .bind(onNext: { [weak self] in
+                self?.viewModel.deleteAllBooks()
+            })
+            .disposed(by: disposeBag)
     }
 }
 

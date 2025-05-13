@@ -7,11 +7,16 @@
 
 import Foundation
 import RxSwift
+import RxCocoa
 
 final class SavedBooksViewModel {
     private let disposeBag = DisposeBag()
     
     let savedBooksSubject = BehaviorSubject<[Book]>(value: [])
+    
+    var savedBooksDriver: Driver<[Book]> {
+        savedBooksSubject.asDriver(onErrorJustReturn: [])
+    }
     
     func fetchSavedBooks() {
         CoreDataService.shared.fetchFavoriteBooks()
