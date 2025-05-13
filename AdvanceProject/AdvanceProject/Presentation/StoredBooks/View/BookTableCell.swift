@@ -1,8 +1,8 @@
 //
-//  BookCell.swift
+//  BookTableCell.swift
 //  AdvanceProject
 //
-//  Created by 양원식 on 5/11/25.
+//  Created by 양원식 on 5/13/25.
 //
 
 import UIKit
@@ -10,9 +10,9 @@ import SnapKit
 import Then
 import Kingfisher
 
-final class BookCell: UICollectionViewCell {
+final class BookTableCell: UITableViewCell {
     
-    static let identifier = "BookCell"
+    static let identifier = "BookTableCell"
     
     // MARK: - UI Components
 
@@ -30,7 +30,6 @@ final class BookCell: UICollectionViewCell {
         $0.clipsToBounds = true
         $0.layer.cornerRadius = 8
         $0.backgroundColor = .tertiarySystemFill
-        $0.isUserInteractionEnabled = false
     }
 
     private let titleLabel = UILabel().then {
@@ -68,10 +67,11 @@ final class BookCell: UICollectionViewCell {
     }
 
     // MARK: - Init
-
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        self.clipsToBounds = false
+    
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        selectionStyle = .none
+        contentView.clipsToBounds = false
         setupLayout()
     }
 
@@ -80,12 +80,12 @@ final class BookCell: UICollectionViewCell {
     }
 
     // MARK: - Layout
-
+    
     private func setupLayout() {
         contentView.backgroundColor = .systemBackground
         contentView.layer.cornerRadius = 10
         contentView.clipsToBounds = false
-
+        
         textStackView.addArrangedSubview(titleLabel)
 
         let subInfoStack = UIStackView(arrangedSubviews: [publisherLabel, UIView(), priceLabel])
@@ -118,12 +118,13 @@ final class BookCell: UICollectionViewCell {
 
         separatorView.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(12)
+            $0.bottom.equalToSuperview()
             $0.height.equalTo(1)
         }
     }
 
     // MARK: - Configuration
-
+    
     func configure(with book: Book) {
         titleLabel.text = book.title
         publisherLabel.text = book.publisher

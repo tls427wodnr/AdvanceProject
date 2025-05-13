@@ -13,4 +13,5 @@ struct Book {
     let publisher: String
     let url: String
     let price: Int
+    let isbn: String
 }

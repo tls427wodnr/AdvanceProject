@@ -10,13 +10,17 @@ import RxSwift
 
 final class SearchViewController: UIViewController {
 
-    private let mainView = SearchView()
+    // MARK: - UI & Properties
+    private let searchView = SearchView()
     private let viewModel: SearchViewModel
     private let disposeBag = DisposeBag()
     private var books: [Book] = []
+    weak var coordinator: SearchCoordinator?
 
-    init(viewModel: SearchViewModel) {
+    // MARK: - Init
+    init(viewModel: SearchViewModel, coordinator: SearchCoordinator?) {
         self.viewModel = viewModel
+        self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -24,28 +28,50 @@ final class SearchViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
+    // MARK: - Lifecycle
     override func loadView() {
-        view = mainView
+        view = searchView
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        mainView.searchBar.delegate = self
-        mainView.collectionView.dataSource = self
+        setupView()
+        setupNavigation()
         bind()
     }
 
+    // MARK: - Setup
+    private func setupView() {
+        searchView.searchBar.delegate = self
+        searchView.collectionView.delegate = self
+        searchView.collectionView.dataSource = self
+        searchView.collectionView.register(BookCell.self, forCellWithReuseIdentifier: BookCell.identifier)
+    }
+    
+    private func setupNavigation() {
+        title = "책 검색"
+    }
+
+    // MARK: - Bind
     private func bind() {
         viewModel.books
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] books in
                 self?.books = books
-                self?.mainView.collectionView.reloadData()
+                self?.searchView.collectionView.reloadData()
             })
             .disposed(by: disposeBag)
     }
+
+    // MARK: - Public
+    func focusSearchBar() {
+        DispatchQueue.main.async {
+            self.searchView.searchBar.becomeFirstResponder()
+        }
+    }
 }
 
+// MARK: - UISearchBarDelegate
 extension SearchViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         guard let query = searchBar.text, !query.isEmpty else { return }
@@ -54,6 +80,7 @@ extension SearchViewController: UISearchBarDelegate {
     }
 }
 
+// MARK: - UICollectionViewDataSource
 extension SearchViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         books.count
@@ -65,5 +92,13 @@ extension SearchViewController: UICollectionViewDataSource {
         }
         cell.configure(with: books[indexPath.item])
         return cell
+    }
+}
+
+// MARK: - UICollectionViewDelegate
+extension SearchViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let selectedBook = books[indexPath.item]
+        coordinator?.showBookDetail(book: selectedBook)
     }
 }

@@ -28,7 +28,8 @@ struct BookDTO: Decodable {
             contents: contents,
             publisher: publisher,
             url: url,
-            price: price
+            price: price,
+            isbn: isbn
         )
     }
 }

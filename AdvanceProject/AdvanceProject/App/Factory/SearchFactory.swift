@@ -10,10 +10,10 @@ import UIKit
 final class SearchFactory {
     func makeSearchViewController(coordinator: SearchCoordinator) -> SearchViewController {
         let service = BookAPIService()
-        let repository = BookRepositoryImpl(service: BookAPIService())
+        let repository = BookRepositoryImpl(service: service)
         let useCase = DefaultSearchBooksUseCase(repository: repository)
         let viewModel = SearchViewModel(searchBooksUseCase: useCase)
-        return SearchViewController(viewModel: viewModel)
+        return SearchViewController(viewModel: viewModel, coordinator: coordinator)
     }
 }
 

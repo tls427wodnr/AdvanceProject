@@ -33,5 +33,15 @@ final class SearchCoordinator: Coordinator {
         navigationController.setViewControllers([vc], animated: false)
     }
     
+    func showBookDetail(book: Book) {
+        let bookDetailFactory = DefaultBookDetailFactory()
+        let coordinator = BookDetailCoordinator(
+            navigationController: navigationController,
+            factory: bookDetailFactory,
+            book: book
+        )
+        currentCoordinators.append(coordinator)
+        coordinator.start()
+    }
     
 }
