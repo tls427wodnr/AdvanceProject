@@ -16,7 +16,8 @@ extension StoredBooks {
             contents: self.contents ?? "",
             publisher: self.publisher ?? "",
             url: self.url ?? "",
-            price: Int(self.price)
+            price: Int(self.price),
+            isbn: self.isbn ?? ""
         )
     }
 }
