@@ -57,18 +57,24 @@ final class BookDetailViewController: UIViewController {
     }
     
     private func bindViewModel() {
-        viewModel.isSavedFavoriteBookSubject
+        viewModel.favoriteBookSaved
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] isSaved in
-                if isSaved {
-                    self?.dismiss(animated: true, completion: {
-                        self?.onDismiss?()
-                    })
-                } else {
-                    let alert = UIAlertController(title: "실패", message: "책 저장에 실패했습니다.", preferredStyle: .alert)
-                    alert.addAction(UIAlertAction(title: "확인", style: .default))
-                    self?.present(alert, animated: true)
-                }
+            .subscribe(onNext: { [weak self] in
+                self?.dismiss(animated: true, completion: {
+                    self?.onDismiss?()
+                })
+            }).disposed(by: disposeBag)
+        
+        viewModel.favoriteBookSaveFailed
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] error in
+                let alert = UIAlertController(
+                    title: "실패",
+                    message: "책 저장에 실패했습니다.",
+                    preferredStyle: .alert
+                )
+                alert.addAction(UIAlertAction(title: "확인", style: .default))
+                self?.present(alert, animated: true)
             }).disposed(by: disposeBag)
     }
     

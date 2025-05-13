@@ -63,7 +63,6 @@ final class BookSearchViewController: UIViewController, UISearchBarDelegate {
     
     override func viewWillAppear(_ animated: Bool) {
         viewModel.fetchRecentBooks()
-        bookSearchResultCollectionView.reloadData()
     }
     
     private func setupViews() {
@@ -73,8 +72,6 @@ final class BookSearchViewController: UIViewController, UISearchBarDelegate {
             bookSearchBar,
             bookSearchResultCollectionView
         ].forEach { view.addSubview($0) }
-        
-        bookSearchBar.setCancelButtonVisible(false)
     }
     
     private func setupConstraints() {
@@ -205,9 +202,7 @@ final class BookSearchViewController: UIViewController, UISearchBarDelegate {
     func focusSearchBar() {
         bookSearchBar.searchBar.becomeFirstResponder()
     }
-}
-
-extension BookSearchViewController {
+    
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
         bookSearchBar.setCancelButtonVisible(true)
     }
@@ -271,9 +266,9 @@ extension BookSearchViewController: UICollectionViewDataSource {
         if let section = BookSection(rawValue: indexPath.section) {
             switch section {
             case .recent:
-                headerView.titleLabel.text = "최근 본 책"
+                headerView.titleLabel.text = section.headerTitle
             case .searchResult:
-                headerView.titleLabel.text = "검색 결과"
+                headerView.titleLabel.text = section.headerTitle
             }
         }
         
