@@ -120,24 +120,30 @@ final class CoreDataService {
     
     func saveRecent(book: Book) -> Single<Void> {
         return Single.create { observer in
-            guard let entity = NSEntityDescription.entity(
-                forEntityName: RecentBookEntity.className,
-                in: self.context
-            ) else {
-                observer(.failure(CoreDataError.entityNotFound))
-                return Disposables.create()
-            }
-            
-            let newBook = NSManagedObject(entity: entity, insertInto: self.context)
-            
-            newBook.setValue(book.title, forKey: RecentBookEntity.Key.title)
-            newBook.setValue(book.authors, forKey: RecentBookEntity.Key.authors)
-            newBook.setValue(book.thumbnailURL, forKey: RecentBookEntity.Key.thumbnailURL)
-            newBook.setValue(book.salePrice, forKey: RecentBookEntity.Key.salePrice)
-            newBook.setValue(book.contents, forKey: RecentBookEntity.Key.contents)
-            newBook.setValue(Date(), forKey: RecentBookEntity.Key.viewedDate)
+            let request: NSFetchRequest<RecentBookEntity> = RecentBookEntity.fetchRequest()
+            request.predicate = NSPredicate(format: "title == %@", book.title)
             
             do {
+                let existing = try self.context.fetch(request)
+                existing.forEach { self.context.delete($0) }
+                
+                guard let entity = NSEntityDescription.entity(
+                    forEntityName: RecentBookEntity.className,
+                    in: self.context
+                ) else {
+                    observer(.failure(CoreDataError.entityNotFound))
+                    return Disposables.create()
+                }
+                
+                let newBook = NSManagedObject(entity: entity, insertInto: self.context)
+                
+                newBook.setValue(book.title, forKey: RecentBookEntity.Key.title)
+                newBook.setValue(book.authors, forKey: RecentBookEntity.Key.authors)
+                newBook.setValue(book.thumbnailURL, forKey: RecentBookEntity.Key.thumbnailURL)
+                newBook.setValue(book.salePrice, forKey: RecentBookEntity.Key.salePrice)
+                newBook.setValue(book.contents, forKey: RecentBookEntity.Key.contents)
+                newBook.setValue(Date(), forKey: RecentBookEntity.Key.viewedDate)
+                
                 try self.context.save()
                 observer(.success(()))
             } catch {
