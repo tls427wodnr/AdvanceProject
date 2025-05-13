@@ -8,6 +8,13 @@
 import UIKit
 
 final class SectionHeaderView: UICollectionReusableView {
+
+    // MARK: - Identifier
+
+    static let identifier = "SectionHeaderView"
+
+    // MARK: - UI Components
+
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.boldSystemFont(ofSize: 18)
@@ -16,10 +23,25 @@ final class SectionHeaderView: UICollectionReusableView {
         return label
     }()
 
+    // MARK: - Initializers
+
     override init(frame: CGRect) {
         super.init(frame: frame)
-        addSubview(titleLabel)
+        setupViews()
+        setupConstraints()
+    }
 
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    // MARK: - Setup
+
+    private func setupViews() {
+        addSubview(titleLabel)
+    }
+
+    private func setupConstraints() {
         NSLayoutConstraint.activate([
             titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
             titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
@@ -28,9 +50,7 @@ final class SectionHeaderView: UICollectionReusableView {
         ])
     }
 
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+    // MARK: - Configuration
 
     func setTitle(_ text: String) {
         titleLabel.text = text

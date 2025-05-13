@@ -62,9 +62,10 @@ final class BookTableViewCell: UITableViewCell {
         
         NSLayoutConstraint.activate([
             bookImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
+            bookImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
             bookImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            bookImageView.widthAnchor.constraint(equalToConstant: 50),
-            bookImageView.heightAnchor.constraint(equalToConstant: 70),
+            bookImageView.widthAnchor.constraint(equalToConstant: 60),
+            bookImageView.heightAnchor.constraint(equalToConstant: 80),
             
             titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
             titleLabel.leadingAnchor.constraint(equalTo: bookImageView.trailingAnchor, constant: 12),

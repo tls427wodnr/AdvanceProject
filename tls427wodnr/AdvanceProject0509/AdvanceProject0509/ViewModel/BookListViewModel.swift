@@ -45,7 +45,7 @@ final class BookListViewModel {
 
         input.loadTrigger
             .flatMapLatest { [unowned self] in
-                coreDataManager.fetchBooks()
+                return coreDataManager.fetchBooks()
                     .asObservable()
                     .materialize()
             }
@@ -63,7 +63,7 @@ final class BookListViewModel {
 
         input.deleteTrigger
             .flatMapLatest { [unowned self] isbn in
-                coreDataManager.deleteBook(byISBN: isbn)
+                return coreDataManager.deleteBook(byISBN: isbn)
                     .andThen(coreDataManager.fetchBooks())
                     .asObservable()
                     .materialize()
@@ -82,7 +82,7 @@ final class BookListViewModel {
 
         input.deleteAllTrigger
             .flatMapLatest { [unowned self] in
-                coreDataManager.deleteBooks()
+                return coreDataManager.deleteBooks()
                     .andThen(coreDataManager.fetchBooks())
                     .asObservable()
                     .materialize()

@@ -58,7 +58,7 @@ final class SearchViewController: UIViewController {
         configureSupplementaryView: { dataSource, collectionView, kind, indexPath in
             let header = collectionView.dequeueReusableSupplementaryView(
                 ofKind: kind,
-                withReuseIdentifier: "SectionHeaderView",
+                withReuseIdentifier: SectionHeaderView.identifier,
                 for: indexPath
             ) as! SectionHeaderView
             
