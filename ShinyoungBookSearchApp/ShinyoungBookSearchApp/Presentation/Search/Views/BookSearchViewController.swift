@@ -57,7 +57,6 @@ final class BookSearchViewController: UIViewController {
         
         setupViews()
         setupConstraints()
-        setupActions()
         bindViewModel()
     }
     
@@ -86,10 +85,6 @@ final class BookSearchViewController: UIViewController {
             $0.leading.trailing.equalTo(view).inset(16)
             $0.bottom.equalTo(view.safeAreaLayoutGuide)
         }
-    }
-    
-    private func setupActions() {
-        bookSearchBar.cancelButton.addTarget(self, action: #selector(cancelButtonDidTap), for: .touchUpInside)
     }
     
     private func bindViewModel() {
@@ -127,12 +122,14 @@ final class BookSearchViewController: UIViewController {
                 self?.bookSearchBar.setCancelButtonVisible(true)
             })
             .disposed(by: disposeBag)
-    }
-    
-    @objc private func cancelButtonDidTap() {
-        bookSearchBar.searchBar.text = ""
-        bookSearchBar.searchBar.resignFirstResponder()
-        bookSearchBar.setCancelButtonVisible(false)
+        
+        bookSearchBar.cancelButton.rx.tap
+            .bind(onNext: { [weak self] in
+                self?.bookSearchBar.searchBar.text = ""
+                self?.bookSearchBar.searchBar.resignFirstResponder()
+                self?.bookSearchBar.setCancelButtonVisible(false)
+            })
+            .disposed(by: disposeBag)
     }
     
     private func createLayout() -> UICollectionViewCompositionalLayout {
