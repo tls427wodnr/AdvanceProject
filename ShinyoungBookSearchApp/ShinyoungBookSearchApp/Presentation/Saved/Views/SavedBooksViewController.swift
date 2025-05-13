@@ -82,13 +82,6 @@ class SavedBooksViewController: UIViewController {
             }, onError: { error in
                 print(error)
             }).disposed(by: disposeBag)
-        
-        viewModel.deleteAllBooksSubject
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] in
-                self?.books = []
-                self?.savedBooksTableView.reloadData()
-            }).disposed(by: disposeBag)
     }
     
     @objc private func deleteAllBooksButtonDidTap() {
