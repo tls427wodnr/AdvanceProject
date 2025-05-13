@@ -13,6 +13,7 @@ class MainViewModel {
     private let searchBooksUseCase: SearchBooksUseCaseProtocol
 
     let searchResultBooks = PublishRelay<[Book]>()
+    let didFailedEvent = PublishRelay<Error>()
 
     private let disposeBag = DisposeBag()
 
@@ -26,10 +27,11 @@ extension MainViewModel {
         searchBooksUseCase.searchBooks(query: query)
             .observe(on: MainScheduler.instance)
             .subscribe(onSuccess: { [weak self] result in
-                self?.searchResultBooks.accept(result)
+                guard let self else { return }
+                self.searchResultBooks.accept(result)
                 print("검색 결과: \(result)")
             }, onFailure: { error in
-                print("검색 에러: \(error)")
+                self.didFailedEvent.accept(error)
             }).disposed(by: disposeBag)
     }
 }
