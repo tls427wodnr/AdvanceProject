@@ -8,6 +8,7 @@
 import UIKit
 import SnapKit
 import RxSwift
+import RxCocoa
 
 final class BookDetailViewController: UIViewController {
     private let book: Book
@@ -53,7 +54,6 @@ final class BookDetailViewController: UIViewController {
     
     private func setupActions() {
         bookDetailView.dismissButton.addTarget(self, action: #selector(dismissButtonDidTap), for: .touchUpInside)
-        bookDetailView.saveButton.addTarget(self, action: #selector(saveButtonDidTap), for: .touchUpInside)
     }
     
     private func bindViewModel() {
@@ -76,17 +76,21 @@ final class BookDetailViewController: UIViewController {
                 alert.addAction(UIAlertAction(title: "확인", style: .default))
                 self?.present(alert, animated: true)
             }).disposed(by: disposeBag)
+        
+        bookDetailView.saveButton.rx.tap
+            .bind(onNext: { [weak self] in
+                guard let book = self?.book else { return }
+                
+                self?.didSaveBook = true
+                self?.viewModel.saveFavoriteBook(with: book)
+            })
+            .disposed(by: disposeBag)
     }
     
     @objc private func dismissButtonDidTap() {
         self.dismiss(animated: true, completion: {
             self.onDismiss?()
         })
-    }
-    
-    @objc private func saveButtonDidTap() {
-        didSaveBook = true
-        viewModel.saveFavoriteBook(with: book)
     }
     
     func wasBookSaved() -> Bool {
