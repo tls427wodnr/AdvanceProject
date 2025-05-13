@@ -50,10 +50,6 @@ final class BookSearchViewController: UIViewController {
         return cv
     }()
     
-    private let viewModel = BookSearchViewModel()
-    private let disposeBag = DisposeBag()
-    private var currentSectionTypes: [BookSectionType] = []
-    
     let dataSource = RxCollectionViewSectionedReloadDataSource<BookSectionModel>(
         configureCell: { dataSource, collectionView, indexPath, book in
             let sectionType = dataSource.sectionModels[indexPath.section].type
@@ -86,6 +82,10 @@ final class BookSearchViewController: UIViewController {
             return headerView
         }
     )
+    
+    private let viewModel = BookSearchViewModel()
+    private let disposeBag = DisposeBag()
+    private var currentSectionTypes: [BookSectionType] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -124,6 +124,9 @@ final class BookSearchViewController: UIViewController {
     
     private func bindViewModel() {
         viewModel.sectionedBooksDriver
+            .do(onNext: { [weak self] sections in
+                self?.currentSectionTypes = sections.map { $0.type }
+            })
             .drive(bookSearchResultCollectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         
@@ -170,18 +173,13 @@ final class BookSearchViewController: UIViewController {
                 present(detailVC, animated: true)
             })
             .disposed(by: disposeBag)
-        
-        viewModel.sectionedBooksDriver
-            .drive(onNext: { [weak self] sectionModels in
-                self?.currentSectionTypes = sectionModels.map { $0.type}
-            })
-            .disposed(by: disposeBag)
     }
     
     private func createLayout() -> UICollectionViewCompositionalLayout {
         return UICollectionViewCompositionalLayout { [weak self] sectionIndex, _ in
-            guard let sectionType = self?.currentSectionTypes[sectionIndex] else { return nil}
-            
+            guard let sectionType = self?.currentSectionTypes[sectionIndex] else {
+                return nil
+            }
             switch sectionType {
             case .recent:
                 return self?.createRecentSection()
