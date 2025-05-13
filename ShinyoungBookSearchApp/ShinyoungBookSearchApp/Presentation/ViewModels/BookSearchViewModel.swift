@@ -17,8 +17,12 @@ final class BookSearchViewModel {
     private let networkService = NetworkService.shared
     
     func searchBooks(with query: String) {
-        guard let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
-              let url = URL(string: "https://dapi.kakao.com/v3/search/book?query=\(encodedQuery)") else {
+        var components = URLComponents(string: "https://dapi.kakao.com/v3/search/book")
+        components?.queryItems = [
+            URLQueryItem(name: "query", value: query)
+        ]
+        
+        guard let url = components?.url else {
             bookSearchResultsSubject.onError(NetworkError.invalidURL)
             return
         }
