@@ -37,7 +37,6 @@ final class BookDetailViewController: UIViewController {
         setupViews()
         setupConstraints()
         bookDetailView.configure(with: book)
-        setupActions()
         bindViewModel()
         viewModel.saveRecentBook(with: book)
     }
@@ -50,10 +49,6 @@ final class BookDetailViewController: UIViewController {
         bookDetailView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
-    }
-    
-    private func setupActions() {
-        bookDetailView.dismissButton.addTarget(self, action: #selector(dismissButtonDidTap), for: .touchUpInside)
     }
     
     private func bindViewModel() {
@@ -85,12 +80,14 @@ final class BookDetailViewController: UIViewController {
                 self?.viewModel.saveFavoriteBook(with: book)
             })
             .disposed(by: disposeBag)
-    }
-    
-    @objc private func dismissButtonDidTap() {
-        self.dismiss(animated: true, completion: {
-            self.onDismiss?()
-        })
+        
+        bookDetailView.dismissButton.rx.tap
+            .bind(onNext: { [weak self] in
+                self?.dismiss(animated: true, completion: {
+                    self?.onDismiss?()
+                })
+            })
+            .disposed(by: disposeBag)
     }
     
     func wasBookSaved() -> Bool {
