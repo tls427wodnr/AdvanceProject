@@ -20,12 +20,10 @@ enum CoreDataError: Error {
 final class CoreDataService {
     static let shared = CoreDataService()
     
-    private var appDelegate: AppDelegate? {
-        UIApplication.shared.delegate as? AppDelegate
-    }
-    
     var context: NSManagedObjectContext {
-        guard let context = appDelegate?.persistentContainer.viewContext else {
+        guard let context = (
+            UIApplication.shared.delegate as? AppDelegate
+        )?.persistentContainer.viewContext else {
             fatalError("AppDelegate 오류")
         }
         
@@ -36,21 +34,12 @@ final class CoreDataService {
     
     func saveFavorite(book: Book) -> Single<Void> {
         return Single.create { observer in
-            guard let entity = NSEntityDescription.entity(
-                forEntityName: BookEntity.className,
-                in: self.context
-            ) else {
-                observer(.failure(CoreDataError.entityNotFound))
-                return Disposables.create()
-            }
-            
-            let newBook = NSManagedObject(entity: entity, insertInto: self.context)
-            
-            newBook.setValue(book.title, forKey: BookEntity.Key.title)
-            newBook.setValue(book.authors, forKey: BookEntity.Key.authors)
-            newBook.setValue(book.thumbnailURL, forKey: BookEntity.Key.thumbnailURL)
-            newBook.setValue(book.salePrice, forKey: BookEntity.Key.salePrice)
-            newBook.setValue(book.contents, forKey: BookEntity.Key.contents)
+            let newBook = BookEntity(context: self.context)
+            newBook.title = book.title
+            newBook.authors = book.authors
+            newBook.thumbnailURL = book.thumbnailURL
+            newBook.salePrice = book.salePrice
+            newBook.contents = book.contents
             
             do {
                 try self.context.save()
@@ -127,22 +116,13 @@ final class CoreDataService {
                 let existing = try self.context.fetch(request)
                 existing.forEach { self.context.delete($0) }
                 
-                guard let entity = NSEntityDescription.entity(
-                    forEntityName: RecentBookEntity.className,
-                    in: self.context
-                ) else {
-                    observer(.failure(CoreDataError.entityNotFound))
-                    return Disposables.create()
-                }
-                
-                let newBook = NSManagedObject(entity: entity, insertInto: self.context)
-                
-                newBook.setValue(book.title, forKey: RecentBookEntity.Key.title)
-                newBook.setValue(book.authors, forKey: RecentBookEntity.Key.authors)
-                newBook.setValue(book.thumbnailURL, forKey: RecentBookEntity.Key.thumbnailURL)
-                newBook.setValue(book.salePrice, forKey: RecentBookEntity.Key.salePrice)
-                newBook.setValue(book.contents, forKey: RecentBookEntity.Key.contents)
-                newBook.setValue(Date(), forKey: RecentBookEntity.Key.viewedDate)
+                let newBook = RecentBookEntity(context: self.context)
+                newBook.title = book.title
+                newBook.authors = book.authors
+                newBook.thumbnailURL = book.thumbnailURL
+                newBook.salePrice = book.salePrice
+                newBook.contents = book.contents
+                newBook.viewedDate = Date()
                 
                 try self.context.save()
                 observer(.success(()))
@@ -158,7 +138,7 @@ final class CoreDataService {
         return Single.create { observer in
             let request: NSFetchRequest<RecentBookEntity> = RecentBookEntity.fetchRequest()
             
-            let sort = NSSortDescriptor(key: RecentBookEntity.Key.viewedDate, ascending: false)
+            let sort = NSSortDescriptor(key: "viewedDate", ascending: false)
             request.sortDescriptors = [sort]
             
             do {

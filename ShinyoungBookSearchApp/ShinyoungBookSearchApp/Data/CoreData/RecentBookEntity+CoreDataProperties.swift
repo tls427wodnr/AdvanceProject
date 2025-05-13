@@ -25,9 +25,7 @@ extension RecentBookEntity {
 
 }
 
-extension RecentBookEntity : Identifiable {
-
-}
+extension RecentBookEntity : Identifiable {}
 
 extension RecentBookEntity {
     func toDomain() -> Book {

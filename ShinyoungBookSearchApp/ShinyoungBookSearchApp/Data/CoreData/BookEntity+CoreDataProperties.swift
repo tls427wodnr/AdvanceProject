@@ -24,9 +24,7 @@ extension BookEntity {
 
 }
 
-extension BookEntity : Identifiable {
-
-}
+extension BookEntity : Identifiable {}
 
 extension BookEntity {
     func toDomain() -> Book {
