@@ -8,7 +8,7 @@
 import UIKit
 import RxSwift
 
-class SearchResultTableViewCell: UICollectionViewCell {
+class SearchResultCollectionViewCell: UICollectionViewCell {
     static let identifier = "SearchResultTableViewCell"
     private let disposeBag = DisposeBag()
 
@@ -75,13 +75,9 @@ class SearchResultTableViewCell: UICollectionViewCell {
                 print(error)
             }).disposed(by: disposeBag)
     }
-
-    func currentThumbnailImage() -> UIImage? {
-        return thumbnailImageView.image
-    }
 }
 
-private extension SearchResultTableViewCell {
+private extension SearchResultCollectionViewCell {
     func configure() {
         setStyle()
         setHierarchy()
@@ -91,8 +87,15 @@ private extension SearchResultTableViewCell {
 
     func setStyle() {
         contentView.layer.cornerRadius = 10
-        contentView.layer.borderWidth = 1.5
-        contentView.layer.borderColor = UIColor.black.cgColor
+        contentView.backgroundColor = .white // 배경색 추가
+
+        layer.shadowColor = UIColor.black.cgColor
+        layer.shadowOpacity = 0.2
+        layer.shadowOffset = CGSize(width: 0, height: 4)
+        layer.shadowRadius = 6
+        layer.masksToBounds = false
+
+        contentView.clipsToBounds = false
     }
 
     func setHierarchy() {
