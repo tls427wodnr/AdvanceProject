@@ -19,6 +19,7 @@ final class BookDetailViewController: UIViewController {
     private let disposeBag = DisposeBag()
     
     var onDismiss: (() -> Void)?
+    private var didSaveBook = false
     
     init(book: Book) {
         self.book = book
@@ -72,10 +73,17 @@ final class BookDetailViewController: UIViewController {
     }
     
     @objc private func dismissButtonDidTap() {
-        dismiss(animated: true)
+        self.dismiss(animated: true, completion: {
+            self.onDismiss?()
+        })
     }
     
     @objc private func saveButtonDidTap() {
+        didSaveBook = true
         viewModel.saveFavoriteBook(with: book)
+    }
+    
+    func wasBookSaved() -> Bool {
+        return didSaveBook
     }
 }

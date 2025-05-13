@@ -63,6 +63,7 @@ final class BookSearchViewController: UIViewController, UISearchBarDelegate {
     
     override func viewWillAppear(_ animated: Bool) {
         viewModel.fetchRecentBooks()
+        bookSearchResultCollectionView.reloadData()
     }
     
     private func setupViews() {
@@ -290,10 +291,15 @@ extension BookSearchViewController: UICollectionViewDelegate {
         
         let detailVC = BookDetailViewController(book: favoriteBooks[indexPath.item])
         detailVC.modalPresentationStyle = .pageSheet
-        detailVC.onDismiss = {
-            let alert = UIAlertController(title: "완료", message: "책이 저장되었습니다.", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "확인", style: .default))
-            self.present(alert, animated: true)
+        detailVC.onDismiss = { [weak detailVC, weak self] in
+            guard let self else { return }
+            self.viewModel.fetchRecentBooks()
+            
+            if detailVC?.wasBookSaved() == true {
+                let alert = UIAlertController(title: "완료", message: "책이 저장되었습니다.", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "확인", style: .default))
+                self.present(alert, animated: true)
+            }
         }
         present(detailVC, animated: true)
     }
