@@ -31,7 +31,6 @@ class SavedBooksViewController: UIViewController {
         setupConstraints()
         setupActions()
         bindViewModel()
-        viewModel.fetchSavedBooks()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -86,21 +85,9 @@ class SavedBooksViewController: UIViewController {
         
         viewModel.deleteAllBooksSubject
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] isDeletedAll in
-                if isDeletedAll {
-                    self?.books = []
-                    self?.savedBooksTableView.reloadData()
-                }
-            }).disposed(by: disposeBag)
-        
-        viewModel.deletebookSubject
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] index in
-                self?.books.remove(at: index)
-                self?.savedBooksTableView.deleteRows(
-                    at: [IndexPath(row: index, section: 0)],
-                    with: .automatic
-                )
+            .subscribe(onNext: { [weak self] in
+                self?.books = []
+                self?.savedBooksTableView.reloadData()
             }).disposed(by: disposeBag)
     }
     
@@ -146,8 +133,9 @@ extension SavedBooksViewController: UITableViewDelegate {
     -> UISwipeActionsConfiguration? {
         let deleteAction = UIContextualAction(style: .destructive, title: "삭제") { [weak self] _, _, completion in
             guard let self = self else { return }
+            
             let book = self.books[indexPath.row]
-            self.viewModel.deleteBook(index: indexPath.row, title: book.title)
+            self.viewModel.deleteBook(title: book.title)
             completion(true)
         }
 

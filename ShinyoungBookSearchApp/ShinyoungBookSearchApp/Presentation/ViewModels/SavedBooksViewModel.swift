@@ -11,9 +11,8 @@ import RxSwift
 final class SavedBooksViewModel {
     private let disposeBag = DisposeBag()
     
-    let savedBooksSubject = BehaviorSubject(value: [Book]())
-    let deleteAllBooksSubject = BehaviorSubject(value: false)
-    let deletebookSubject = PublishSubject<Int>()
+    let savedBooksSubject = BehaviorSubject<[Book]>(value: [])
+    let deleteAllBooksSubject = PublishSubject<Void>()
     
     func fetchSavedBooks() {
         CoreDataService.shared.fetchFavoriteBooks()
@@ -29,17 +28,18 @@ final class SavedBooksViewModel {
         CoreDataService.shared.deleteAllBooks()
             .observe(on: MainScheduler.instance)
             .subscribe(onSuccess: { [weak self] in
-                self?.deleteAllBooksSubject.onNext(true)
+                self?.deleteAllBooksSubject.onNext(())
+                self?.fetchSavedBooks()
             }, onFailure: { [weak self] error in
                 self?.deleteAllBooksSubject.onError(error)
             }).disposed(by: disposeBag)
     }
     
-    func deleteBook(index: Int, title: String) {
+    func deleteBook(title: String) {
         CoreDataService.shared.deleteBook(title: title)
             .observe(on: MainScheduler.instance)
             .subscribe(onSuccess: { [weak self] in
-                self?.deletebookSubject.onNext(index)
+                self?.fetchSavedBooks()
             }).disposed(by: disposeBag)
     }
 }
