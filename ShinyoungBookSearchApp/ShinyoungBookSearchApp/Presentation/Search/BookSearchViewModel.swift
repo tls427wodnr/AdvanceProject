@@ -19,8 +19,8 @@ final class BookSearchViewModel {
         Observable.combineLatest(recentBooksSubject, bookSearchResultsSubject)
             .map { recent, search in
                 return [
-                    BookSectionModel(header: "최근 본 책", items: recent),
-                    BookSectionModel(header: "검색 결과", items: search)
+                    BookSectionModel(type: .recent, header: "최근 본 책", items: recent),
+                    BookSectionModel(type: .searchResult, header: "검색 결과", items: search)
                 ]
             }
             .asDriver(onErrorJustReturn: [])

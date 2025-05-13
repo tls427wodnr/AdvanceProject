@@ -11,7 +11,13 @@ import RxSwift
 import RxCocoa
 import RxDataSources
 
+enum BookSectionType {
+    case recent
+    case searchResult
+}
+
 struct BookSectionModel {
+    let type: BookSectionType
     var header: String
     var items: [Book]
 }
@@ -20,18 +26,6 @@ extension BookSectionModel: SectionModelType {
     init(original: BookSectionModel, items: [Book]) {
         self = original
         self.items = items
-    }
-}
-
-enum BookSection: Int, CaseIterable {
-    case recent
-    case searchResult
-
-    var headerTitle: String {
-        switch self {
-        case .recent: return "최근 본 책"
-        case .searchResult: return "검색 결과"
-        }
     }
 }
 
@@ -58,10 +52,11 @@ final class BookSearchViewController: UIViewController {
     
     private let viewModel = BookSearchViewModel()
     private let disposeBag = DisposeBag()
+    private var currentSectionTypes: [BookSectionType] = []
     
     let dataSource = RxCollectionViewSectionedReloadDataSource<BookSectionModel>(
         configureCell: { dataSource, collectionView, indexPath, book in
-            let sectionType = BookSection(rawValue: indexPath.section)
+            let sectionType = dataSource.sectionModels[indexPath.section].type
             switch sectionType {
             case .recent:
                 let cell = collectionView.dequeueReusableCell(
@@ -77,8 +72,6 @@ final class BookSearchViewController: UIViewController {
                 ) as! SearchResultCell
                 cell.configure(with: book)
                 return cell
-            default:
-                return UICollectionViewCell()
             }
         },
         configureSupplementaryView: { dataSource, collectionView, kind, indexPath in
@@ -177,17 +170,23 @@ final class BookSearchViewController: UIViewController {
                 present(detailVC, animated: true)
             })
             .disposed(by: disposeBag)
+        
+        viewModel.sectionedBooksDriver
+            .drive(onNext: { [weak self] sectionModels in
+                self?.currentSectionTypes = sectionModels.map { $0.type}
+            })
+            .disposed(by: disposeBag)
     }
     
     private func createLayout() -> UICollectionViewCompositionalLayout {
-        return UICollectionViewCompositionalLayout { sectionIndex, _ in
-            guard let section = BookSection(rawValue: sectionIndex) else { return nil }
+        return UICollectionViewCompositionalLayout { [weak self] sectionIndex, _ in
+            guard let sectionType = self?.currentSectionTypes[sectionIndex] else { return nil}
             
-            switch section {
+            switch sectionType {
             case .recent:
-                return self.createRecentSection()
+                return self?.createRecentSection()
             case .searchResult:
-                return self.createSearchResultSection()
+                return self?.createSearchResultSection()
             }
         }
     }
