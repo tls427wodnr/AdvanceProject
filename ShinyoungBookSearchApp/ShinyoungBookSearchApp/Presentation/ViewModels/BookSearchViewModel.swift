@@ -14,8 +14,6 @@ final class BookSearchViewModel {
     let bookSearchResultsSubject = BehaviorSubject(value: [Book]())
     let recentBooksSubject = BehaviorSubject(value: [Book]())
     
-    private let networkService = NetworkService.shared
-    
     func searchBooks(with query: String) {
         var components = URLComponents(string: "https://dapi.kakao.com/v3/search/book")
         components?.queryItems = [
@@ -27,7 +25,7 @@ final class BookSearchViewModel {
             return
         }
         
-        networkService.fetch(url: url)
+        NetworkService.shared.fetch(url: url)
             .subscribe(onSuccess: { [weak self] (response: BookSearchResponse) in
                 let books = response.documents.map { $0.toDomain() }
                 self?.bookSearchResultsSubject.onNext(books)
