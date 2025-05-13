@@ -30,6 +30,7 @@ final class BookCell: UICollectionViewCell {
         $0.clipsToBounds = true
         $0.layer.cornerRadius = 8
         $0.backgroundColor = .tertiarySystemFill
+        $0.isUserInteractionEnabled = false
     }
 
     private let titleLabel = UILabel().then {
@@ -70,6 +71,7 @@ final class BookCell: UICollectionViewCell {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
+        self.clipsToBounds = false
         setupLayout()
     }
 
@@ -82,7 +84,7 @@ final class BookCell: UICollectionViewCell {
     private func setupLayout() {
         contentView.backgroundColor = .systemBackground
         contentView.layer.cornerRadius = 10
-        contentView.clipsToBounds = true
+        contentView.clipsToBounds = false
 
         textStackView.addArrangedSubview(titleLabel)
 

@@ -23,11 +23,13 @@ final class SearchView: UIView {
         $0.autocapitalizationType = .none
     }
 
-    lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: makeLayout(.compositional)).then {
-        $0.backgroundColor = .systemBackground
-        $0.register(BookCell.self, forCellWithReuseIdentifier: BookCell.identifier)
-        $0.keyboardDismissMode = .onDrag
-    }
+    let collectionView: UICollectionView = {
+        let layout = makeLayout(.compositional)
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.backgroundColor = .systemBackground
+        collectionView.keyboardDismissMode = .onDrag
+        return collectionView
+    }()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -45,7 +47,7 @@ final class SearchView: UIView {
 
         searchBar.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide)
-            $0.leading.trailing.equalToSuperview().inset(16)
+            $0.leading.trailing.equalToSuperview()
         }
 
         collectionView.snp.makeConstraints {
@@ -54,11 +56,11 @@ final class SearchView: UIView {
         }
     }
 
-    private func makeLayout(_ type: LayoutType) -> UICollectionViewLayout {
+    private static func makeLayout(_ type: LayoutType) -> UICollectionViewLayout {
         switch type {
         case .flow:
             let layout = UICollectionViewFlowLayout()
-            layout.itemSize = CGSize(width: UIScreen.main.bounds.width - 32, height: 100)
+            layout.itemSize = CGSize(width: UIScreen.main.bounds.width, height: 100)
             layout.minimumLineSpacing = 12
             layout.sectionInset = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
             return layout
@@ -69,7 +71,7 @@ final class SearchView: UIView {
                 heightDimension: .estimated(100)
             )
             let item = NSCollectionLayoutItem(layoutSize: itemSize)
-            item.contentInsets = NSDirectionalEdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16)
+            item.contentInsets = NSDirectionalEdgeInsets(top: 6, leading: 0, bottom: 6, trailing: 0)
 
             let groupSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
@@ -82,4 +84,5 @@ final class SearchView: UIView {
         }
     }
 }
+
 

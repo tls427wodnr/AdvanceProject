@@ -9,7 +9,7 @@ import UIKit
 import RxSwift
 
 final class BookDetailViewController: UIViewController {
-    private let mainView = BookDetailView()
+    private let bookDetailView = BookDetailView()
     private let viewModel: BookDetailViewModel
     private let disposeBag = DisposeBag()
 
@@ -23,14 +23,14 @@ final class BookDetailViewController: UIViewController {
     }
 
     override func loadView() {
-        view = mainView
+        view = bookDetailView
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        mainView.configure(with: viewModel.book)
-        mainView.addButton.addTarget(self, action: #selector(didTapAdd), for: .touchUpInside)
+        bookDetailView.configure(with: viewModel.book)
+        bookDetailView.addButton.addTarget(self, action: #selector(didTapAdd), for: .touchUpInside)
         setupNavigation()
     }
 
@@ -41,7 +41,7 @@ final class BookDetailViewController: UIViewController {
     }
 
     private func animateAddButton() {
-        let button = mainView.addButton
+        let button = bookDetailView.addButton
         UIView.animate(withDuration: 0.1,
                        animations: {
             button.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)

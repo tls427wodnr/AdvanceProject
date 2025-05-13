@@ -33,5 +33,4 @@ final class StoredBooksCoordinator: Coordinator {
         navigationController.setViewControllers([vc], animated: false)
     }
     
-    
 }

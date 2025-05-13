@@ -8,13 +8,16 @@
 import UIKit
 
 final class BookDetailCoordinator: Coordinator {
-    var navigationController: UINavigationController
+
+    private let navigationController: UINavigationController
     private let factory: BookDetailFactory
-    private var childCoordinators: [Coordinator] = []
+    private let book: Book
 
-    private var book: Book
-
-    init(navigationController: UINavigationController, factory: BookDetailFactory, book: Book) {
+    init(
+        navigationController: UINavigationController,
+        factory: BookDetailFactory,
+        book: Book
+    ) {
         self.navigationController = navigationController
         self.factory = factory
         self.book = book
@@ -23,17 +26,10 @@ final class BookDetailCoordinator: Coordinator {
     func start() {
         let viewController = factory.makeBookDetailViewController(book: book, coordinator: self)
         let nav = UINavigationController(rootViewController: viewController)
-        nav.modalPresentationStyle = .pageSheet
         navigationController.present(nav, animated: true)
     }
 
     func dismiss() {
-        navigationController.presentedViewController?.dismiss(animated: true)
+        navigationController.dismiss(animated: true)
     }
-    
-    func didAddBookToLibrary(_ book: Book) {
-        print("'\(book.title)' 장바구니에 담김")
-        dismiss()
-    }
-
 }

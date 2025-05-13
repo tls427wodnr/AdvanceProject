@@ -18,23 +18,22 @@ final class BookDetailViewModel {
     func didTapClose() {
         coordinator?.dismiss()
     }
-    
-    func didTapAddBook() {
-        CoreDataManager.shared.save(book: book)
-        coordinator?.didAddBookToLibrary(book)
-    }
 
     func tryAddBook() -> Observable<Bool> {
         return Observable.create { observer in
             if CoreDataManager.shared.isBookAlreadyStored(self.book) {
-                observer.onNext(false) // 이미 저장됨
+                observer.onNext(false)
             } else {
                 CoreDataManager.shared.save(book: self.book)
-                observer.onNext(true) // 새로 저장함
+                observer.onNext(true)
             }
             observer.onCompleted()
             return Disposables.create()
         }
     }
 
+    func didTapAddBook() {
+        coordinator?.dismiss()
+    }
 }
+
