@@ -9,6 +9,19 @@ import UIKit
 import SnapKit
 import RxSwift
 import RxCocoa
+import RxDataSources
+
+struct BookSectionModel {
+    var header: String
+    var items: [Book]
+}
+
+extension BookSectionModel: SectionModelType {
+    init(original: BookSectionModel, items: [Book]) {
+        self = original
+        self.items = items
+    }
+}
 
 enum BookSection: Int, CaseIterable {
     case recent
@@ -40,17 +53,46 @@ final class BookSearchViewController: UIViewController {
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
             withReuseIdentifier: SectionHeaderView.id
         )
-        cv.dataSource = self
-        cv.delegate = self
         return cv
     }()
     
     private let viewModel = BookSearchViewModel()
-    
     private let disposeBag = DisposeBag()
     
-    private var favoriteBooks = [Book]()
-    private var recentBooks = [Book]()
+    let dataSource = RxCollectionViewSectionedReloadDataSource<BookSectionModel>(
+        configureCell: { dataSource, collectionView, indexPath, book in
+            let sectionType = BookSection(rawValue: indexPath.section)
+            switch sectionType {
+            case .recent:
+                let cell = collectionView.dequeueReusableCell(
+                    withReuseIdentifier: RecentBookCell.id,
+                    for: indexPath
+                ) as! RecentBookCell
+                cell.configure(with: book.thumbnailURL)
+                return cell
+            case .searchResult:
+                let cell = collectionView.dequeueReusableCell(
+                    withReuseIdentifier: SearchResultCell.id,
+                    for: indexPath
+                ) as! SearchResultCell
+                cell.configure(with: book)
+                return cell
+            default:
+                return UICollectionViewCell()
+            }
+        },
+        configureSupplementaryView: { dataSource, collectionView, kind, indexPath in
+            guard let headerView = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind,
+                withReuseIdentifier: SectionHeaderView.id,
+                for: indexPath
+            ) as? SectionHeaderView else {
+                return UICollectionReusableView()
+            }
+            headerView.titleLabel.text = dataSource.sectionModels[indexPath.section].header
+            return headerView
+        }
+    )
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -88,23 +130,9 @@ final class BookSearchViewController: UIViewController {
     }
     
     private func bindViewModel() {
-        viewModel.bookSearchResultsSubject
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] books in
-                self?.favoriteBooks = books
-                self?.bookSearchResultCollectionView.reloadData()
-            }, onError: { error in
-                print(error)
-            }).disposed(by: disposeBag)
-        
-        viewModel.recentBooksSubject
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] books in
-                self?.recentBooks = books
-                self?.bookSearchResultCollectionView.reloadData()
-            }, onError: { error in
-                print(error)
-            }).disposed(by: disposeBag)
+        viewModel.sectionedBooksDriver
+            .drive(bookSearchResultCollectionView.rx.items(dataSource: dataSource))
+            .disposed(by: disposeBag)
         
         bookSearchBar.searchBar.rx.searchButtonClicked
             .withLatestFrom(bookSearchBar.searchBar.rx.text.orEmpty)
@@ -128,6 +156,25 @@ final class BookSearchViewController: UIViewController {
                 self?.bookSearchBar.searchBar.text = ""
                 self?.bookSearchBar.searchBar.resignFirstResponder()
                 self?.bookSearchBar.setCancelButtonVisible(false)
+            })
+            .disposed(by: disposeBag)
+        
+        bookSearchResultCollectionView.rx
+            .modelSelected(Book.self)
+            .bind(onNext: { [weak self] selectedBook in
+                guard let self else { return }
+                
+                let detailVC = BookDetailViewController(book: selectedBook)
+                detailVC.modalPresentationStyle = .pageSheet
+                detailVC.onDismiss = { [weak detailVC] in
+                    self.viewModel.fetchRecentBooks()
+                    if detailVC?.wasBookSaved() == true {
+                        let alert = UIAlertController(title: "완료", message: "책이 저장되었습니다.", preferredStyle: .alert)
+                        alert.addAction(UIAlertAction(title: "확인", style: .default))
+                        self.present(alert, animated: true)
+                    }
+                }
+                present(detailVC, animated: true)
             })
             .disposed(by: disposeBag)
     }
@@ -211,90 +258,5 @@ final class BookSearchViewController: UIViewController {
     
     func focusSearchBar() {
         bookSearchBar.searchBar.becomeFirstResponder()
-    }
-}
-
-extension BookSearchViewController: UICollectionViewDataSource {
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return BookSection.allCases.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        switch BookSection(rawValue: section) {
-        case .recent: return recentBooks.count
-        case .searchResult: return favoriteBooks.count
-        case .none: return 0
-        }
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let section = BookSection(rawValue: indexPath.section) else { return UICollectionViewCell() }
-
-        switch section {
-        case .recent:
-            let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: RecentBookCell.id,
-                for: indexPath
-            ) as! RecentBookCell
-            cell.configure(with: recentBooks[indexPath.item].thumbnailURL)
-            return cell
-
-        case .searchResult:
-            let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: SearchResultCell.id,
-                for: indexPath
-            ) as! SearchResultCell
-            cell.configure(with: favoriteBooks[indexPath.item])
-            return cell
-        }
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        guard kind == UICollectionView.elementKindSectionHeader else {
-            return UICollectionReusableView()
-        }
-        
-        guard let headerView = collectionView.dequeueReusableSupplementaryView(
-            ofKind: kind,
-            withReuseIdentifier: SectionHeaderView.id,
-            for: indexPath
-        ) as? SectionHeaderView else {
-            return UICollectionReusableView()
-        }
-        
-        if let section = BookSection(rawValue: indexPath.section) {
-            switch section {
-            case .recent:
-                headerView.titleLabel.text = section.headerTitle
-            case .searchResult:
-                headerView.titleLabel.text = section.headerTitle
-            }
-        }
-        
-        return headerView
-    }
-}
-
-extension BookSearchViewController: UICollectionViewDelegate {
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let section = BookSection(rawValue: indexPath.section) else { return }
-
-        if section == .recent {
-            return
-        }
-        
-        let detailVC = BookDetailViewController(book: favoriteBooks[indexPath.item])
-        detailVC.modalPresentationStyle = .pageSheet
-        detailVC.onDismiss = { [weak detailVC, weak self] in
-            guard let self else { return }
-            self.viewModel.fetchRecentBooks()
-            
-            if detailVC?.wasBookSaved() == true {
-                let alert = UIAlertController(title: "완료", message: "책이 저장되었습니다.", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "확인", style: .default))
-                self.present(alert, animated: true)
-            }
-        }
-        present(detailVC, animated: true)
     }
 }

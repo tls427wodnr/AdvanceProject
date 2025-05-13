@@ -7,12 +7,24 @@
 
 import Foundation
 import RxSwift
+import RxCocoa
 
 final class BookSearchViewModel {
     private let disposeBag = DisposeBag()
     
-    let bookSearchResultsSubject = BehaviorSubject(value: [Book]())
-    let recentBooksSubject = BehaviorSubject(value: [Book]())
+    let bookSearchResultsSubject = BehaviorSubject<[Book]>(value: [])
+    let recentBooksSubject = BehaviorSubject<[Book]>(value: [])
+    
+    var sectionedBooksDriver: Driver<[BookSectionModel]> {
+        Observable.combineLatest(recentBooksSubject, bookSearchResultsSubject)
+            .map { recent, search in
+                return [
+                    BookSectionModel(header: "최근 본 책", items: recent),
+                    BookSectionModel(header: "검색 결과", items: search)
+                ]
+            }
+            .asDriver(onErrorJustReturn: [])
+    }
     
     func searchBooks(with query: String) {
         var components = URLComponents(string: "https://dapi.kakao.com/v3/search/book")
