@@ -16,7 +16,9 @@ class CartCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
-        addSubview(stackView)
+        selectionStyle = .none
+        
+        contentView.addSubview(stackView)
         
         stackView.snp.makeConstraints {
             $0.edges.equalToSuperview()
@@ -27,9 +29,16 @@ class CartCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func update(with book: Book) {
-        stackView.titleLabel.text = book.title
-        stackView.authorLabel.text = book.author
-        stackView.priceLabel.text = book.price.wonFormatter()
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        let insets = UIEdgeInsets(top: 4, left: 8, bottom: 4, right: 8)
+        contentView.frame = contentView.frame.inset(by: insets)
+    }
+    
+    func update(with item: CartItem) {
+        stackView.titleLabel.text = item.title
+        stackView.authorLabel.text = item.author
+        stackView.priceLabel.text = item.price.wonFormatter()
     }
 }

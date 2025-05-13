@@ -39,6 +39,10 @@ class DetailViewController: UIViewController {
             guard let self, let book else { return }
             detailView.configure(with: book)
         }
+        
+        viewModel.bindError { [weak self] message in
+            self?.showAlert(title: "오류", message: message)
+        }
     }
 }
 
@@ -49,6 +53,6 @@ extension DetailViewController: DetailViewDelegate {
     
     func addButtonTapped() {
         viewModel.action?(.addToCart)
-        showAlert(title: "장바구니 담기 완료", message: "선택한 상품이 장바구니에 추가되었습니다.")
+        showAlert(title: "완료", message: "장바구니에 추가되었습니다.")
     }
 }

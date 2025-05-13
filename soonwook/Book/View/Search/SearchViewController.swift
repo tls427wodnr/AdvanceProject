@@ -9,7 +9,16 @@ import UIKit
 
 class SearchViewController: UIViewController {
     private let searchView = SearchView()
-    private let viewModel = SearchViewModel()
+    private let viewModel: SearchViewModel
+    
+    init(viewModel: SearchViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func loadView() {
         view = searchView
@@ -90,7 +99,7 @@ extension SearchViewController: UICollectionViewDataSource {
 
 extension SearchViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let viewModel = DetailViewModel(book: viewModel.state.books[indexPath.item])
+        let viewModel = DetailViewModel(book: viewModel.state.books[indexPath.item], cartRepository: viewModel.cartRepository)
         let viewController = DetailViewController(viewModel: viewModel)
         present(viewController, animated: true)
     }

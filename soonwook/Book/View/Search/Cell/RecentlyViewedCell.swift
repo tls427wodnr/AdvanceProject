@@ -24,7 +24,7 @@ class RecentlyViewedCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        addSubview(imageView)
+        contentView.addSubview(imageView)
         
         imageView.snp.makeConstraints {
             $0.edges.equalToSuperview()

@@ -12,6 +12,7 @@ struct BookResponse: Decodable {
 }
 
 struct Book: Decodable {
+    let isbn: String // id로 사용
     let title: String
     let authors: [String]
     let price: Int

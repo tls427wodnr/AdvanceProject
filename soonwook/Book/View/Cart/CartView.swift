@@ -12,6 +12,7 @@ class CartView: UIView {
     let tableView: UITableView = {
         let tableView = UITableView()
         tableView.register(CartCell.self, forCellReuseIdentifier: CartCell.reuseIdentifier)
+        tableView.separatorStyle = .none
         return tableView
     }()
     

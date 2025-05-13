@@ -23,13 +23,16 @@ final class DetailViewModel: ViewModelProtocol {
         var onChange: ((Book?) -> Void)?
     }
     
-    let book: Book
-    
     var action: ((Action) -> Void)?
+    var onError: ((String) -> Void)?
     var state = State()
     
-    init(book: Book) {
+    private let book: Book
+    private let cartRepository: CartRepositoryProtocol
+    
+    init(book: Book, cartRepository: CartRepositoryProtocol) {
         self.book = book
+        self.cartRepository = cartRepository
         
         prepareAction()
     }
@@ -42,12 +45,20 @@ final class DetailViewModel: ViewModelProtocol {
             case .onAppear:
                 state.book = self.book
             case .addToCart:
-                print("Add to cart: \(book.title)")
+                guard !cartRepository.isItemInCart(isbn: book.isbn) else {
+                    onError?("장바구니에 있는 상품입니다.")
+                    return
+                }
+                cartRepository.addToCart(isbn: book.isbn, title: book.title, author: book.author, price: book.price)
             }
         }
     }
     
     func bindBook(_ onChange: @escaping (Book?) -> Void) {
         state.onChange = onChange
+    }
+    
+    func bindError(_ onError: @escaping (String) -> Void) {
+        self.onError = onError
     }
 }

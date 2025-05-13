@@ -42,9 +42,13 @@ final class SearchViewModel: ViewModelProtocol {
     var action: ((Action) -> Void)?
     var state = State()
     
-    private let bookRepository: BookRepositoryProtocol = BookRepository()
+    private let bookRepository: BookRepositoryProtocol
+    let cartRepository: CartRepositoryProtocol
     
-    init() {
+    init(bookRepository: BookRepositoryProtocol, cartRepository: CartRepositoryProtocol) {
+        self.bookRepository = bookRepository
+        self.cartRepository = cartRepository
+        
         prepareAction()
     }
     
