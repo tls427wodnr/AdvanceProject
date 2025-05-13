@@ -50,9 +50,22 @@ class CartViewController: UIViewController {
         }
     }
     
-    @objc func deleteAll() {}
+    @objc func deleteAll() {
+        viewModel.action?(.removeAll)
+    }
     
-    @objc func add() {}
+    @objc func add() {
+        if let tabBarController {
+            tabBarController.selectedIndex = 0
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                if let navigationController = tabBarController.viewControllers?.first as? UINavigationController,
+                   let searchViewController = navigationController.topViewController as? SearchViewController {
+                    searchViewController.searchView.searchBar.becomeFirstResponder()
+                }
+            }
+        }
+    }
 }
 
 extension CartViewController: UITableViewDataSource {
@@ -70,5 +83,15 @@ extension CartViewController: UITableViewDataSource {
 extension CartViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         50
+    }
+    
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let deleteAction = UIContextualAction(style: .destructive, title: "삭제") { [weak self] _, _, completion in
+            guard let self else { return }
+            let item = viewModel.state.items[indexPath.row]
+            viewModel.action?(.removeFromCart(item))
+            completion(true)
+        }
+        return UISwipeActionsConfiguration(actions: [deleteAction])
     }
 }

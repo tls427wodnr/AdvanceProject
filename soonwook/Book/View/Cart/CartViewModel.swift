@@ -10,7 +10,6 @@ import Foundation
 final class CartViewModel: ViewModelProtocol {
     enum Action {
         case onAppear
-        case addToCart(CartItem)
         case removeFromCart(CartItem)
         case removeAll
     }
@@ -42,21 +41,25 @@ final class CartViewModel: ViewModelProtocol {
             
             switch action {
             case .onAppear:
-                let items = cartRepository.fetchCartItems().map { item in
-                    return CartItem(isbn: item.isbn, title: item.title, author: item.author, price: item.price)
-                }
-                state.items = items
-            case .addToCart(let item):
-                cartRepository.addToCart(isbn: item.isbn, title: item.title, author: item.author, price: item.price)
+                fetchCartItems()
             case .removeFromCart(let item):
                 cartRepository.removeCartItem(isbn: item.isbn)
+                state.items.removeAll { $0.isbn == item.isbn }
             case .removeAll:
                 cartRepository.removeAllCartItems()
+                state.items.removeAll()
             }
         }
     }
     
     func bindCartItem(_ onChange: @escaping ([CartItem]) -> Void) {
         state.onChange = onChange
+    }
+    
+    private func fetchCartItems() {
+        let items = cartRepository.fetchCartItems().map { item in
+            return CartItem(isbn: item.isbn, title: item.title, author: item.author, price: item.price)
+        }
+        state.items = items
     }
 }

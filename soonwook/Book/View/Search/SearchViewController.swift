@@ -8,7 +8,7 @@
 import UIKit
 
 class SearchViewController: UIViewController {
-    private let searchView = SearchView()
+    let searchView = SearchView()
     private let viewModel: SearchViewModel
     
     init(viewModel: SearchViewModel) {
