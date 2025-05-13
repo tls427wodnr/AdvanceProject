@@ -11,6 +11,8 @@ class DetailViewController: UIViewController {
     private let detailView = DetailView()
     private let viewModel: DetailViewModel
     
+    var onDismiss: (() -> Void)? // detail view가 닫히면 search view의 '최근 본 책'을 업데이트
+    
     init(viewModel: DetailViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -32,6 +34,10 @@ class DetailViewController: UIViewController {
         viewModel.action?(.onAppear)
         
         detailView.delegate = self
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        onDismiss?()
     }
     
     private func bindViewModel() {

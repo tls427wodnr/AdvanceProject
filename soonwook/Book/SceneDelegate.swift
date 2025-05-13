@@ -23,9 +23,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let bookRepository = BookRepository()
         let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
         let cartRepository = CartRepository(context: context)
+        let historyRepository = HistoryRepository(context: context)
         
         let window = UIWindow(windowScene: windowScene)
-        window.rootViewController = TabBarController(bookRepository: bookRepository, cartRepository: cartRepository)
+        window.rootViewController = TabBarController(bookRepository: bookRepository, cartRepository: cartRepository, historyRepository: historyRepository)
         window.makeKeyAndVisible()
         self.window = window
     }

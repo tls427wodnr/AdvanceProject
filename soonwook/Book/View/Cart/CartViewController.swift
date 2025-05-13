@@ -27,10 +27,7 @@ class CartViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationController?.navigationBar.prefersLargeTitles = true
-        navigationItem.title = "장바구니"
-        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deleteAll))
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(add))
+        setNavigationBar()
         
         cartView.tableView.dataSource = self
         cartView.tableView.delegate = self
@@ -40,6 +37,13 @@ class CartViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         viewModel.action?(.onAppear)
+    }
+    
+    private func setNavigationBar() {
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.title = "장바구니"
+        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deleteAll))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(add))
     }
     
     private func bindViewModel() {
@@ -54,6 +58,7 @@ class CartViewController: UIViewController {
         viewModel.action?(.removeAll)
     }
     
+    // + 버튼 누르면 search view로 이동하고, search bar 포커싱
     @objc func add() {
         if let tabBarController {
             tabBarController.selectedIndex = 0

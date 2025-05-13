@@ -10,10 +10,13 @@ import UIKit
 class TabBarController: UITabBarController {
     let bookRepository: BookRepositoryProtocol
     let cartRepository: CartRepositoryProtocol
+    let historyRepository: HistoryRepositoryProtocol
     
-    init(bookRepository: BookRepositoryProtocol, cartRepository: CartRepositoryProtocol) {
+    init(bookRepository: BookRepositoryProtocol, cartRepository: CartRepositoryProtocol, historyRepository: HistoryRepositoryProtocol) {
         self.bookRepository = bookRepository
         self.cartRepository = cartRepository
+        self.historyRepository = historyRepository
+        
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -24,7 +27,7 @@ class TabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let searchViewModel = SearchViewModel(bookRepository: bookRepository, cartRepository: cartRepository)
+        let searchViewModel = SearchViewModel(bookRepository: bookRepository, cartRepository: cartRepository, historyRepository: historyRepository)
         let searchViewController = UINavigationController(rootViewController: SearchViewController(viewModel: searchViewModel))
         searchViewController.tabBarItem = UITabBarItem(title: "검색", image: UIImage(systemName: "magnifyingglass"), tag: 0)
         
