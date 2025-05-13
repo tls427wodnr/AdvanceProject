@@ -82,6 +82,7 @@ final class BookCollectionViewCell: UICollectionViewCell {
     func configure(with item: BookItem) {
         titleLabel.text = item.title
         authorLabel.text = item.author
+        imageView.image = nil
         
         if let url = URL(string: item.image) {
             URLSession.shared.dataTask(with: url) { data, response, error in

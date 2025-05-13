@@ -82,6 +82,7 @@ final class BookTableViewCell: UITableViewCell {
     func configure(with item: BookItem) {
         titleLabel.text = item.title
         authorLabel.text = item.author
+        bookImageView.image = nil
         
         if let url = URL(string: item.image) {
             URLSession.shared.dataTask(with: url) { data, _, _ in

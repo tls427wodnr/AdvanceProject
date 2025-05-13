@@ -100,6 +100,37 @@ final class SearchViewController: UIViewController {
         ])
     }
     
+    // MARK: - Input Builders
+    
+    private func makeQueryInput() -> Observable<String> {
+        searchBar.rx.text.orEmpty
+            .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
+            .distinctUntilChanged()
+    }
+    
+    private func makeLoadMoreTrigger() -> Observable<Void> {
+        collectionView.rx.contentOffset
+            .observe(on: MainScheduler.instance)
+            .map { [weak self] _ -> Bool in
+                guard let self = self else { return false }
+
+                let visibleIndexPaths = self.collectionView.indexPathsForVisibleItems
+                guard let lastVisible = visibleIndexPaths.sorted().last,
+                      case .search = self.dataSource[lastVisible.section] else {
+                    return false
+                }
+
+                let offsetY = self.collectionView.contentOffset.y
+                let contentHeight = self.collectionView.contentSize.height
+                let frameHeight = self.collectionView.frame.size.height
+
+                return offsetY > (contentHeight - frameHeight - 150)
+            }
+            .distinctUntilChanged()
+            .filter { $0 }
+            .map { _ in () }
+    }
+    
     // MARK: - Bindings
     
     private func bindFocusTrigger() {
@@ -114,9 +145,8 @@ final class SearchViewController: UIViewController {
     private func bindViewModel() {
         
         let searchInput = SearchViewModel.Input(
-            query: searchBar.rx.text.orEmpty
-                .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
-                .distinctUntilChanged()
+            query: makeQueryInput(),
+            loadMoreTrigger: makeLoadMoreTrigger()
         )
         
         let searchOutput = searchViewModel.transform(input: searchInput)
