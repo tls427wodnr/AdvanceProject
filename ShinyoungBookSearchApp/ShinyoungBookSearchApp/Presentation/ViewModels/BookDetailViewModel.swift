@@ -11,8 +11,6 @@ import RxSwift
 final class BookDetailViewModel {
     private let disposeBag = DisposeBag()
     
-    let isSavedRecentBookSubject = BehaviorSubject<Bool>(value: false)
-    
     let favoriteBookSaved = PublishSubject<Void>()
     let favoriteBookSaveFailed = PublishSubject<Error>()
     
@@ -32,12 +30,8 @@ final class BookDetailViewModel {
     
     func saveRecentBook(with book: Book) {
         CoreDataService.shared.saveRecent(book: book)
-            .observe(on: MainScheduler.instance)
-            .subscribe(onSuccess: { [weak self] in
-                self?.isSavedRecentBookSubject.onNext(true)
-            }, onFailure: { [weak self] error in
-                print("CoreData 저장 실패: \(error)")
-                self?.isSavedRecentBookSubject.onError(error)
+            .subscribe(onFailure: { error in
+                    print("최근 본 책 저장 실패: \(error)")
             }).disposed(by: disposeBag)
     }
 }
