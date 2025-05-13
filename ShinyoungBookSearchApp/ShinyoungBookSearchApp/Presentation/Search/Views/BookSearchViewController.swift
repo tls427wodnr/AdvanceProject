@@ -8,6 +8,7 @@
 import UIKit
 import SnapKit
 import RxSwift
+import RxCocoa
 
 enum BookSection: Int, CaseIterable {
     case recent
@@ -21,7 +22,7 @@ enum BookSection: Int, CaseIterable {
     }
 }
 
-final class BookSearchViewController: UIViewController, UISearchBarDelegate {
+final class BookSearchViewController: UIViewController {
     private let bookSearchBar = BookSearchBar()
     
     private lazy var bookSearchResultCollectionView: UICollectionView = {
@@ -56,7 +57,6 @@ final class BookSearchViewController: UIViewController, UISearchBarDelegate {
         
         setupViews()
         setupConstraints()
-        setupSearchBar()
         setupActions()
         bindViewModel()
     }
@@ -88,10 +88,6 @@ final class BookSearchViewController: UIViewController, UISearchBarDelegate {
         }
     }
     
-    private func setupSearchBar() {
-        bookSearchBar.searchBar.delegate = self
-    }
-    
     private func setupActions() {
         bookSearchBar.cancelButton.addTarget(self, action: #selector(cancelButtonDidTap), for: .touchUpInside)
     }
@@ -114,6 +110,23 @@ final class BookSearchViewController: UIViewController, UISearchBarDelegate {
             }, onError: { error in
                 print(error)
             }).disposed(by: disposeBag)
+        
+        bookSearchBar.searchBar.rx.searchButtonClicked
+            .withLatestFrom(bookSearchBar.searchBar.rx.text.orEmpty)
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+            .bind(onNext: { [weak self] query in
+                self?.viewModel.searchBooks(with: query)
+                self?.bookSearchBar.searchBar.resignFirstResponder()
+                self?.bookSearchBar.setCancelButtonVisible(false)
+            })
+            .disposed(by: disposeBag)
+        
+        bookSearchBar.searchBar.rx.textDidBeginEditing
+            .bind(onNext: { [weak self] in
+                self?.bookSearchBar.setCancelButtonVisible(true)
+            })
+            .disposed(by: disposeBag)
     }
     
     @objc private func cancelButtonDidTap() {
@@ -201,17 +214,6 @@ final class BookSearchViewController: UIViewController, UISearchBarDelegate {
     
     func focusSearchBar() {
         bookSearchBar.searchBar.becomeFirstResponder()
-    }
-    
-    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
-        bookSearchBar.setCancelButtonVisible(true)
-    }
-    
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        guard let query = searchBar.text, !query.isEmpty else { return }
-        viewModel.searchBooks(with: query)
-        searchBar.resignFirstResponder()
-        bookSearchBar.setCancelButtonVisible(false)
     }
 }
 
