@@ -96,7 +96,7 @@ class BookDetailBottomSheetViewController: UIViewController {
     // MARK: - Configuration
     
     func configure(with item: BookItem) {
-        viewModel = BookDetailBottomSheetViewModel(book: item)
+        viewModel = BookDetailBottomSheetViewModel(book: item,useCase: LocalBookUseCase(repository: LocalBookRepository()))
         titleLabel.text = item.title
         authorLabel.text = item.author
         publisherLabel.text = item.publisher

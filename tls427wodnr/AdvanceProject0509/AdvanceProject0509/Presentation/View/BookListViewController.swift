@@ -12,7 +12,7 @@ import RxCocoa
 class BookListViewController: UIViewController {
     
     private let tableView = UITableView()
-    private let viewModel = BookListViewModel()
+    private let viewModel = BookListViewModel(useCase: LocalBookUseCase(repository: LocalBookRepository()))
     private let disposeBag = DisposeBag()
     
     // MARK: - Input Relays

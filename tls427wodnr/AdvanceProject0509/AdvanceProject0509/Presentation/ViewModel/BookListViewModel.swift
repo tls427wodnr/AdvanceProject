@@ -31,12 +31,12 @@ final class BookListViewModel {
     private let booksRelay = BehaviorRelay<[BookItem]>(value: [])
     private let errorRelay = PublishRelay<String>()
     private let disposeBag = DisposeBag()
-    private let coreDataManager: BookDataManager
+    private let useCase: LocalBookUseCaseProtocol
 
     // MARK: - Init
 
-    init(coreDataManager: BookDataManager = .shared) {
-        self.coreDataManager = coreDataManager
+    init(useCase: LocalBookUseCaseProtocol) {
+        self.useCase = useCase
     }
 
     // MARK: - Transform
@@ -45,7 +45,7 @@ final class BookListViewModel {
 
         input.loadTrigger
             .flatMapLatest { [unowned self] in
-                return coreDataManager.fetchBooks()
+                useCase.fetchAll()
                     .asObservable()
                     .materialize()
             }
@@ -63,8 +63,8 @@ final class BookListViewModel {
 
         input.deleteTrigger
             .flatMapLatest { [unowned self] isbn in
-                return coreDataManager.deleteBook(byISBN: isbn)
-                    .andThen(coreDataManager.fetchBooks())
+                useCase.delete(isbn: isbn)
+                    .andThen(useCase.fetchAll())
                     .asObservable()
                     .materialize()
             }
@@ -82,8 +82,8 @@ final class BookListViewModel {
 
         input.deleteAllTrigger
             .flatMapLatest { [unowned self] in
-                return coreDataManager.deleteBooks()
-                    .andThen(coreDataManager.fetchBooks())
+                useCase.deleteAll()
+                    .andThen(useCase.fetchAll())
                     .asObservable()
                     .materialize()
             }

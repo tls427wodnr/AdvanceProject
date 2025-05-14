@@ -25,9 +25,9 @@ final class BookDetailBottomSheetViewModel {
     }
 
     // MARK: - Properties
+    private let useCase: LocalBookUseCaseProtocol
 
     private let book: BookItem
-    private let coreDataManager: BookDataManager
     private let disposeBag = DisposeBag()
 
     private let addedRelay = PublishRelay<Void>()
@@ -35,9 +35,9 @@ final class BookDetailBottomSheetViewModel {
 
     // MARK: - Init
 
-    init(book: BookItem, coreDataManager: BookDataManager = .shared) {
+    init(book: BookItem, useCase: LocalBookUseCaseProtocol) {
         self.book = book
-        self.coreDataManager = coreDataManager
+        self.useCase = useCase
     }
 
     // MARK: - Transform
@@ -45,7 +45,7 @@ final class BookDetailBottomSheetViewModel {
     func transform(input: Input) -> Output {
         input.addTrigger
             .flatMapLatest { [unowned self] in
-                coreDataManager.saveBook(book)
+                useCase.save(book)
                     .asObservable()
                     .materialize()
             }

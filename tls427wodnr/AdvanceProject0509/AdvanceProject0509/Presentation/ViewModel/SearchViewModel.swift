@@ -19,27 +19,27 @@ final class SearchViewModel {
     }
 
     // MARK: - Output
-    
+
     struct Output {
         let books: Driver<[BookItem]>
         let error: Signal<Error>
     }
-    
+
     // MARK: - Properties
 
     private let booksRelay = BehaviorRelay<[BookItem]>(value: [])
     private let errorRelay = PublishRelay<Error>()
     private let disposeBag = DisposeBag()
-    private let networkManager: NetworkManager
-    
+    private let fetchBooksUseCase: FetchBooksUseCaseProtocol
+
     private var currentQuery: String = ""
     private var currentPage: Int = 1
     private var isLoading = false
-    
+
     // MARK: - Init
 
-    init(networkManager: NetworkManager = .shared) {
-        self.networkManager = networkManager
+    init(fetchBooksUseCase: FetchBooksUseCaseProtocol) {
+        self.fetchBooksUseCase = fetchBooksUseCase
     }
 
     // MARK: - Transform
@@ -54,16 +54,16 @@ final class SearchViewModel {
             .distinctUntilChanged()
             .flatMapLatest { [weak self] query -> Observable<[BookItem]> in
                 guard let self = self else { return .empty() }
-                
+
                 if query.isEmpty {
                     return .just([])
                 }
-                
-                return self.networkManager.fetchBooksAPI(query: query, start: 1)
+
+                return self.fetchBooksUseCase.execute(query: query, start: 1)
                     .do(
-                         onSubscribe: { [weak self] in self?.isLoading = true },
-                         onDispose: { [weak self] in self?.isLoading = false }
-                     )
+                        onSubscribe: { [weak self] in self?.isLoading = true },
+                        onDispose: { [weak self] in self?.isLoading = false }
+                    )
                     .catch { [weak self] error in
                         self?.errorRelay.accept(error)
                         return .just([])
@@ -71,36 +71,36 @@ final class SearchViewModel {
             }
             .bind(to: booksRelay)
             .disposed(by: disposeBag)
-        
-        input.loadMoreTrigger
-                    .observe(on: MainScheduler.instance)
-                    .filter { [weak self] in
-                        guard let self = self else { return false }
-                        return !self.isLoading && !self.currentQuery.isEmpty
-                    }
-                    .flatMapLatest { [weak self] _ -> Observable<[BookItem]> in
-                        guard let self = self else { return .empty() }
-                        
-                        self.isLoading = true
-                        self.currentPage += 1
-                        let nextPage = 1 + (currentPage - 1) * 30
 
-                        return self.networkManager.fetchBooksAPI(query: self.currentQuery, start: nextPage)
-                            .do(
-                                 onSubscribe: { [weak self] in self?.isLoading = true },
-                                 onDispose: { [weak self] in self?.isLoading = false }
-                             )
-                            .catch { [weak self] error in
-                                self?.errorRelay.accept(error)
-                                return .just([])
-                            }
+        input.loadMoreTrigger
+            .observe(on: MainScheduler.instance)
+            .filter { [weak self] in
+                guard let self = self else { return false }
+                return !self.isLoading && !self.currentQuery.isEmpty
+            }
+            .flatMapLatest { [weak self] _ -> Observable<[BookItem]> in
+                guard let self = self else { return .empty() }
+
+                self.isLoading = true
+                self.currentPage += 1
+                let nextPage = 1 + (self.currentPage - 1) * 30
+
+                return self.fetchBooksUseCase.execute(query: self.currentQuery, start: nextPage)
+                    .do(
+                        onSubscribe: { [weak self] in self?.isLoading = true },
+                        onDispose: { [weak self] in self?.isLoading = false }
+                    )
+                    .catch { [weak self] error in
+                        self?.errorRelay.accept(error)
+                        return .just([])
                     }
-                    .subscribe(onNext: { [weak self] additionalBooks in
-                        guard let self = self else { return }
-                        let combined = self.booksRelay.value + additionalBooks
-                        self.booksRelay.accept(combined)
-                    })
-                    .disposed(by: disposeBag)
+            }
+            .subscribe(onNext: { [weak self] newBooks in
+                guard let self = self else { return }
+                let combined = self.booksRelay.value + newBooks
+                self.booksRelay.accept(combined)
+            })
+            .disposed(by: disposeBag)
 
         return Output(
             books: booksRelay.asDriver(),

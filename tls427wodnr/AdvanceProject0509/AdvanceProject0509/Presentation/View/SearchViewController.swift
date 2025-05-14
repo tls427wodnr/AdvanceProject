@@ -36,7 +36,7 @@ final class SearchViewController: UIViewController {
     
     // MARK: - Properties
     
-    private let searchViewModel = SearchViewModel()
+    private let searchViewModel = SearchViewModel(fetchBooksUseCase: FetchBooksUseCase(repository: BookRepository(networkService: NetworkService())))
     private let recentViewModel = RecentBookListViewModel()
     private let disposeBag = DisposeBag()
     
