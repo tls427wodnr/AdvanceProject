@@ -281,3 +281,10 @@ final class BookSearchViewController: UIViewController {
         bookSearchBar.searchBar.becomeFirstResponder()
     }
 }
+
+extension BookSearchViewController: ScrollToTopCapable {
+    func scrollToTop() {
+        let offset = CGPoint(x: 0, y: -bookSearchResultCollectionView.contentInset.top)
+        bookSearchResultCollectionView.setContentOffset(offset, animated: true)
+    }
+}
