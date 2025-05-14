@@ -29,4 +29,15 @@ extension UIView {
             }
         }
     }
+    
+    func popAnimation(scale: CGFloat = 0.95, duration: TimeInterval = 0.1) {
+            UIView.animate(withDuration: duration,
+                           animations: {
+                self.transform = CGAffineTransform(scaleX: scale, y: scale)
+            }, completion: { _ in
+                UIView.animate(withDuration: duration) {
+                    self.transform = .identity
+                }
+            })
+        }
 }
