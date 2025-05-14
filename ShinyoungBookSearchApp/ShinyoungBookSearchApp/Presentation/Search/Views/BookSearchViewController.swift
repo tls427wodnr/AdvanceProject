@@ -96,6 +96,7 @@ final class BookSearchViewController: UIViewController {
         bindBookSelection()
         bindPagination()
         bindCancelButton()
+        bindErrorMessage()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -202,6 +203,16 @@ final class BookSearchViewController: UIViewController {
                 self?.bookSearchBar.searchBar.text = ""
                 self?.bookSearchBar.searchBar.resignFirstResponder()
                 self?.bookSearchBar.setCancelButtonVisible(false)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func bindErrorMessage() {
+        viewModel.errorMessageRelay
+            .bind(onNext: { [weak self] message in
+                let alert = UIAlertController(title: "에러", message: message, preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "확인", style: .default))
+                self?.present(alert, animated: true)
             })
             .disposed(by: disposeBag)
     }
