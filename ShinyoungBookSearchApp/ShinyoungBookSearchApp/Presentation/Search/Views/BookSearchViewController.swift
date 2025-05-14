@@ -87,7 +87,7 @@ final class BookSearchViewController: UIViewController {
     private let disposeBag = DisposeBag()
     private var currentSectionTypes: [BookSectionType] = []
     
-    private var currentQuery: String = ""
+//    private var currentQuery: String = ""
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -138,8 +138,9 @@ final class BookSearchViewController: UIViewController {
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
             .bind(onNext: { [weak self] query in
-                self?.currentQuery = query
-                self?.viewModel.searchBooks(with: query, isPaging: false)
+//                self?.currentQuery = query
+                self?.viewModel.queryRelay.accept(query)
+                self?.viewModel.searchBooks(isPaging: false)
                 self?.bookSearchBar.searchBar.resignFirstResponder()
                 self?.bookSearchBar.setCancelButtonVisible(false)
             })
@@ -194,7 +195,7 @@ final class BookSearchViewController: UIViewController {
                    self.viewModel.hasNextPage,
                    !self.viewModel.isLoading {
 
-                    self.viewModel.searchBooks(with: self.currentQuery, isPaging: true)
+                    self.viewModel.searchBooks(isPaging: true)
                 }
             })
             .disposed(by: disposeBag)

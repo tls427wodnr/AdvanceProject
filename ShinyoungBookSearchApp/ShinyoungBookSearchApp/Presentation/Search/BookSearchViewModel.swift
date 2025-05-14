@@ -13,6 +13,7 @@ final class BookSearchViewModel {
     private let disposeBag = DisposeBag()
     
     let metaSubject = PublishSubject<Meta>()
+    let queryRelay = BehaviorRelay<String>(value: "")
     let bookSearchResultsSubject = BehaviorSubject<[Book]>(value: [])
     let recentBooksSubject = BehaviorSubject<[Book]>(value: [])
     
@@ -48,8 +49,12 @@ final class BookSearchViewModel {
         return isLoadingRelay.value
     }
     
-    func searchBooks(with query: String, isPaging: Bool = false) {
+    func searchBooks(isPaging: Bool = false) {
+        let query = queryRelay.value.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty else { return }
+        
         isLoadingRelay.accept(true)
+        currentPage = isPaging ? currentPage : 1
         
         var components = URLComponents(string: "https://dapi.kakao.com/v3/search/book")
         components?.queryItems = [
@@ -59,6 +64,7 @@ final class BookSearchViewModel {
         
         guard let url = components?.url else {
             bookSearchResultsSubject.onError(NetworkError.invalidURL)
+            isLoadingRelay.accept(false)
             return
         }
         
@@ -69,11 +75,11 @@ final class BookSearchViewModel {
                 self.isEnd = response.meta?.isEnd ?? true
                 
                 let books = response.documents.map { $0.toDomain() }
+                
                 if isPaging {
                     let current = (try? self.bookSearchResultsSubject.value()) ?? []
                     self.bookSearchResultsSubject.onNext(current + books)
                 } else {
-                    self.currentPage = 1
                     self.bookSearchResultsSubject.onNext(books)
                 }
                 self.currentPage += 1
