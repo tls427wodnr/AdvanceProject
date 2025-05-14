@@ -1,48 +1,47 @@
 //
-//  BookTableViewCell.swift
+//  BookCell.swift
 //  AdvanceProject0509
 //
-//  Created by tlswo on 5/12/25.
+//  Created by tlswo on 5/9/25.
 //
 
 import UIKit
 
-final class BookTableViewCell: UITableViewCell {
+final class SearchCollectionViewCell: UICollectionViewCell {
+    static let identifier = "BookCollectionViewCell"
     
-    static let identifier = "BookTableViewCell"
-    
-    // MARK: - UI Components
+    // MARK: - UI Elements
     
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 2
-        label.font = .systemFont(ofSize: 15)
+        label.font = .systemFont(ofSize: 15, weight: .semibold)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     private let authorLabel: UILabel = {
         let label = UILabel()
-        label.numberOfLines = 2
-        label.font = .systemFont(ofSize: 12)
+        label.numberOfLines = 1
+        label.font = .systemFont(ofSize: 13)
         label.textColor = .gray
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private let bookImageView: UIImageView = {
+    private let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 4
+        imageView.clipsToBounds = true
+        imageView.contentMode = .scaleAspectFill
         return imageView
     }()
     
-    // MARK: - Initializer
+    // MARK: - Init
     
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         contentView.backgroundColor = .secondarySystemBackground
         contentView.layer.cornerRadius = 8
         contentView.clipsToBounds = true
@@ -56,25 +55,24 @@ final class BookTableViewCell: UITableViewCell {
     // MARK: - Layout
     
     private func setupLayout() {
-        contentView.addSubview(bookImageView)
+        contentView.addSubview(imageView)
         contentView.addSubview(titleLabel)
         contentView.addSubview(authorLabel)
         
         NSLayoutConstraint.activate([
-            bookImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
-            bookImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
-            bookImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            bookImageView.widthAnchor.constraint(equalToConstant: 60),
-            bookImageView.heightAnchor.constraint(equalToConstant: 80),
+            imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
+            imageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            imageView.widthAnchor.constraint(equalToConstant: 60),
+            imageView.heightAnchor.constraint(equalToConstant: 80),
             
-            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
-            titleLabel.leadingAnchor.constraint(equalTo: bookImageView.trailingAnchor, constant: 12),
+            titleLabel.topAnchor.constraint(equalTo: imageView.topAnchor),
+            titleLabel.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: 12),
             titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12),
             
             authorLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
             authorLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
             authorLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor),
-            authorLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -12)
+            authorLabel.bottomAnchor.constraint(lessThanOrEqualTo: imageView.bottomAnchor)
         ])
     }
     
@@ -83,13 +81,13 @@ final class BookTableViewCell: UITableViewCell {
     func configure(with item: BookItem) {
         titleLabel.text = item.title
         authorLabel.text = item.author
-        bookImageView.image = nil
+        imageView.image = nil
         
         if let url = URL(string: item.image) {
-            URLSession.shared.dataTask(with: url) { data, _, _ in
+            URLSession.shared.dataTask(with: url) { data, response, error in
                 if let data = data, let image = UIImage(data: data) {
                     DispatchQueue.main.async {
-                        self.bookImageView.image = image
+                        self.imageView.image = image
                     }
                 }
             }.resume()

@@ -43,8 +43,10 @@ class BookListViewController: UIViewController {
                 
         output.books
             .drive(tableView.rx.items(
-                cellIdentifier: BookTableViewCell.identifier,
-                cellType: BookTableViewCell.self
+                cellIdentifier: BookListTableViewCell
+.identifier,
+                cellType: BookListTableViewCell
+.self
             )) { _, item, cell in
                 cell.configure(with: item)
             }
@@ -78,7 +80,9 @@ class BookListViewController: UIViewController {
             tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
         
-        tableView.register(BookTableViewCell.self, forCellReuseIdentifier: BookTableViewCell.identifier)
+        tableView.register(BookListTableViewCell
+.self, forCellReuseIdentifier: BookListTableViewCell
+.identifier)
     }
     
     private func setupNavigationBar() {
