@@ -29,7 +29,9 @@ class SavedBooksViewController: UIViewController {
 
         setupViews()
         setupConstraints()
-        bindViewModel()
+        bindSavedBooks()
+        bindAddButton()
+        bindDeleteAllButton()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -58,14 +60,16 @@ class SavedBooksViewController: UIViewController {
         }
     }
     
-    private func bindViewModel() {
+    private func bindSavedBooks() {
         viewModel.savedBooksDriver
             .drive(onNext: { [weak self] books in
                 self?.books = books
                 self?.savedBooksTableView.reloadData()
             })
             .disposed(by: disposeBag)
-        
+    }
+    
+    private func bindAddButton() {
         savedBooksHeader.addButton.rx.tap
             .bind(onNext: { [weak self] in
                 self?.tabBarController?.selectedIndex = 0
@@ -76,7 +80,9 @@ class SavedBooksViewController: UIViewController {
                 }
             })
             .disposed(by: disposeBag)
-        
+    }
+    
+    private func bindDeleteAllButton() {
         savedBooksHeader.deleteAllBooksButton.rx.tap
             .bind(onNext: { [weak self] in
                 self?.viewModel.deleteAllBooks()
