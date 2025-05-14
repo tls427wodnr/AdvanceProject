@@ -55,20 +55,10 @@ final class CoreDataStorage: CoreDataStorageProtocol {
         } catch {
             throw CoreDataError.deleteError(error)
         }
-        do {
-            try saveContext(context)
-        } catch {
-            throw CoreDataError.saveError(error)
-        }
     }
 
     func delete(_ object: NSManagedObject, in context: NSManagedObjectContext) throws {
         context.delete(object)
-        do {
-            try saveContext(context)
-        } catch {
-            throw CoreDataError.saveError(error)
-        }
     }
 
 }
