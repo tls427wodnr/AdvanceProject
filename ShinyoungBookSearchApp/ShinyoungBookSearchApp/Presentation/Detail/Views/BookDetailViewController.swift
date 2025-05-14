@@ -40,7 +40,7 @@ final class BookDetailViewController: UIViewController, UIAdaptivePresentationCo
         viewModel.saveRecentBook(with: book)
         self.presentationController?.delegate = self
         bindFavoriteSaveResult()
-        bindDismissButtons()
+        bindButtons()
     }
     
     private func setupViews() {
@@ -73,7 +73,9 @@ final class BookDetailViewController: UIViewController, UIAdaptivePresentationCo
                 alert.addAction(UIAlertAction(title: "확인", style: .default))
                 self?.present(alert, animated: true)
             }).disposed(by: disposeBag)
-        
+    }
+    
+    private func bindButtons() {
         bookDetailView.saveButton.rx.tap
             .bind(onNext: { [weak self] in
                 guard let book = self?.book else { return }
@@ -82,9 +84,7 @@ final class BookDetailViewController: UIViewController, UIAdaptivePresentationCo
                 self?.viewModel.saveFavoriteBook(with: book)
             })
             .disposed(by: disposeBag)
-    }
-    
-    private func bindDismissButtons() {
+        
         bookDetailView.dismissButton.rx.tap
             .bind(onNext: { [weak self] in
                 self?.dismiss(animated: true, completion: {
