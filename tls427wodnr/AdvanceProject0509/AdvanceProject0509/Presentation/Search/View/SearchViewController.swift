@@ -10,6 +10,10 @@ import RxSwift
 import RxCocoa
 import RxDataSources
 
+protocol SearchViewControllerDelegate: AnyObject {
+    func searchViewController(_ viewController: UIViewController, didSelect book: BookItem)
+}
+
 final class SearchViewController: UIViewController {
     
     // MARK: - UI
@@ -35,6 +39,8 @@ final class SearchViewController: UIViewController {
     }()
     
     // MARK: - Properties
+    
+    weak var delegate: SearchViewControllerDelegate?
     
     private let searchViewModel: SearchViewModelProtocol
     private let recentViewModel: RecentBookListViewModelProtocol
@@ -207,18 +213,9 @@ final class SearchViewController: UIViewController {
             .disposed(by: disposeBag)
         
         collectionView.rx.modelSelected(BookItem.self)
-            .subscribe(onNext: { book in
-                let bottomSheetVC = BookDetailBottomSheetViewController()
-                bottomSheetVC.configure(with: book)
-                bottomSheetVC.modalPresentationStyle = .pageSheet
-                
-                if let sheet = bottomSheetVC.sheetPresentationController {
-                    sheet.detents = [.large()]
-                    sheet.selectedDetentIdentifier = .large
-                    sheet.prefersGrabberVisible = true
-                }
-                
-                self.present(bottomSheetVC, animated: true, completion: nil)
+            .subscribe(onNext: { [weak self] book in
+                guard let self = self else { return }
+                self.delegate?.searchViewController(self, didSelect: book)
             })
             .disposed(by: disposeBag)
     }

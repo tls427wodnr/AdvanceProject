@@ -20,6 +20,8 @@ class BookListViewController: UIViewController {
     private let deleteTrigger = PublishRelay<String>()
     private let deleteAllTrigger = PublishRelay<Void>()
     
+    // MARK: - Lifecycle
+    
     init(viewModel: BookListViewModelProtocol) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -40,6 +42,8 @@ class BookListViewController: UIViewController {
         super.viewWillAppear(animated)
         loadTrigger.accept(())
     }
+    
+    // MARK: - Bindings
     
     private func bindViewModel() {
         let input = BookListViewModelInput(
@@ -76,6 +80,8 @@ class BookListViewController: UIViewController {
             })
             .disposed(by: disposeBag)
     }
+    
+    // MARK: - Layout
     
     private func setupTableView() {
         view.backgroundColor = .white

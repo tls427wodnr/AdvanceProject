@@ -13,7 +13,7 @@ class BookDetailBottomSheetViewController: UIViewController {
     
     // MARK: - Properties
     
-    private var viewModel: BookDetailBottomSheetViewModel!
+    private var viewModel: BookDetailBottomSheetViewModelProtocol
     private let addTrigger = PublishRelay<Void>()
     private let disposeBag = DisposeBag()
     
@@ -85,6 +85,15 @@ class BookDetailBottomSheetViewController: UIViewController {
     
     // MARK: - Lifecycle
     
+    init(viewModel: BookDetailBottomSheetViewModelProtocol) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
@@ -96,7 +105,6 @@ class BookDetailBottomSheetViewController: UIViewController {
     // MARK: - Configuration
     
     func configure(with item: BookItem) {
-        viewModel = BookDetailBottomSheetViewModel(book: item,useCase: LocalBookUseCase(repository: LocalBookRepository()))
         titleLabel.text = item.title
         authorLabel.text = item.author
         publisherLabel.text = item.publisher
