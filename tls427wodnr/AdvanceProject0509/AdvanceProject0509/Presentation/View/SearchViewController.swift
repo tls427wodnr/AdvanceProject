@@ -37,7 +37,7 @@ final class SearchViewController: UIViewController {
     // MARK: - Properties
     
     private let searchViewModel = SearchViewModel(fetchBooksUseCase: FetchBooksUseCase(repository: BookRepository(networkService: NetworkService())))
-    private let recentViewModel = RecentBookListViewModel()
+    private let recentViewModel = RecentBookListViewModel(useCase: LocalRecentBookUseCase(repository: LocalRecentBookRepository()))
     private let disposeBag = DisposeBag()
     
     private lazy var dataSource = RxCollectionViewSectionedReloadDataSource<BookSection>(

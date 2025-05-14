@@ -1,16 +1,14 @@
 //
-//  RecentBookManager.swift
+//  LocalRecentBookRepository.swift
 //  AdvanceProject0509
 //
-//  Created by tlswo on 5/12/25.
+//  Created by tlswo on 5/14/25.
 //
 
 import Foundation
 import RxSwift
 
-final class RecentBookDataManager {
-    
-    static let shared = RecentBookDataManager()
+final class LocalRecentBookRepository: LocalRecentBookRepositoryProtocol {
     
     private let key = "recentBooks"
     private let maxCount = 10
