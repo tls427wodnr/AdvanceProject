@@ -12,14 +12,10 @@ import RxCocoa
 final class BookSearchViewModel {
     private let disposeBag = DisposeBag()
     
-    let metaSubject = PublishSubject<Meta>()
     let queryRelay = BehaviorRelay<String>(value: "")
+    
     let bookSearchResultsSubject = BehaviorSubject<[Book]>(value: [])
     let recentBooksSubject = BehaviorSubject<[Book]>(value: [])
-    
-    var metaDriver: Driver<Meta> {
-        metaSubject.asDriver(onErrorDriveWith: .empty())
-    }
     
     var sectionedBooksDriver: Driver<[BookSectionModel]> {
         Observable.combineLatest(recentBooksSubject, bookSearchResultsSubject)
@@ -34,17 +30,14 @@ final class BookSearchViewModel {
     
     private var currentPage = 1
     private var isEnd = false
-    
     var hasNextPage: Bool {
         return !isEnd
     }
     
     let isLoadingRelay = BehaviorRelay<Bool>(value: false)
-    
     var isLoadingDriver: Driver<Bool> {
         isLoadingRelay.asDriver()
-    }
-    
+    }    
     var isLoading: Bool {
         return isLoadingRelay.value
     }
