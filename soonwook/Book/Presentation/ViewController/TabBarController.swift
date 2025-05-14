@@ -8,14 +8,14 @@
 import UIKit
 
 class TabBarController: UITabBarController {
-    let bookRepository: BookRepositoryProtocol
-    let cartRepository: CartRepositoryProtocol
-    let historyRepository: HistoryRepositoryProtocol
+    let bookUseCase: BookUseCaseProtocol
+    let cartItemUseCase: CartItemUseCaseProtocol
+    let historyUseCase: HistoryUseCaseProtocol
     
-    init(bookRepository: BookRepositoryProtocol, cartRepository: CartRepositoryProtocol, historyRepository: HistoryRepositoryProtocol) {
-        self.bookRepository = bookRepository
-        self.cartRepository = cartRepository
-        self.historyRepository = historyRepository
+    init(bookUseCase: BookUseCaseProtocol, cartItemUseCase: CartItemUseCaseProtocol, historyUseCase: HistoryUseCaseProtocol) {
+        self.bookUseCase = bookUseCase
+        self.cartItemUseCase = cartItemUseCase
+        self.historyUseCase = historyUseCase
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -27,11 +27,11 @@ class TabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let searchViewModel = SearchViewModel(bookRepository: bookRepository, cartRepository: cartRepository, historyRepository: historyRepository)
+        let searchViewModel = SearchViewModel(bookUseCase: bookUseCase, cartItemUseCase: cartItemUseCase, historyUseCase: historyUseCase)
         let searchViewController = UINavigationController(rootViewController: SearchViewController(viewModel: searchViewModel))
         searchViewController.tabBarItem = UITabBarItem(title: "검색", image: UIImage(systemName: "magnifyingglass"), tag: 0)
         
-        let cartViewModel = CartViewModel(cartRepository: cartRepository)
+        let cartViewModel = CartViewModel(cartItemUseCase: cartItemUseCase)
         let cartViewController = UINavigationController(rootViewController: CartViewController(viewModel: cartViewModel))
         cartViewController.tabBarItem = UITabBarItem(title: "장바구니", image: UIImage(systemName: "cart"), tag: 1)
         

@@ -53,18 +53,18 @@ final class SearchViewModel: ViewModelProtocol {
     var action: ((Action) -> Void)?
     var state = State()
     
-    private let bookRepository: BookRepositoryProtocol
-    let cartRepository: CartRepositoryProtocol
-    let historyRepository: HistoryRepositoryProtocol
+    private let bookUseCase: BookUseCaseProtocol
+    let cartItemUseCase: CartItemUseCaseProtocol
+    let historyUseCase: HistoryUseCaseProtocol
     
     private let disposeBag = DisposeBag()
     private var currentPage = 1
     private var isLoading = false
     
-    init(bookRepository: BookRepositoryProtocol, cartRepository: CartRepositoryProtocol, historyRepository: HistoryRepositoryProtocol) {
-        self.bookRepository = bookRepository
-        self.cartRepository = cartRepository
-        self.historyRepository = historyRepository
+    init(bookUseCase: BookUseCaseProtocol, cartItemUseCase: CartItemUseCaseProtocol, historyUseCase: HistoryUseCaseProtocol) {
+        self.bookUseCase = bookUseCase
+        self.cartItemUseCase = cartItemUseCase
+        self.historyUseCase = historyUseCase
         
         prepareAction()
     }
@@ -93,9 +93,7 @@ final class SearchViewModel: ViewModelProtocol {
     }
     
     private func fetchHistories(){
-        let histories = historyRepository.fetchHistories().map { history in
-            return History(isbn: history.isbn, title: history.title, authors: history.authors, price: history.price, contents: history.contents, thumbnail: history.thumbnail, timestamp: history.timestamp)
-        }
+        let histories = historyUseCase.fetchHistories()
         state.histories = sortHistories(histories)
     }
     
@@ -109,24 +107,24 @@ final class SearchViewModel: ViewModelProtocol {
     }
     
     // 무한 스크롤 구현 전: book 데이터만 수신, page 쿼리 불가
-    private func searchBook(searchText: String) {
-        bookRepository.searchBook(searchText: searchText) { [weak self] result in
-            guard let self else { return }
-            switch result {
-            case .success(let books):
-                state.books = books
-            case .failure(let error):
-                state.error = error
-            }
-        }
-    }
+//    private func searchBook(searchText: String) {
+//        bookRepository.searchBook(searchText: searchText) { [weak self] result in
+//            guard let self else { return }
+//            switch result {
+//            case .success(let books):
+//                state.books = books
+//            case .failure(let error):
+//                state.error = error
+//            }
+//        }
+//    }
     
     // 무한 스크롤 구현 후: book 데이터와 meta 데이터 수신, page 쿼리 가능, RxSwift 이용
     private func searchBook(searchText: String, page: Int) {
         guard !isLoading else { return }
         isLoading = true
         
-        bookRepository.searchBook(searchText: searchText, page: page)
+        bookUseCase.searchBook(searchText: searchText, page: page)
             .subscribe { [weak self] response in
                 guard let self else { return }
                 

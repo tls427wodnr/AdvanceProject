@@ -149,7 +149,7 @@ extension SearchViewController: UICollectionViewDelegate {
     }
     
     private func makeDetailViewController(book: Book) -> DetailViewController {
-        let viewModel = DetailViewModel(book: book, cartRepository: viewModel.cartRepository, historyRepository: viewModel.historyRepository)
+        let viewModel = DetailViewModel(book: book, cartItemUseCase: viewModel.cartItemUseCase, historyUseCase: viewModel.historyUseCase)
         let viewController = DetailViewController(viewModel: viewModel)
         viewController.onDismiss = { [weak self] in
             self?.viewModel.action?(.onAppear)

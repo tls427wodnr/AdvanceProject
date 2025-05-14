@@ -27,10 +27,10 @@ final class CartViewModel: ViewModelProtocol {
     var action: ((Action) -> Void)?
     var state = State()
     
-    private let cartRepository: CartRepositoryProtocol
+    private let cartItemUseCase: CartItemUseCaseProtocol
     
-    init(cartRepository: CartRepositoryProtocol) {
-        self.cartRepository = cartRepository
+    init(cartItemUseCase: CartItemUseCaseProtocol) {
+        self.cartItemUseCase = cartItemUseCase
         
         prepareAction()
     }
@@ -43,10 +43,10 @@ final class CartViewModel: ViewModelProtocol {
             case .onAppear:
                 fetchCartItems()
             case .removeFromCart(let item):
-                cartRepository.removeCartItem(isbn: item.isbn)
+                cartItemUseCase.removeCartItem(item)
                 state.items.removeAll { $0.isbn == item.isbn }
             case .removeAll:
-                cartRepository.removeAllCartItems()
+                cartItemUseCase.removeAllCartItems()
                 state.items.removeAll()
             }
         }
@@ -57,9 +57,7 @@ final class CartViewModel: ViewModelProtocol {
     }
     
     private func fetchCartItems() {
-        let items = cartRepository.fetchCartItems().map { item in
-            return CartItem(isbn: item.isbn, title: item.title, author: item.author, price: item.price)
-        }
+        let items = cartItemUseCase.fetchCartItems()
         state.items = items
     }
 }
