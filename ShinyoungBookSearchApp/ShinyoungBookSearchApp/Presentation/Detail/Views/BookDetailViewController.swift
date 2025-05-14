@@ -10,7 +10,7 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
-final class BookDetailViewController: UIViewController {
+final class BookDetailViewController: UIViewController, UIAdaptivePresentationControllerDelegate {
     private let book: Book
     
     private let bookDetailView = BookDetailView()
@@ -39,6 +39,7 @@ final class BookDetailViewController: UIViewController {
         bookDetailView.configure(with: book)
         bindViewModel()
         viewModel.saveRecentBook(with: book)
+        self.presentationController?.delegate = self
     }
     
     private func setupViews() {
@@ -92,5 +93,9 @@ final class BookDetailViewController: UIViewController {
     
     func wasBookSaved() -> Bool {
         return didSaveBook
+    }
+    
+    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+        onDismiss?()
     }
 }
