@@ -12,8 +12,13 @@ import RxCocoa
 final class BookSearchViewModel {
     private let disposeBag = DisposeBag()
     
+    let metaSubject = PublishSubject<Meta>()
     let bookSearchResultsSubject = BehaviorSubject<[Book]>(value: [])
     let recentBooksSubject = BehaviorSubject<[Book]>(value: [])
+    
+    var metaDriver: Driver<Meta> {
+        metaSubject.asDriver(onErrorDriveWith: .empty())
+    }
     
     var sectionedBooksDriver: Driver<[BookSectionModel]> {
         Observable.combineLatest(recentBooksSubject, bookSearchResultsSubject)
@@ -41,6 +46,10 @@ final class BookSearchViewModel {
             .subscribe(onSuccess: { [weak self] (response: BookSearchResponse) in
                 let books = response.documents.map { $0.toDomain() }
                 self?.bookSearchResultsSubject.onNext(books)
+                
+                if let meta = response.meta {
+                    self?.metaSubject.onNext(meta)
+                }                
             }, onFailure: { [weak self] error in
                 self?.bookSearchResultsSubject.onError(error)
             }).disposed(by: disposeBag)
