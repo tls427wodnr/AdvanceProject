@@ -115,7 +115,7 @@ class BookDetailBottomSheetViewController: UIViewController {
     // MARK: - Bindings
     
     private func bindViewModel() {
-        let input = BookDetailBottomSheetViewModel.Input(addTrigger: addTrigger.asObservable())
+        let input = BookDetailBottomSheetViewModelInput(addTrigger: addTrigger.asObservable())
         let output = viewModel.transform(input: input)
 
         output.added

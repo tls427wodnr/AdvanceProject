@@ -12,13 +12,22 @@ import RxCocoa
 class BookListViewController: UIViewController {
     
     private let tableView = UITableView()
-    private let viewModel = BookListViewModel(useCase: LocalBookUseCase(repository: LocalBookRepository()))
+    private let viewModel: BookListViewModelProtocol
     private let disposeBag = DisposeBag()
     
     // MARK: - Input Relays
     private let loadTrigger = PublishRelay<Void>()
     private let deleteTrigger = PublishRelay<String>()
     private let deleteAllTrigger = PublishRelay<Void>()
+    
+    init(viewModel: BookListViewModelProtocol) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,20 +42,20 @@ class BookListViewController: UIViewController {
     }
     
     private func bindViewModel() {
-        let input = BookListViewModel.Input(
+        let input = BookListViewModelInput(
             loadTrigger: loadTrigger.asObservable(),
             deleteTrigger: deleteTrigger.asObservable(),
             deleteAllTrigger: deleteAllTrigger.asObservable()
         )
         
         let output = viewModel.transform(input: input)
-                
+        
         output.books
             .drive(tableView.rx.items(
                 cellIdentifier: BookListTableViewCell
-.identifier,
+                    .identifier,
                 cellType: BookListTableViewCell
-.self
+                    .self
             )) { _, item, cell in
                 cell.configure(with: item)
             }
@@ -81,8 +90,8 @@ class BookListViewController: UIViewController {
         ])
         
         tableView.register(BookListTableViewCell
-.self, forCellReuseIdentifier: BookListTableViewCell
-.identifier)
+            .self, forCellReuseIdentifier: BookListTableViewCell
+            .identifier)
     }
     
     private func setupNavigationBar() {

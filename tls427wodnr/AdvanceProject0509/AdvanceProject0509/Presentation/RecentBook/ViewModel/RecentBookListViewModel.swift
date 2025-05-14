@@ -8,30 +8,36 @@
 import RxSwift
 import RxCocoa
 
-final class RecentBookListViewModel {
-    // MARK: - Input
-    struct Input {
-        let loadTrigger: Observable<Void>
-        let addBook: Observable<BookItem>
-    }
+struct RecentBookListViewModelInput {
+    let loadTrigger: Observable<Void>
+    let addBook: Observable<BookItem>
+}
 
-    // MARK: - Output
-    struct Output {
-        let books: Driver<[BookItem]>
-    }
+struct RecentBookListViewModelOutput {
+    let books: Driver<[BookItem]>
+}
+
+protocol RecentBookListViewModelProtocol {
+    func transform(input: RecentBookListViewModelInput) -> RecentBookListViewModelOutput
+}
+
+final class RecentBookListViewModel: RecentBookListViewModelProtocol {
 
     // MARK: - Private
+    
     private let useCase: LocalRecentBookUseCaseProtocol
     private let booksRelay = BehaviorRelay<[BookItem]>(value: [])
     private let disposeBag = DisposeBag()
 
     // MARK: - Init
+    
     init(useCase: LocalRecentBookUseCaseProtocol) {
         self.useCase = useCase
     }
 
     // MARK: - Transform
-    func transform(input: Input) -> Output {
+    
+    func transform(input: RecentBookListViewModelInput) -> RecentBookListViewModelOutput {
         input.loadTrigger
             .flatMapLatest { [weak self] _ -> Single<[BookItem]> in
                 guard let self = self else { return .just([]) }
@@ -48,6 +54,6 @@ final class RecentBookListViewModel {
             .bind(to: booksRelay)
             .disposed(by: disposeBag)
 
-        return Output(books: booksRelay.asDriver())
+        return RecentBookListViewModelOutput(books: booksRelay.asDriver())
     }
 }

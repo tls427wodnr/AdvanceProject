@@ -9,21 +9,21 @@ import Foundation
 import RxSwift
 import RxCocoa
 
-final class SearchViewModel {
+struct SearchViewModelInput {
+    let query: Observable<String>
+    let loadMoreTrigger: Observable<Void>
+}
 
-    // MARK: - Input
+struct SearchViewModelOutput {
+    let books: Driver<[BookItem]>
+    let error: Signal<Error>
+}
 
-    struct Input {
-        let query: Observable<String>
-        let loadMoreTrigger: Observable<Void>
-    }
+protocol SearchViewModelProtocol {
+    func transform(input: SearchViewModelInput) -> SearchViewModelOutput
+}
 
-    // MARK: - Output
-
-    struct Output {
-        let books: Driver<[BookItem]>
-        let error: Signal<Error>
-    }
+final class SearchViewModel: SearchViewModelProtocol {
 
     // MARK: - Properties
 
@@ -44,7 +44,7 @@ final class SearchViewModel {
 
     // MARK: - Transform
 
-    func transform(input: Input) -> Output {
+    func transform(input: SearchViewModelInput) -> SearchViewModelOutput {
         input.query
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .do(onNext: { [weak self] newQuery in
@@ -102,7 +102,7 @@ final class SearchViewModel {
             })
             .disposed(by: disposeBag)
 
-        return Output(
+        return SearchViewModelOutput(
             books: booksRelay.asDriver(),
             error: errorRelay.asSignal()
         )

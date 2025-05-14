@@ -9,22 +9,22 @@ import Foundation
 import RxSwift
 import RxCocoa
 
-final class BookListViewModel {
+struct BookListViewModelInput {
+    let loadTrigger: Observable<Void>
+    let deleteTrigger: Observable<String>
+    let deleteAllTrigger: Observable<Void>
+}
 
-    // MARK: - Input
+struct BookListViewModelOutput {
+    let books: Driver<[BookItem]>
+    let error: Driver<String>
+}
 
-    struct Input {
-        let loadTrigger: Observable<Void>
-        let deleteTrigger: Observable<String>
-        let deleteAllTrigger: Observable<Void>
-    }
+protocol BookListViewModelProtocol {
+    func transform(input: BookListViewModelInput) -> BookListViewModelOutput
+}
 
-    // MARK: - Output
-
-    struct Output {
-        let books: Driver<[BookItem]>
-        let error: Driver<String>
-    }
+final class BookListViewModel: BookListViewModelProtocol {
 
     // MARK: - Private
 
@@ -41,7 +41,7 @@ final class BookListViewModel {
 
     // MARK: - Transform
 
-    func transform(input: Input) -> Output {
+    func transform(input: BookListViewModelInput) -> BookListViewModelOutput {
 
         input.loadTrigger
             .flatMapLatest { [unowned self] in
@@ -99,7 +99,7 @@ final class BookListViewModel {
             })
             .disposed(by: disposeBag)
 
-        return Output(
+        return BookListViewModelOutput(
             books: booksRelay.asDriver(),
             error: errorRelay.asDriver(onErrorJustReturn: "알 수 없는 오류")
         )

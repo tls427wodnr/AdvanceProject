@@ -9,22 +9,23 @@ import Foundation
 import RxSwift
 import RxCocoa
 
-final class BookDetailBottomSheetViewModel {
+struct BookDetailBottomSheetViewModelInput {
+    let addTrigger: Observable<Void>
+}
 
-    // MARK: - Input
+struct BookDetailBottomSheetViewModelOutput {
+    let added: Driver<Void>
+    let error: Driver<String>
+}
 
-    struct Input {
-        let addTrigger: Observable<Void>
-    }
+protocol BookDetailBottomSheetViewModelProtocol {
+    func transform(input: BookDetailBottomSheetViewModelInput) -> BookDetailBottomSheetViewModelOutput
+}
 
-    // MARK: - Output
-
-    struct Output {
-        let added: Driver<Void>
-        let error: Driver<String>
-    }
+final class BookDetailBottomSheetViewModel: BookDetailBottomSheetViewModelProtocol {
 
     // MARK: - Properties
+    
     private let useCase: LocalBookUseCaseProtocol
 
     private let book: BookItem
@@ -42,7 +43,7 @@ final class BookDetailBottomSheetViewModel {
 
     // MARK: - Transform
 
-    func transform(input: Input) -> Output {
+    func transform(input: BookDetailBottomSheetViewModelInput) -> BookDetailBottomSheetViewModelOutput {
         input.addTrigger
             .flatMapLatest { [unowned self] in
                 useCase.save(book)
@@ -61,7 +62,7 @@ final class BookDetailBottomSheetViewModel {
             })
             .disposed(by: disposeBag)
 
-        return Output(
+        return BookDetailBottomSheetViewModelOutput(
             added: addedRelay.asDriver(onErrorDriveWith: .empty()),
             error: errorRelay.asDriver(onErrorJustReturn: "알 수 없는 오류")
         )

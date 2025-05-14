@@ -36,8 +36,8 @@ final class SearchViewController: UIViewController {
     
     // MARK: - Properties
     
-    private let searchViewModel = SearchViewModel(fetchBooksUseCase: FetchBooksUseCase(repository: BookRepository(networkService: NetworkService())))
-    private let recentViewModel = RecentBookListViewModel(useCase: LocalRecentBookUseCase(repository: LocalRecentBookRepository()))
+    private let searchViewModel: SearchViewModelProtocol
+    private let recentViewModel: RecentBookListViewModelProtocol
     private let disposeBag = DisposeBag()
     
     private lazy var dataSource = RxCollectionViewSectionedReloadDataSource<BookSection>(
@@ -73,6 +73,16 @@ final class SearchViewController: UIViewController {
     )
     
     // MARK: - Lifecycle
+    
+    init(searchViewModel: SearchViewModelProtocol, recentViewModel: RecentBookListViewModelProtocol) {
+        self.searchViewModel = searchViewModel
+        self.recentViewModel = recentViewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -144,7 +154,7 @@ final class SearchViewController: UIViewController {
     
     private func bindViewModel() {
         
-        let searchInput = SearchViewModel.Input(
+        let searchInput = SearchViewModelInput(
             query: makeQueryInput(),
             loadMoreTrigger: makeLoadMoreTrigger()
         )
@@ -164,7 +174,7 @@ final class SearchViewController: UIViewController {
             }
             .map { $0.1 }
         
-        let recentInput = RecentBookListViewModel.Input(
+        let recentInput = RecentBookListViewModelInput(
             loadTrigger: .just(()),
             addBook: bookSelection.asObservable()
         )

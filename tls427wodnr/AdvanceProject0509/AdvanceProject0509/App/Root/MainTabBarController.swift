@@ -12,17 +12,6 @@ final class MainTabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureTabBarAppearance()
-        setupViewControllers()
-    }
-    
-    private func setupViewControllers() {
-        let searchVC = UINavigationController(rootViewController: SearchViewController())
-        searchVC.tabBarItem = UITabBarItem(title: "검색", image: UIImage(systemName: "magnifyingglass"), tag: 0)
-
-        let bookListVC = UINavigationController(rootViewController: BookListViewController())
-        bookListVC.tabBarItem = UITabBarItem(title: "담은 책 리스트", image: UIImage(systemName: "books.vertical"), tag: 1)
-
-        viewControllers = [searchVC, bookListVC]
     }
     
     private func configureTabBarAppearance() {
