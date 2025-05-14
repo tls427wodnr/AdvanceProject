@@ -14,4 +14,5 @@ struct RecentBook {
     let thumbnailURL: String
     let contents: String?
     let viewedDate: Date
+    let isbn: String
 }

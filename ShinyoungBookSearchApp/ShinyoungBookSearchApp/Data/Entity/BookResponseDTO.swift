@@ -30,11 +30,11 @@ struct BookResponseDTO: Decodable {
     let salePrice: Int
     let thumbnail: String
     let contents: String?
+    let isbn: String
     
     enum CodingKeys: String, CodingKey {
-        case title, authors
+        case title, authors, thumbnail, contents, isbn
         case salePrice = "sale_price"
-        case thumbnail, contents
     }
 }
 
@@ -45,7 +45,8 @@ extension BookResponseDTO {
             authors: authors.joined(separator: ", "),
             salePrice: "₩" + formatPrice(salePrice),
             thumbnailURL: thumbnail,
-            contents: contents
+            contents: contents,
+            isbn: isbn
         )
     }
 

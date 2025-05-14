@@ -115,7 +115,7 @@ extension SavedBooksViewController: UITableViewDelegate {
             guard let self = self else { return }
             
             let book = self.books[indexPath.row]
-            self.viewModel.deleteBook(title: book.title)
+            self.viewModel.deleteBook(isbn: book.isbn)
             completion(true)
         }
 

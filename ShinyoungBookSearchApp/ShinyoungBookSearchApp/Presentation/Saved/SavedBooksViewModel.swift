@@ -38,8 +38,8 @@ final class SavedBooksViewModel {
             }).disposed(by: disposeBag)
     }
     
-    func deleteBook(title: String) {
-        CoreDataService.shared.deleteBook(title: title)
+    func deleteBook(isbn: String) {
+        CoreDataService.shared.deleteBook(isbn: isbn)
             .observe(on: MainScheduler.instance)
             .subscribe(onSuccess: { [weak self] in
                 self?.fetchSavedBooks()

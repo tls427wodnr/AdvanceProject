@@ -21,6 +21,7 @@ extension BookEntity {
     @NSManaged public var salePrice: String?
     @NSManaged public var thumbnailURL: String?
     @NSManaged public var contents: String?
+    @NSManaged public var isbn: String?
 
 }
 
@@ -33,7 +34,8 @@ extension BookEntity {
             authors: self.authors ?? "",
             salePrice: self.salePrice ?? "",
             thumbnailURL: self.thumbnailURL ?? "",
-            contents: self.contents
+            contents: self.contents,
+            isbn: self.isbn ?? ""
         )
     }
 }
