@@ -91,7 +91,11 @@ final class BookSearchViewController: UIViewController {
         
         setupViews()
         setupConstraints()
-        bindViewModel()
+        bindSectionedBooks()
+        bindSearchBar()
+        bindBookSelection()
+        bindPagination()
+        bindCancelButton()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -122,11 +126,13 @@ final class BookSearchViewController: UIViewController {
         }
     }
     
-    private func bindViewModel() {
+    private func bindSectionedBooks() {
         viewModel.sectionedBooksDriver
             .drive(bookSearchResultCollectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
-        
+    }
+    
+    private func bindSearchBar() {
         bookSearchBar.searchBar.rx.searchButtonClicked
             .withLatestFrom(bookSearchBar.searchBar.rx.text.orEmpty)
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
@@ -144,15 +150,9 @@ final class BookSearchViewController: UIViewController {
                 self?.bookSearchBar.setCancelButtonVisible(true)
             })
             .disposed(by: disposeBag)
-        
-        bookSearchBar.cancelButton.rx.tap
-            .bind(onNext: { [weak self] in
-                self?.bookSearchBar.searchBar.text = ""
-                self?.bookSearchBar.searchBar.resignFirstResponder()
-                self?.bookSearchBar.setCancelButtonVisible(false)
-            })
-            .disposed(by: disposeBag)
-        
+    }
+    
+    private func bindBookSelection() {
         bookSearchResultCollectionView.rx
             .modelSelected(Book.self)
             .bind(onNext: { [weak self] selectedBook in
@@ -171,7 +171,9 @@ final class BookSearchViewController: UIViewController {
                 present(detailVC, animated: true)
             })
             .disposed(by: disposeBag)
-        
+    }
+    
+    private func bindPagination() {
         bookSearchResultCollectionView.rx
             .willDisplayCell
             .observe(on: MainScheduler.instance)
@@ -190,6 +192,16 @@ final class BookSearchViewController: UIViewController {
 
                     self.viewModel.searchBooks(isPaging: true)
                 }
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func bindCancelButton() {
+        bookSearchBar.cancelButton.rx.tap
+            .bind(onNext: { [weak self] in
+                self?.bookSearchBar.searchBar.text = ""
+                self?.bookSearchBar.searchBar.resignFirstResponder()
+                self?.bookSearchBar.setCancelButtonVisible(false)
             })
             .disposed(by: disposeBag)
     }

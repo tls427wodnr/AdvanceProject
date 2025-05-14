@@ -17,6 +17,8 @@ final class BookSearchViewModel {
     let bookSearchResultsSubject = BehaviorSubject<[Book]>(value: [])
     let recentBooksSubject = BehaviorSubject<[Book]>(value: [])
     
+    let errorMessageRelay = PublishRelay<String>()
+    
     var sectionedBooksDriver: Driver<[BookSectionModel]> {
         Observable.combineLatest(recentBooksSubject, bookSearchResultsSubject)
             .map { recent, search in
@@ -56,7 +58,7 @@ final class BookSearchViewModel {
         ]
         
         guard let url = components?.url else {
-            bookSearchResultsSubject.onError(NetworkError.invalidURL)
+            errorMessageRelay.accept("유효하지 않은 검색 URL입니다.")
             isLoadingRelay.accept(false)
             return
         }
@@ -78,7 +80,7 @@ final class BookSearchViewModel {
                 self.currentPage += 1
                 self.isLoadingRelay.accept(false)
             }, onFailure: { [weak self] error in
-                self?.bookSearchResultsSubject.onError(error)
+                self?.errorMessageRelay.accept("책 검색 실패: \(error.localizedDescription)")
                 self?.isLoadingRelay.accept(false)
             }).disposed(by: disposeBag)
     }
@@ -89,7 +91,7 @@ final class BookSearchViewModel {
             .subscribe(onSuccess: { [weak self] books in
                 self?.recentBooksSubject.onNext(books)
             }, onFailure: { [weak self] error in
-                self?.recentBooksSubject.onError(error)
+                self?.errorMessageRelay.accept("최근 본 책 로드 실패: \(error.localizedDescription)")
             }).disposed(by: disposeBag)
     }
 }
