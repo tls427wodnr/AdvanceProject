@@ -34,7 +34,15 @@ final class BookSearchViewModel {
     private var currentPage = 1
     private var isEnd = false
     
+    var hasNextPage: Bool {
+        return !isEnd
+    }
+    
+    var isLoading: Bool = false
+    
     func searchBooks(with query: String, isPaging: Bool = false) {
+        isLoading = true
+        
         var components = URLComponents(string: "https://dapi.kakao.com/v3/search/book")
         components?.queryItems = [
             URLQueryItem(name: "query", value: query),
@@ -60,9 +68,11 @@ final class BookSearchViewModel {
                     self.currentPage = 1
                     self.bookSearchResultsSubject.onNext(books)
                 }
-                currentPage += 1
+                self.currentPage += 1
+                self.isLoading = false
             }, onFailure: { [weak self] error in
                 self?.bookSearchResultsSubject.onError(error)
+                self?.isLoading = false
             }).disposed(by: disposeBag)
     }
     

@@ -86,6 +86,8 @@ final class BookSearchViewController: UIViewController {
     private let viewModel = BookSearchViewModel()
     private let disposeBag = DisposeBag()
     private var currentSectionTypes: [BookSectionType] = []
+    
+    private var currentQuery: String = ""
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -135,7 +137,8 @@ final class BookSearchViewController: UIViewController {
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
             .bind(onNext: { [weak self] query in
-                self?.viewModel.searchBooks(with: query)
+                self?.currentQuery = query
+                self?.viewModel.searchBooks(with: query, isPaging: false)
                 self?.bookSearchBar.searchBar.resignFirstResponder()
                 self?.bookSearchBar.setCancelButtonVisible(false)
             })
@@ -171,6 +174,27 @@ final class BookSearchViewController: UIViewController {
                     }
                 }
                 present(detailVC, animated: true)
+            })
+            .disposed(by: disposeBag)
+        
+        bookSearchResultCollectionView.rx
+            .willDisplayCell
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] cell, indexPath in
+                guard let self else { return }
+                
+                let sectionType = self.currentSectionTypes[indexPath.section]
+                guard sectionType == .searchResult else { return }
+                
+                let sectionItems = try? self.viewModel.bookSearchResultsSubject.value()
+                let itemCount = sectionItems?.count ?? 0
+                
+                if indexPath.item >= itemCount - 3,
+                   self.viewModel.hasNextPage,
+                   !self.viewModel.isLoading {
+
+                    self.viewModel.searchBooks(with: self.currentQuery, isPaging: true)
+                }
             })
             .disposed(by: disposeBag)
     }
