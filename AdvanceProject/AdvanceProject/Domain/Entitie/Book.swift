@@ -5,6 +5,8 @@
 //  Created by 양원식 on 5/11/25.
 //
 
+import Foundation
+
 struct Book {
     let title: String
     let thumbnail: String

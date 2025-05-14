@@ -9,31 +9,25 @@ import RxSwift
 final class BookDetailViewModel {
     let book: Book
     private weak var coordinator: BookDetailCoordinator?
+    private let useCase: BookDetailUseCase
 
-    init(book: Book, coordinator: BookDetailCoordinator?) {
+    init(book: Book, coordinator: BookDetailCoordinator?, useCase: BookDetailUseCase) {
         self.book = book
         self.coordinator = coordinator
+        self.useCase = useCase
     }
 
-    func didTapClose() {
-        coordinator?.dismiss()
-    }
-
-    func tryAddBook() -> Observable<Bool> {
-        return Observable.create { observer in
-            if CoreDataManager.shared.isBookAlreadyStored(self.book) {
-                observer.onNext(false)
-            } else {
-                CoreDataManager.shared.save(book: self.book)
-                observer.onNext(true)
-            }
-            observer.onCompleted()
-            return Disposables.create()
-        }
+    func tryAddBook() -> Observable<AddBookResult> {
+        useCase.tryAdd(book: book)
     }
 
     func didTapAddBook() {
         coordinator?.dismiss()
     }
+
+    func didTapClose() {
+        coordinator?.dismiss()
+    }
 }
+
 

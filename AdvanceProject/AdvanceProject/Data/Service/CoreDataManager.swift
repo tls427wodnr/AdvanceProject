@@ -40,6 +40,7 @@ final class CoreDataManager {
 
     // MARK: - Save (중복 저장 방지 포함)
     func save(book: Book) {
+        
         if isBookAlreadyStored(book) {
             print("이미 저장된 책입니다: \(book.title)")
             return
@@ -54,7 +55,7 @@ final class CoreDataManager {
         stored.url = book.url
         stored.price = Int64(book.price)
         stored.isbn = book.isbn
-
+        print("Save 저장 완료")
         saveContext()
     }
 
@@ -104,6 +105,58 @@ final class CoreDataManager {
             saveContext()
         } catch {
             print("전체 삭제 실패: \(error)")
+        }
+    }
+    
+    // MARK: - 최근 본 책 저장
+    func saveToRecent(book: Book) {
+        let fetchRequest: NSFetchRequest<RecentBooks> = RecentBooks.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "isbn == %@", book.isbn)
+
+        if let existing = try? context.fetch(fetchRequest), let old = existing.first {
+            context.delete(old)
+        }
+
+        let stored = RecentBooks(context: context)
+        stored.title = book.title
+        stored.thumbnail = book.thumbnail
+        stored.authors = book.authors.joined(separator: ", ")
+        stored.contents = book.contents
+        stored.publisher = book.publisher
+        stored.url = book.url
+        stored.price = Int64(book.price)
+        stored.isbn = book.isbn
+        stored.createdAt = Date()
+        print("saveToRecent 저장 완료")
+        saveContext()
+    }
+
+    // MARK: - 최근 본 책 불러오기
+    func fetchRecentBooks(limit: Int = 10) -> [RecentBook] {
+        let fetchRequest: NSFetchRequest<RecentBooks> = RecentBooks.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
+        fetchRequest.fetchLimit = limit
+
+        do {
+            let result = try context.fetch(fetchRequest)
+            return result.map { $0.toRecentBook() }
+        } catch {
+            print("최근 책 불러오기 실패: \(error)")
+            return []
+        }
+    }
+    
+    // MARK: - 최근 본 책 전체 삭제
+    func deleteAllRecentBooks() {
+        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = RecentBooks.fetchRequest()
+        let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+
+        do {
+            try persistentContainer.persistentStoreCoordinator.execute(deleteRequest, with: context)
+            saveContext()
+            print("최근 본 책 전체 삭제 완료")
+        } catch {
+            print("최근 본 책 전체 삭제 실패: \(error)")
         }
     }
 }
