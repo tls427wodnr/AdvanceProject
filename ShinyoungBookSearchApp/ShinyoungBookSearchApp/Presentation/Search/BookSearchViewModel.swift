@@ -38,10 +38,18 @@ final class BookSearchViewModel {
         return !isEnd
     }
     
-    var isLoading: Bool = false
+    let isLoadingRelay = BehaviorRelay<Bool>(value: false)
+    
+    var isLoadingDriver: Driver<Bool> {
+        isLoadingRelay.asDriver()
+    }
+    
+    var isLoading: Bool {
+        return isLoadingRelay.value
+    }
     
     func searchBooks(with query: String, isPaging: Bool = false) {
-        isLoading = true
+        isLoadingRelay.accept(true)
         
         var components = URLComponents(string: "https://dapi.kakao.com/v3/search/book")
         components?.queryItems = [
@@ -69,10 +77,10 @@ final class BookSearchViewModel {
                     self.bookSearchResultsSubject.onNext(books)
                 }
                 self.currentPage += 1
-                self.isLoading = false
+                self.isLoadingRelay.accept(false)
             }, onFailure: { [weak self] error in
                 self?.bookSearchResultsSubject.onError(error)
-                self?.isLoading = false
+                self?.isLoadingRelay.accept(false)
             }).disposed(by: disposeBag)
     }
     
