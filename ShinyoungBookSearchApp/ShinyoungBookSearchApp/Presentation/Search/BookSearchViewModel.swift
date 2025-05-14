@@ -31,10 +31,14 @@ final class BookSearchViewModel {
             .asDriver(onErrorJustReturn: [])
     }
     
-    func searchBooks(with query: String) {
+    private var currentPage = 1
+    private var isEnd = false
+    
+    func searchBooks(with query: String, isPaging: Bool = false) {
         var components = URLComponents(string: "https://dapi.kakao.com/v3/search/book")
         components?.queryItems = [
-            URLQueryItem(name: "query", value: query)
+            URLQueryItem(name: "query", value: query),
+            URLQueryItem(name: "page", value: "\(currentPage)")
         ]
         
         guard let url = components?.url else {
@@ -44,12 +48,19 @@ final class BookSearchViewModel {
         
         NetworkService.shared.fetch(url: url)
             .subscribe(onSuccess: { [weak self] (response: BookSearchResponse) in
-                let books = response.documents.map { $0.toDomain() }
-                self?.bookSearchResultsSubject.onNext(books)
+                guard let self else { return }
                 
-                if let meta = response.meta {
-                    self?.metaSubject.onNext(meta)
-                }                
+                self.isEnd = response.meta?.isEnd ?? true
+                
+                let books = response.documents.map { $0.toDomain() }
+                if isPaging {
+                    let current = (try? self.bookSearchResultsSubject.value()) ?? []
+                    self.bookSearchResultsSubject.onNext(current + books)
+                } else {
+                    self.currentPage = 1
+                    self.bookSearchResultsSubject.onNext(books)
+                }
+                currentPage += 1
             }, onFailure: { [weak self] error in
                 self?.bookSearchResultsSubject.onError(error)
             }).disposed(by: disposeBag)
