@@ -11,12 +11,14 @@ import RxCocoa
 
 final class SearchViewModel {
 
-    // MARK: - Input / Output
+    // MARK: - Input
 
     struct Input {
         let query: Observable<String>
     }
 
+    // MARK: - Output
+    
     struct Output {
         let books: Driver<[BookItem]>
         let error: Signal<Error>
@@ -27,7 +29,13 @@ final class SearchViewModel {
     private let booksRelay = BehaviorRelay<[BookItem]>(value: [])
     private let errorRelay = PublishRelay<Error>()
     private let disposeBag = DisposeBag()
-    private let networkManager = NetworkManager.shared
+    private let networkManager: NetworkManager
+    
+    // MARK: - Init
+
+    init(networkManager: NetworkManager = .shared) {
+        self.networkManager = networkManager
+    }
 
     // MARK: - Transform
 

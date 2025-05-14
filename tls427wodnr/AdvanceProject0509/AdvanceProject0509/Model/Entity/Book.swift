@@ -12,6 +12,7 @@ struct BookResponse: Codable {
 }
 
 struct BookItem: Codable {
+    let isbn: String
     let title: String
     let image: String
     let author: String

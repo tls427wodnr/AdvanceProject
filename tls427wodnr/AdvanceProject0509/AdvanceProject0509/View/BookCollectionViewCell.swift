@@ -7,13 +7,24 @@
 
 import UIKit
 
-final class BookCell: UICollectionViewCell {
-    static let identifier = "BookCell"
+final class BookCollectionViewCell: UICollectionViewCell {
+    static let identifier = "BookCollectionViewCell"
+    
+    // MARK: - UI Elements
     
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 2
-        label.font = .systemFont(ofSize: 15)
+        label.font = .systemFont(ofSize: 15, weight: .semibold)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let authorLabel: UILabel = {
+        let label = UILabel()
+        label.numberOfLines = 1
+        label.font = .systemFont(ofSize: 13)
+        label.textColor = .gray
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -21,8 +32,13 @@ final class BookCell: UICollectionViewCell {
     private let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.layer.cornerRadius = 4
+        imageView.clipsToBounds = true
+        imageView.contentMode = .scaleAspectFill
         return imageView
     }()
+    
+    // MARK: - Init
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -36,9 +52,12 @@ final class BookCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Layout
+    
     private func setupLayout() {
-        contentView.addSubview(titleLabel)
         contentView.addSubview(imageView)
+        contentView.addSubview(titleLabel)
+        contentView.addSubview(authorLabel)
         
         NSLayoutConstraint.activate([
             imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
@@ -46,16 +65,24 @@ final class BookCell: UICollectionViewCell {
             imageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
             imageView.widthAnchor.constraint(equalToConstant: 50),
             imageView.heightAnchor.constraint(equalToConstant: 70),
-
-            titleLabel.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: 12),
+            
             titleLabel.topAnchor.constraint(equalTo: imageView.topAnchor),
+            titleLabel.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: 12),
             titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12),
-            titleLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -8)
+            
+            authorLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
+            authorLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
+            authorLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor),
+            authorLabel.bottomAnchor.constraint(lessThanOrEqualTo: imageView.bottomAnchor)
         ])
     }
     
+    // MARK: - Configure
+    
     func configure(with item: BookItem) {
         titleLabel.text = item.title
+        authorLabel.text = item.author
+        
         if let url = URL(string: item.image) {
             URLSession.shared.dataTask(with: url) { data, response, error in
                 if let data = data, let image = UIImage(data: data) {
