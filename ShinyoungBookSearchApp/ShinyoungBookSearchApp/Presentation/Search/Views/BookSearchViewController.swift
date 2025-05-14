@@ -85,9 +85,6 @@ final class BookSearchViewController: UIViewController {
     
     private let viewModel = BookSearchViewModel()
     private let disposeBag = DisposeBag()
-    private var currentSectionTypes: [BookSectionType] = []
-    
-//    private var currentQuery: String = ""
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -127,9 +124,6 @@ final class BookSearchViewController: UIViewController {
     
     private func bindViewModel() {
         viewModel.sectionedBooksDriver
-            .do(onNext: { [weak self] sections in
-                self?.currentSectionTypes = sections.map { $0.type }
-            })
             .drive(bookSearchResultCollectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         
@@ -138,7 +132,6 @@ final class BookSearchViewController: UIViewController {
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
             .bind(onNext: { [weak self] query in
-//                self?.currentQuery = query
                 self?.viewModel.queryRelay.accept(query)
                 self?.viewModel.searchBooks(isPaging: false)
                 self?.bookSearchBar.searchBar.resignFirstResponder()
@@ -185,7 +178,7 @@ final class BookSearchViewController: UIViewController {
             .subscribe(onNext: { [weak self] cell, indexPath in
                 guard let self else { return }
                 
-                let sectionType = self.currentSectionTypes[indexPath.section]
+                let sectionType = self.dataSource.sectionModels[indexPath.section].type
                 guard sectionType == .searchResult else { return }
                 
                 let sectionItems = try? self.viewModel.bookSearchResultsSubject.value()
@@ -203,14 +196,15 @@ final class BookSearchViewController: UIViewController {
     
     private func createLayout() -> UICollectionViewCompositionalLayout {
         return UICollectionViewCompositionalLayout { [weak self] sectionIndex, _ in
-            guard let sectionType = self?.currentSectionTypes[sectionIndex] else {
-                return nil
-            }
+            guard let self else { return nil }
+                
+            let sectionType = self.dataSource.sectionModels[sectionIndex].type
+            
             switch sectionType {
             case .recent:
-                return self?.createRecentSection()
+                return self.createRecentSection()
             case .searchResult:
-                return self?.createSearchResultSection()
+                return self.createSearchResultSection()
             }
         }
     }
