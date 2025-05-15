@@ -8,26 +8,7 @@
 import RxSwift
 import RxCocoa
 
-// MARK: - Input
-
-struct RecentBookListViewModelInput {
-    let loadTrigger: Observable<Void>
-    let addBook: Observable<BookItem>
-}
-
-// MARK: - Output
-
-struct RecentBookListViewModelOutput {
-    let books: Driver<[BookItem]>
-}
-
-// MARK: - Protocol
-
-protocol RecentBookListViewModelProtocol {
-    func transform(input: RecentBookListViewModelInput) -> RecentBookListViewModelOutput
-}
-
-// MARK: - ViewModel
+// MARK: - RecentBookListViewModel
 
 final class RecentBookListViewModel: RecentBookListViewModelProtocol {
 

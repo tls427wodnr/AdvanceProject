@@ -9,28 +9,7 @@ import Foundation
 import RxSwift
 import RxCocoa
 
-// MARK: - Input
-
-struct BookListViewModelInput {
-    let loadTrigger: Observable<Void>
-    let deleteTrigger: Observable<String>
-    let deleteAllTrigger: Observable<Void>
-}
-
-// MARK: - Output
-
-struct BookListViewModelOutput {
-    let books: Driver<[BookItem]>
-    let error: Driver<String>
-}
-
-// MARK: - Protocol
-
-protocol BookListViewModelProtocol {
-    func transform(input: BookListViewModelInput) -> BookListViewModelOutput
-}
-
-// MARK: - ViewModel
+// MARK: - BookListViewModel
 
 final class BookListViewModel: BookListViewModelProtocol {
 

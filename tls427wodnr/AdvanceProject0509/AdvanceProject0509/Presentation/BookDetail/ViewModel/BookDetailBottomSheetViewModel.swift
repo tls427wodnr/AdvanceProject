@@ -9,26 +9,7 @@ import Foundation
 import RxSwift
 import RxCocoa
 
-// MARK: - Input
-
-struct BookDetailBottomSheetViewModelInput {
-    let addTrigger: Observable<Void>
-}
-
-// MARK: - Output
-
-struct BookDetailBottomSheetViewModelOutput {
-    let added: Driver<Void>
-    let error: Driver<String>
-}
-
-// MARK: - Protocol
-
-protocol BookDetailBottomSheetViewModelProtocol {
-    func transform(input: BookDetailBottomSheetViewModelInput) -> BookDetailBottomSheetViewModelOutput
-}
-
-// MARK: - ViewModel
+// MARK: - BookDetailBottomSheetViewModel
 
 final class BookDetailBottomSheetViewModel: BookDetailBottomSheetViewModelProtocol {
 
