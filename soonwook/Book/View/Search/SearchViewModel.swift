@@ -17,13 +17,21 @@ protocol ViewModelProtocol {
 
 final class SearchViewModel: ViewModelProtocol {
     enum Action {
+        case onAppear
         case searchBook(String)
+        case onDismissDetailView
     }
     
     struct State {
         var books: [Book] = [] {
             didSet {
                 onChange?(books)
+            }
+        }
+        
+        var histories: [History] = [] {
+            didSet {
+                onHistoryChange?(histories)
             }
         }
         
@@ -36,15 +44,22 @@ final class SearchViewModel: ViewModelProtocol {
         var searchText = ""
         
         var onChange: (([Book]) -> Void)?
+        var onHistoryChange: (([History]) -> Void)?
         var onError: ((Error?) -> Void)?
     }
     
     var action: ((Action) -> Void)?
     var state = State()
     
-    private let bookRepository: BookRepositoryProtocol = BookRepository()
+    private let bookRepository: BookRepositoryProtocol
+    let cartRepository: CartRepositoryProtocol
+    let historyRepository: HistoryRepositoryProtocol
     
-    init() {
+    init(bookRepository: BookRepositoryProtocol, cartRepository: CartRepositoryProtocol, historyRepository: HistoryRepositoryProtocol) {
+        self.bookRepository = bookRepository
+        self.cartRepository = cartRepository
+        self.historyRepository = historyRepository
+        
         prepareAction()
     }
     
@@ -53,11 +68,24 @@ final class SearchViewModel: ViewModelProtocol {
             guard let self else { return }
             
             switch action {
+            case .onAppear, .onDismissDetailView:
+                fetchHistories()
             case .searchBook(let searchText):
                 state.searchText = searchText
                 searchBook(searchText: searchText)
             }
         }
+    }
+    
+    private func fetchHistories(){
+        let histories = historyRepository.fetchHistories().map { history in
+            return History(isbn: history.isbn, title: history.title, authors: history.authors, price: history.price, contents: history.contents, thumbnail: history.thumbnail, timestamp: history.timestamp)
+        }
+        state.histories = sortHistories(histories)
+    }
+    
+    private func sortHistories(_ histories: [History]) -> [History] {
+        histories.sorted(by: { $0.timestamp > $1.timestamp })
     }
     
     private func searchBook(searchText: String) {
@@ -74,6 +102,10 @@ final class SearchViewModel: ViewModelProtocol {
     
     func bindBook(_ onChange: @escaping ([Book]) -> Void) {
         state.onChange = onChange
+    }
+    
+    func bindHistory(_ onChange: @escaping ([History]) -> Void) {
+        state.onHistoryChange = onChange
     }
     
     func bindError(_ onError: @escaping (Error?) -> Void) {

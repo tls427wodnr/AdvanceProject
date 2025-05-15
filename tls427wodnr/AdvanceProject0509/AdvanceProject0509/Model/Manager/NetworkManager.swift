@@ -45,7 +45,7 @@ final class NetworkManager {
                     observer.onError(NSError(domain: "No data", code: -3, userInfo: nil))
                     return
                 }
-                
+                                
                 do {
                     let decoded = try JSONDecoder().decode(BookResponse.self, from: data)
                     observer.onNext(decoded.items)

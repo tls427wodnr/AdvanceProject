@@ -6,12 +6,14 @@
 //
 
 import Foundation
+import RxDataSources
 
 struct BookResponse: Codable {
     let items: [BookItem]
 }
 
 struct BookItem: Codable {
+    let isbn: String
     let title: String
     let image: String
     let author: String
