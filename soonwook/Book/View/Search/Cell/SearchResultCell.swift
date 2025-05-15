@@ -16,7 +16,7 @@ class SearchResultCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        addSubview(stackView)
+        contentView.addSubview(stackView)
         
         stackView.snp.makeConstraints {
             $0.edges.equalToSuperview()

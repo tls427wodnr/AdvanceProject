@@ -8,8 +8,17 @@
 import UIKit
 
 class SearchViewController: UIViewController {
-    private let searchView = SearchView()
-    private let viewModel = SearchViewModel()
+    let searchView = SearchView()
+    private let viewModel: SearchViewModel
+    
+    init(viewModel: SearchViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func loadView() {
         view = searchView
@@ -21,15 +30,21 @@ class SearchViewController: UIViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.title = "검색"
         
+        setDelegate()
+        
+        bindViewModel()
+        
+        viewModel.action?(.onAppear)
+    }
+    
+    private func setDelegate() {
         searchView.collectionView.dataSource = self
         searchView.collectionView.delegate = self
         
         searchView.searchBar.delegate = self
-        
-        bindViewModel()
     }
     
-    func bindViewModel() {
+    private func bindViewModel() {
         // book 데이터가 바뀌면 컬렉션 뷰 리로드
         viewModel.bindBook { [weak self] books in
             DispatchQueue.main.async {
@@ -37,42 +52,44 @@ class SearchViewController: UIViewController {
             }
         }
         
-        viewModel.bindError { [weak self] error in
-            if let error {
-                self?.showError(error)
+        // history 데이터가 바뀌면 컬렉션 뷰 리로드
+        viewModel.bindHistory { [weak self] histories in
+            DispatchQueue.main.async {
+                self?.searchView.collectionView.reloadData()
             }
         }
-    }
-    
-    private func showError(_ error: Error) {
-        let alertTitle = NSLocalizedString("Error", comment: "Error alert title")
-        let alert = UIAlertController(
-            title: alertTitle, message: error.localizedDescription, preferredStyle: .alert)
-        let actionTitle = NSLocalizedString("OK", comment: "Alert OK button title")
-        alert.addAction(
-            UIAlertAction(
-                title: actionTitle, style: .default,
-                handler: { [weak self] _ in
-                    self?.dismiss(animated: true)
-                }))
-        present(alert, animated: true, completion: nil)
+        
+        viewModel.bindError { [weak self] error in
+            if let error {
+                self?.showAlert(title: "Error", message: error.localizedDescription)
+            }
+        }
     }
 }
 
 extension SearchViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        viewModel.state.books.count
+        let section = Section(rawValue: section)
+        switch section {
+        case .history:
+            return viewModel.state.histories.count
+        case .searchResult:
+            return viewModel.state.books.count
+        case .none:
+            return 0
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let section = Section(rawValue: indexPath.section)!
         
         switch section {
-        case .recentlyViewed:
+        case .history:
             let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: RecentlyViewedCell.reuseIdentifier,
+                withReuseIdentifier: HistoryCell.reuseIdentifier,
                 for: indexPath
-            ) as! RecentlyViewedCell
+            ) as! HistoryCell
+            cell.update(with: viewModel.state.histories[indexPath.item])
             return cell
         case .searchResult:
             let cell = collectionView.dequeueReusableCell(
@@ -104,8 +121,31 @@ extension SearchViewController: UICollectionViewDataSource {
 
 extension SearchViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let viewController = UINavigationController(rootViewController: DetailViewController())
-        present(viewController, animated: true)
+        let section = Section(rawValue: indexPath.section)
+        
+        switch section {
+        case .history:
+            let history = viewModel.state.histories[indexPath.item]
+            let book = Book(isbn: history.isbn, title: history.title, authors: history.authors, price: history.price, contents: history.contents, thumbnail: history.thumbnail)
+            let viewController = makeDetailViewController(book: book)
+            present(viewController, animated: true)
+        case .searchResult:
+            let book = viewModel.state.books[indexPath.item]
+            let viewController = makeDetailViewController(book: book)
+            present(viewController, animated: true)
+        case .none:
+            break
+        }
+    }
+    
+    private func makeDetailViewController(book: Book) -> DetailViewController {
+        let viewModel = DetailViewModel(book: book, cartRepository: viewModel.cartRepository, historyRepository: viewModel.historyRepository)
+        let viewController = DetailViewController(viewModel: viewModel)
+        viewController.onDismiss = { [weak self] in
+            self?.viewModel.action?(.onDismissDetailView)
+        }
+        
+        return viewController
     }
 }
 
