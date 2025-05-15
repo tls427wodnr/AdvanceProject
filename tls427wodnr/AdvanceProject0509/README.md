@@ -120,3 +120,5 @@ AdvanceProject0509/
 ```
 
 ## 시연 영상
+https://github.com/user-attachments/assets/383729cf-8b85-4857-bbc0-7eafc9936b56
+
