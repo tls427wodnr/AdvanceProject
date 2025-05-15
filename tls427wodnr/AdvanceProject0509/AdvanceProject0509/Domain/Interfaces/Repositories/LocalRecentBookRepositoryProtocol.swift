@@ -7,6 +7,8 @@
 
 import RxSwift
 
+// MARK: - LocalRecentBookRepositoryProtocol
+
 protocol LocalRecentBookRepositoryProtocol {
     func load() -> Single<[BookItem]>
     func save(_ book: BookItem) -> Completable

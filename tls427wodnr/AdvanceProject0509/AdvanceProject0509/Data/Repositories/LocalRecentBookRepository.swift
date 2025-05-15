@@ -8,11 +8,17 @@
 import Foundation
 import RxSwift
 
+// MARK: - LocalRecentBookRepository
+
 final class LocalRecentBookRepository: LocalRecentBookRepositoryProtocol {
+    
+    // MARK: - Properties
     
     private let key = "recentBooks"
     private let maxCount = 10
-
+    
+    // MARK: - Methods
+    
     func load() -> Single<[BookItem]> {
         return Single.create { single in
             guard let data = UserDefaults.standard.data(forKey: self.key),

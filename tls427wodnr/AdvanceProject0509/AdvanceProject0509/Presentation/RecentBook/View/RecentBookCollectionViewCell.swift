@@ -7,11 +7,15 @@
 
 import UIKit
 
+// MARK: - RecentBookCollectionViewCell
+
 final class RecentBookCollectionViewCell: UICollectionViewCell {
     
+    // MARK: - Identifier
+
     static let identifier = "RecentBookCollectionViewCell"
 
-    // MARK: - UI
+    // MARK: - UI Components
 
     private let imageView: UIImageView = {
         let imageView = UIImageView()
@@ -24,10 +28,20 @@ final class RecentBookCollectionViewCell: UICollectionViewCell {
         return imageView
     }()
 
-    // MARK: - Init
+    // MARK: - Initializer
 
     override init(frame: CGRect) {
         super.init(frame: frame)
+        setupLayout()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    // MARK: - Layout
+
+    private func setupLayout() {
         contentView.addSubview(imageView)
 
         NSLayoutConstraint.activate([
@@ -36,10 +50,6 @@ final class RecentBookCollectionViewCell: UICollectionViewCell {
             imageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             imageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
         ])
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 
     // MARK: - Configuration

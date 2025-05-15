@@ -7,7 +7,12 @@
 
 import Foundation
 
+// MARK: - AppConfig
+
 enum AppConfig {
+
+    // MARK: - API Keys
+
     static var clientID: String {
         guard let value = Bundle.main.object(forInfoDictionaryKey: "CLIENT_ID") as? String else {
             fatalError("CLIENT_ID is missing in Info.plist")

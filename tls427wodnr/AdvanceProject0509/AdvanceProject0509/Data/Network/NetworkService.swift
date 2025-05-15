@@ -8,12 +8,18 @@
 import Foundation
 import RxSwift
 
+// MARK: - Protocol
+
 protocol NetworkServiceProtocol {
     func request<T: Decodable>(_ type: T.Type, url: URL, headers: [String: String]) -> Observable<T>
 }
 
+// MARK: - Service
+
 final class NetworkService: NetworkServiceProtocol {
     
+    // MARK: - Methods
+
     func request<T: Decodable>(_ type: T.Type, url: URL, headers: [String: String]) -> Observable<T> {
         return Observable.create { observer in
             var request = URLRequest(url: url)

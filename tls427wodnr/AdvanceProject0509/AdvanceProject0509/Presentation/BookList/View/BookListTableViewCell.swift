@@ -7,8 +7,12 @@
 
 import UIKit
 
+// MARK: - BookListTableViewCell
+
 final class BookListTableViewCell: UITableViewCell {
     
+    // MARK: - Identifier
+
     static let identifier = "BookTableViewCell"
     
     // MARK: - UI Components
@@ -40,7 +44,7 @@ final class BookListTableViewCell: UITableViewCell {
     }()
     
     // MARK: - Initializer
-    
+
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         contentView.backgroundColor = .secondarySystemBackground
@@ -78,8 +82,8 @@ final class BookListTableViewCell: UITableViewCell {
         ])
     }
     
-    // MARK: - Configure
-    
+    // MARK: - Configuration
+
     func configure(with item: BookItem) {
         titleLabel.text = item.title
         authorLabel.text = item.author

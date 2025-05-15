@@ -9,18 +9,22 @@ import UIKit
 import RxSwift
 import RxCocoa
 
+// MARK: - BookDetailBottomSheetViewController
+
 class BookDetailBottomSheetViewController: UIViewController {
     
     // MARK: - Properties
-    
+
     private var viewModel: BookDetailBottomSheetViewModelProtocol
     private let addTrigger = PublishRelay<Void>()
     private let disposeBag = DisposeBag()
     
+    // MARK: - UI Components
+
     private let scrollView = UIScrollView()
     private let contentStackView = UIStackView()
     private let buttonContainerView = UIView()
-    
+
     private let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
@@ -29,7 +33,7 @@ class BookDetailBottomSheetViewController: UIViewController {
         imageView.heightAnchor.constraint(equalToConstant: 220).isActive = true
         return imageView
     }()
-    
+
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = .boldSystemFont(ofSize: 20)
@@ -37,7 +41,7 @@ class BookDetailBottomSheetViewController: UIViewController {
         label.numberOfLines = 2
         return label
     }()
-    
+
     private let authorLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 14)
@@ -45,14 +49,14 @@ class BookDetailBottomSheetViewController: UIViewController {
         label.textAlignment = .center
         return label
     }()
-    
+
     private let publisherLabel: UILabel = {
         let label = UILabel()
         label.font = .boldSystemFont(ofSize: 16)
         label.textAlignment = .center
         return label
     }()
-    
+
     private let descriptionLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 13)
@@ -60,7 +64,7 @@ class BookDetailBottomSheetViewController: UIViewController {
         label.textAlignment = .justified
         return label
     }()
-    
+
     private let closeButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("X", for: .normal)
@@ -82,18 +86,20 @@ class BookDetailBottomSheetViewController: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
-    
-    // MARK: - Lifecycle
-    
+
+    // MARK: - Initializer
+
     init(viewModel: BookDetailBottomSheetViewModelProtocol) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
+    // MARK: - Lifecycle
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
@@ -101,14 +107,15 @@ class BookDetailBottomSheetViewController: UIViewController {
         setupButtonActions()
         bindViewModel()
     }
-    
+
     // MARK: - Configuration
-    
+
     func configure(with item: BookItem) {
         titleLabel.text = item.title
         authorLabel.text = item.author
         publisherLabel.text = item.publisher
         descriptionLabel.text = item.description
+
         if let url = URL(string: item.image) {
             URLSession.shared.dataTask(with: url) { data, _, _ in
                 if let data = data, let image = UIImage(data: data) {
@@ -119,9 +126,9 @@ class BookDetailBottomSheetViewController: UIViewController {
             }.resume()
         }
     }
-    
+
     // MARK: - Bindings
-    
+
     private func bindViewModel() {
         let input = BookDetailBottomSheetViewModelInput(addTrigger: addTrigger.asObservable())
         let output = viewModel.transform(input: input)
@@ -140,11 +147,15 @@ class BookDetailBottomSheetViewController: UIViewController {
             })
             .disposed(by: disposeBag)
     }
-    
+
     // MARK: - Layout
-    
+
     private func setupLayout() {
-        // MARK: - ScrollView Setup
+        setupScrollView()
+        setupButtonArea()
+    }
+
+    private func setupScrollView() {
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         contentStackView.axis = .vertical
         contentStackView.spacing = 12
@@ -172,8 +183,9 @@ class BookDetailBottomSheetViewController: UIViewController {
             $0.translatesAutoresizingMaskIntoConstraints = false
             $0.widthAnchor.constraint(equalTo: contentStackView.widthAnchor).isActive = true
         }
+    }
 
-        // MARK: - Floating Button Setup
+    private func setupButtonArea() {
         buttonContainerView.translatesAutoresizingMaskIntoConstraints = false
 
         let buttonStack = UIStackView(arrangedSubviews: [closeButton, actionButton])
@@ -199,8 +211,8 @@ class BookDetailBottomSheetViewController: UIViewController {
             actionButton.heightAnchor.constraint(equalToConstant: 44)
         ])
     }
-    
-    // MARK: - Button Actions
+
+    // MARK: - Actions
 
     private func setupButtonActions() {
         closeButton.addTarget(self, action: #selector(handleCloseTapped), for: .touchUpInside)

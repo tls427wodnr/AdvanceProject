@@ -9,23 +9,31 @@ import Foundation
 import RxSwift
 import RxCocoa
 
+// MARK: - Input
+
 struct BookDetailBottomSheetViewModelInput {
     let addTrigger: Observable<Void>
 }
+
+// MARK: - Output
 
 struct BookDetailBottomSheetViewModelOutput {
     let added: Driver<Void>
     let error: Driver<String>
 }
 
+// MARK: - Protocol
+
 protocol BookDetailBottomSheetViewModelProtocol {
     func transform(input: BookDetailBottomSheetViewModelInput) -> BookDetailBottomSheetViewModelOutput
 }
 
+// MARK: - ViewModel
+
 final class BookDetailBottomSheetViewModel: BookDetailBottomSheetViewModelProtocol {
 
     // MARK: - Properties
-    
+
     private let useCase: LocalBookUseCaseProtocol
 
     private let book: BookItem
@@ -34,7 +42,7 @@ final class BookDetailBottomSheetViewModel: BookDetailBottomSheetViewModelProtoc
     private let addedRelay = PublishRelay<Void>()
     private let errorRelay = PublishRelay<String>()
 
-    // MARK: - Init
+    // MARK: - Initializer
 
     init(book: BookItem, useCase: LocalBookUseCaseProtocol) {
         self.book = book

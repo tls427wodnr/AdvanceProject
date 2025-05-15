@@ -7,6 +7,8 @@
 
 import RxSwift
 
+// MARK: - FetchBooksUseCaseProtocol
+
 protocol FetchBooksUseCaseProtocol {
     func execute(query: String, start: Int) -> Observable<[BookItem]>
 }

@@ -7,6 +7,8 @@
 
 import RxSwift
 
+// MARK: - LocalRecentBookUseCaseProtocol
+
 protocol LocalRecentBookUseCaseProtocol {
     func loadRecentBooks() -> Single<[BookItem]>
     func addRecentBook(_ book: BookItem) -> Completable

@@ -7,10 +7,15 @@
 
 import UIKit
 
+// MARK: - SearchCollectionViewCell
+
 final class SearchCollectionViewCell: UICollectionViewCell {
-    static let identifier = "BookCollectionViewCell"
     
-    // MARK: - UI Elements
+    // MARK: - Identifier
+    
+    static let identifier = "SearchCollectionViewCell"
+    
+    // MARK: - UI Components
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -38,7 +43,7 @@ final class SearchCollectionViewCell: UICollectionViewCell {
         return imageView
     }()
     
-    // MARK: - Init
+    // MARK: - Initializer
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -76,7 +81,7 @@ final class SearchCollectionViewCell: UICollectionViewCell {
         ])
     }
     
-    // MARK: - Configure
+    // MARK: - Configuration
     
     func configure(with item: BookItem) {
         titleLabel.text = item.title

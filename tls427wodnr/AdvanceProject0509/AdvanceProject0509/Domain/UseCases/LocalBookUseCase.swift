@@ -7,13 +7,21 @@
 
 import RxSwift
 
+// MARK: - LocalBookUseCase
+
 final class LocalBookUseCase: LocalBookUseCaseProtocol {
     
+    // MARK: - Properties
+    
     private let repository: LocalBookRepositoryProtocol
+    
+    // MARK: - Initializer
     
     init(repository: LocalBookRepositoryProtocol) {
         self.repository = repository
     }
+    
+    // MARK: - Methods
     
     func save(_ item: BookItem) -> Completable {
         repository.save(item)

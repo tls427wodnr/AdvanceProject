@@ -7,6 +7,8 @@
 
 import UIKit
 
+// MARK: - SectionHeaderView
+
 final class SectionHeaderView: UICollectionReusableView {
 
     // MARK: - Identifier
@@ -23,7 +25,7 @@ final class SectionHeaderView: UICollectionReusableView {
         return label
     }()
 
-    // MARK: - Initializers
+    // MARK: - Initializer
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -35,7 +37,7 @@ final class SectionHeaderView: UICollectionReusableView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    // MARK: - Setup
+    // MARK: - View Setup
 
     private func setupViews() {
         addSubview(titleLabel)

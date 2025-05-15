@@ -7,6 +7,8 @@
 
 import RxSwift
 
+// MARK: - LocalBookRepositoryProtocol
+
 protocol LocalBookRepositoryProtocol {
     func save(_ item: BookItem) -> Completable
     func fetchAll() -> Single<[BookItem]>

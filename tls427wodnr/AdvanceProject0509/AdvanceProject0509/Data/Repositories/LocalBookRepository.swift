@@ -9,17 +9,25 @@ import Foundation
 import CoreData
 import RxSwift
 
+// MARK: - Enum
+
 enum CoreDataError: Error {
     case managerDeallocated
 }
 
+// MARK: - LocalBookRepository
+
 final class LocalBookRepository: LocalBookRepositoryProtocol {
 
+    // MARK: - Properties
+    
     private let persistentContainer: NSPersistentContainer
     private var context: NSManagedObjectContext {
         persistentContainer.viewContext
     }
 
+    // MARK: - Initializer
+    
     init(container: NSPersistentContainer = NSPersistentContainer(name: "Model")) {
         self.persistentContainer = container
         self.persistentContainer.loadPersistentStores { _, error in
@@ -28,6 +36,8 @@ final class LocalBookRepository: LocalBookRepositoryProtocol {
             }
         }
     }
+    
+    // MARK: - Methods
 
     func save(_ item: BookItem) -> Completable {
         return Completable.create { [weak self] completable in

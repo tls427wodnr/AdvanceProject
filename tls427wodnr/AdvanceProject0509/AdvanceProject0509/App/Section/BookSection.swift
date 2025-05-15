@@ -7,10 +7,14 @@
 
 import RxDataSources
 
+// MARK: - BookSection
+
 enum BookSection {
     case recent([BookItem])
     case search([BookItem])
 }
+
+// MARK: - SectionModelType
 
 extension BookSection: SectionModelType {
     typealias Item = BookItem

@@ -9,19 +9,27 @@ import UIKit
 import RxSwift
 import RxCocoa
 
+// MARK: - BookListViewController
+
 class BookListViewController: UIViewController {
     
+    // MARK: - UI Components
+
     private let tableView = UITableView()
+    
+    // MARK: - Dependencies
+
     private let viewModel: BookListViewModelProtocol
     private let disposeBag = DisposeBag()
     
-    // MARK: - Input Relays
+    // MARK: - Triggers
+    
     private let loadTrigger = PublishRelay<Void>()
     private let deleteTrigger = PublishRelay<String>()
     private let deleteAllTrigger = PublishRelay<Void>()
     
-    // MARK: - Lifecycle
-    
+    // MARK: - Initializers
+
     init(viewModel: BookListViewModelProtocol) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -30,6 +38,8 @@ class BookListViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -81,8 +91,8 @@ class BookListViewController: UIViewController {
             .disposed(by: disposeBag)
     }
     
-    // MARK: - Layout
-    
+    // MARK: - UI Setup
+
     private func setupTableView() {
         view.backgroundColor = .white
         view.addSubview(tableView)

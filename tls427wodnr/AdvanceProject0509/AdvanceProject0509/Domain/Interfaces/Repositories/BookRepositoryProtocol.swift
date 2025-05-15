@@ -7,6 +7,8 @@
 
 import RxSwift
 
+// MARK: - BookRepositoryProtocol
+
 protocol BookRepositoryProtocol {
     func fetchBooks(query: String, start: Int) -> Observable<[BookItem]>
 }

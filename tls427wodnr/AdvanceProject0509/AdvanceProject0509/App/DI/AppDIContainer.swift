@@ -5,35 +5,29 @@
 //  Created by tlswo on 5/14/25.
 //
 
+// MARK: - AppDIContainer
+
 final class AppDIContainer {
 
-    // MARK: - Shared
+    // MARK: - Dependencies
     
     private let networkService: NetworkServiceProtocol = NetworkService()
 
-    // MARK: - ViewModel Factories
-
-    func makeSearchViewModel() -> SearchViewModelProtocol {
-        let repository = BookRepository(networkService: networkService)
-        let useCase = FetchBooksUseCase(repository: repository)
-        return SearchViewModel(fetchBooksUseCase: useCase)
+    // MARK: - DIContainers
+    
+    func makeSearchDIContainer() -> SearchDIContainer {
+        return SearchDIContainer(networkService: networkService)
     }
 
-    func makeBookListViewModel() -> BookListViewModelProtocol {
-        let repository = LocalBookRepository()
-        let useCase = LocalBookUseCase(repository: repository)
-        return BookListViewModel(useCase: useCase)
+    func makeBookListDIContainer() -> BookListDIContainer {
+        return BookListDIContainer()
     }
 
-    func makeBookDetailViewModel(book: BookItem) -> BookDetailBottomSheetViewModelProtocol {
-        let repository = LocalBookRepository()
-        let useCase = LocalBookUseCase(repository: repository)
-        return BookDetailBottomSheetViewModel(book: book, useCase: useCase)
+    func makeBookDetailDIContainer() -> BookDetailDIContainer {
+        return BookDetailDIContainer()
     }
 
-    func makeRecentBookListViewModel() -> RecentBookListViewModel {
-        let repository = LocalRecentBookRepository()
-        let useCase = LocalRecentBookUseCase(repository: repository)
-        return RecentBookListViewModel(useCase: useCase)
+    func makeRecentBookDIContainer() -> RecentBookDIContainer {
+        return RecentBookDIContainer()
     }
 }

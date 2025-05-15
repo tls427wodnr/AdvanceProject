@@ -8,9 +8,13 @@
 import Foundation
 import RxDataSources
 
+// MARK: - DTO
+
 struct BookResponse: Codable {
     let items: [BookItem]
 }
+
+// MARK: - Model
 
 struct BookItem: Codable {
     let isbn: String

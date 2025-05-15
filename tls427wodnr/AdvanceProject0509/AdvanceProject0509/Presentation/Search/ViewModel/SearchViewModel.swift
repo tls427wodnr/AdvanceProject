@@ -9,19 +9,27 @@ import Foundation
 import RxSwift
 import RxCocoa
 
+// MARK: - Input
+
 struct SearchViewModelInput {
     let query: Observable<String>
     let loadMoreTrigger: Observable<Void>
 }
+
+// MARK: - Output
 
 struct SearchViewModelOutput {
     let books: Driver<[BookItem]>
     let error: Signal<Error>
 }
 
+// MARK: - Protocol
+
 protocol SearchViewModelProtocol {
     func transform(input: SearchViewModelInput) -> SearchViewModelOutput
 }
+
+// MARK: - ViewModel
 
 final class SearchViewModel: SearchViewModelProtocol {
 
@@ -36,7 +44,7 @@ final class SearchViewModel: SearchViewModelProtocol {
     private var currentPage: Int = 1
     private var isLoading = false
 
-    // MARK: - Init
+    // MARK: - Initializer
 
     init(fetchBooksUseCase: FetchBooksUseCaseProtocol) {
         self.fetchBooksUseCase = fetchBooksUseCase
@@ -45,6 +53,9 @@ final class SearchViewModel: SearchViewModelProtocol {
     // MARK: - Transform
 
     func transform(input: SearchViewModelInput) -> SearchViewModelOutput {
+        
+        // MARK: Search Query Binding
+        
         input.query
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .do(onNext: { [weak self] newQuery in
@@ -72,6 +83,8 @@ final class SearchViewModel: SearchViewModelProtocol {
             .bind(to: booksRelay)
             .disposed(by: disposeBag)
 
+        // MARK: Load More Binding
+        
         input.loadMoreTrigger
             .observe(on: MainScheduler.instance)
             .filter { [weak self] in

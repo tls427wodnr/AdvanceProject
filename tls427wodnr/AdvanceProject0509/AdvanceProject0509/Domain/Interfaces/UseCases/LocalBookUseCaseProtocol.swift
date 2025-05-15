@@ -7,6 +7,8 @@
 
 import RxSwift
 
+// MARK: - LocalBookUseCaseProtocol
+
 protocol LocalBookUseCaseProtocol {
     func save(_ item: BookItem) -> Completable
     func fetchAll() -> Single<[BookItem]>

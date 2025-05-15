@@ -8,15 +8,23 @@
 import Foundation
 import RxSwift
 
+// MARK: - BookRepository
+
 final class BookRepository: BookRepositoryProtocol {
     
+    // MARK: - Properties
+
     private let networkService: NetworkServiceProtocol
     private let baseURL = "https://openapi.naver.com/v1/search/book.json"
     
+    // MARK: - Initializer
+
     init(networkService: NetworkServiceProtocol) {
         self.networkService = networkService
     }
     
+    // MARK: - Methods
+
     func fetchBooks(query: String, start: Int) -> Observable<[BookItem]> {
         guard var components = URLComponents(string: baseURL) else {
             return Observable.error(NSError(domain: "Invalid base URL", code: -1))
