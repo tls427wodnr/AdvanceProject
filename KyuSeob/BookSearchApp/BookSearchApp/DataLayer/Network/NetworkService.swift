@@ -17,7 +17,8 @@ final class NetworkService: NetworkServiceProtocol {
         return Single.create { single in
             let baseURL = "https://dapi.kakao.com/v3/search/book"
 
-            guard let url = URL(string: "\(baseURL)?q=\(query)") else {
+            guard let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+                  let url = URL(string: "\(baseURL)?q=\(encodedQuery)") else {
                 single(.failure(NetworkError.invalidURL))
                 return Disposables.create()
             }

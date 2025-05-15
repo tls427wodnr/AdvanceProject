@@ -28,8 +28,8 @@ class MainViewController: UIViewController {
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.register(
-            SearchResultTableViewCell.self,
-            forCellWithReuseIdentifier: SearchResultTableViewCell.identifier
+            SearchResultCollectionViewCell.self,
+            forCellWithReuseIdentifier: SearchResultCollectionViewCell.identifier
         )
         collectionView.register(
             SectionHeaderView.self,
@@ -39,6 +39,10 @@ class MainViewController: UIViewController {
 
         return collectionView
     }()
+
+    private lazy var emptyView = EmptyView().then {
+        $0.configure(with: "검색 결과가 없어요")
+    }
 
     init(viewModel: MainViewModel) {
         self.viewModel = viewModel
@@ -54,6 +58,10 @@ class MainViewController: UIViewController {
 
         configure()
     }
+
+    func activateSearchBar() {
+        searchBar.becomeFirstResponder()
+    }
 }
 
 private extension MainViewController {
@@ -65,12 +73,13 @@ private extension MainViewController {
     }
 
     func setStyle() {
-        view.backgroundColor = .systemBackground // TODO: - 트러블슈팅 기록용
+        view.backgroundColor = .systemBackground
+        searchBar.backgroundColor = .systemBackground
         navigationController?.navigationBar.isHidden = true
     }
 
     func setHierarchy() {
-        view.addSubviews(views: searchBar, resultCollectionView)
+        view.addSubviews(views: searchBar, resultCollectionView, emptyView)
     }
 
     func setConstraints() {
@@ -85,28 +94,43 @@ private extension MainViewController {
             $0.top.equalTo(searchBar.snp.bottom).offset(10)
             $0.bottom.equalToSuperview()
         }
+
+        emptyView.snp.makeConstraints {
+            $0.top.equalTo(searchBar.snp.bottom)
+            $0.directionalHorizontalEdges.equalTo(resultCollectionView)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide)
+        }
     }
 
     func bind() {
         searchBar.rx.searchButtonClicked
             .withLatestFrom(searchBar.rx.text.orEmpty)
             .bind(onNext: { [weak self] query in
-                self?.viewModel.searchBooks(with: query)
-                self?.resultCollectionView.reloadData()
+                guard let self else { return }
+                self.viewModel.searchBooks(with: query)
+                self.resultCollectionView.reloadData()
             }).disposed(by: disposeBag)
 
         searchBar.rx.text.orEmpty
             .bind(onNext: { [weak self] text in
+                guard let self else { return }
                 if text.isEmpty {
-                    self?.searchResultBooks = []
-                    self?.resultCollectionView.reloadData()
+                    self.searchResultBooks = []
+                    self.resultCollectionView.reloadData()
                 }
             }).disposed(by: disposeBag)
 
         viewModel.searchResultBooks
             .subscribe(onNext: { [weak self] books in
-                self?.searchResultBooks = books
-                self?.resultCollectionView.reloadData()
+                guard let self else { return }
+                self.searchResultBooks = books
+                self.resultCollectionView.reloadData()
+            }).disposed(by: disposeBag)
+
+        viewModel.didFailedEvent
+            .subscribe(onNext: { [weak self] error in
+                guard let self else { return }
+                self.showNoticeAlert(message: error.localizedDescription) // TODO: - 에러 메시지 정의
             }).disposed(by: disposeBag)
     }
 
@@ -120,7 +144,7 @@ private extension MainViewController {
 
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .absolute(100)
+            heightDimension: .absolute(150)
         )
 
         let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
@@ -147,14 +171,16 @@ private extension MainViewController {
 
 extension MainViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return searchResultBooks.count
+        let count = searchResultBooks.count
+        emptyView.isHidden = count != 0
+        return count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: SearchResultTableViewCell.identifier,
+            withReuseIdentifier: SearchResultCollectionViewCell.identifier,
             for: indexPath
-        ) as? SearchResultTableViewCell else {
+        ) as? SearchResultCollectionViewCell else {
             return UICollectionViewCell()
         }
 
@@ -175,7 +201,16 @@ extension MainViewController: UICollectionViewDataSource {
 
 extension MainViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let detailViewController = BookDetailViewController()
-        self.navigationController?.pushViewController(detailViewController, animated: true)
+        let detailBookViewModel = BookDetailViewModel(
+            book: searchResultBooks[indexPath.item],
+            cartBookUseCase: CartBookUseCase(
+                cartBookRepository: CartBookRepository(
+                    coreDataStorage: CoreDataStorage()
+                ) // TODO: - DIContainer 관리 필요
+            )
+        )
+        let detailViewController = BookDetailViewController(bookDetailViewModel: detailBookViewModel)
+        detailViewController.modalPresentationStyle = .pageSheet
+        self.present(detailViewController, animated: true)
     }
 }

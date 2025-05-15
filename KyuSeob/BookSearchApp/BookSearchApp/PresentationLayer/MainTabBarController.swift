@@ -16,7 +16,7 @@ final class MainTabBarController: UITabBarController {
 
     private func setupTabs() {
         self.tabBar.backgroundColor = .systemBackground
-        self.tabBar.tintColor = .init(hex: "000000")
+        self.tabBar.tintColor = .label
         self.tabBar.unselectedItemTintColor = .init(hex: "999999")
 
         let firstVC = MainViewController(
@@ -30,7 +30,15 @@ final class MainTabBarController: UITabBarController {
         )
         firstVC.tabBarItem = UITabBarItem(title: "검색", image: .init(systemName: "magnifyingglass"), tag: 0)
 
-        let secondVC = MyBooksViewController()
+        let secondVC = CartBookListViewController(
+            viewModel: CartBookListViewModel(
+                cartBookUseCase: CartBookUseCase(
+                    cartBookRepository: CartBookRepository(
+                        coreDataStorage: CoreDataStorage()
+                    )
+                )
+            )
+        )
         secondVC.tabBarItem = UITabBarItem(title: "담은 책", image: .init(systemName: "list.bullet"), tag: 1)
 
         viewControllers = [

@@ -10,5 +10,7 @@ import Foundation
 struct Book {
     let title: String
     let authors: [String]
+    let thumbnail: String
     let price: Int
+    let contents: String
 }

@@ -22,7 +22,9 @@ final class BookRepository: BookRepositoryProtocol {
                     Book(
                         title: doc.title,
                         authors: doc.authors,
-                        price: doc.price
+                        thumbnail: doc.thumbnail,
+                        price: doc.price,
+                        contents: doc.contents
                     )
                 }
             }
