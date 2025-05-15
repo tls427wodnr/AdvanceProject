@@ -26,18 +26,20 @@ final class StoredBooksViewModel {
         books.accept(useCase.fetch())
     }
 
-    func remove(at index: Int) {
-        var current = books.value
-        let book = current[index]
+    func remove(book: Book) {
         useCase.remove(book: book)
-        current.remove(at: index)
-        books.accept(current)
+        books.accept(books.value.filter { $0.isbn != book.isbn })
         removedBook.accept(book)
     }
 
     func clearAll() {
         useCase.clear()
         books.accept([])
+    }
+
+    func book(at index: Int) -> Book? {
+        guard books.value.indices.contains(index) else { return nil }
+        return books.value[index]
     }
 }
 

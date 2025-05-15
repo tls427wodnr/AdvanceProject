@@ -84,7 +84,15 @@ final class StoredBooksViewController: UIViewController {
                 self?.storedBooksView.tableView.reloadData()
             })
             .disposed(by: disposeBag)
+
+        viewModel.removedBook
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] book in
+                self?.view.showToast(message: "『\(book.title)』을 삭제했어요")
+            })
+            .disposed(by: disposeBag)
     }
+
 
     // MARK: - Actions
     @objc private func didTapClearAll() {
@@ -116,10 +124,11 @@ extension StoredBooksViewController: UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(
             withIdentifier: BookTableCell.identifier,
             for: indexPath
-        ) as? BookTableCell else {
+        ) as? BookTableCell,
+        let book = viewModel.book(at: indexPath.row) else {
             return UITableViewCell()
         }
-        cell.configure(with: viewModel.books.value[indexPath.row])
+        cell.configure(with: book)
         return cell
     }
 }
@@ -129,17 +138,19 @@ extension StoredBooksViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView,
                    trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let delete = UIContextualAction(style: .destructive, title: "삭제") { [weak self] _, _, completion in
-            guard let self = self else {
+            guard let self = self,
+                  let book = self.viewModel.book(at: indexPath.row) else {
                 completion(false)
                 return
             }
-            tableView.beginUpdates()
-            tableView.deleteRows(at: [indexPath], with: .fade)
-            self.viewModel.remove(at: indexPath.row)
-            tableView.endUpdates()
+
+            self.viewModel.remove(book: book)
+
             completion(true)
         }
+
         return UISwipeActionsConfiguration(actions: [delete])
     }
 }
+
 

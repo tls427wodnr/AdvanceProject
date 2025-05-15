@@ -13,8 +13,10 @@ protocol BookDetailFactory {
 
 final class DefaultBookDetailFactory: BookDetailFactory {
     func makeBookDetailViewController(book: Book, coordinator: BookDetailCoordinator) -> BookDetailViewController {
-        let viewModel = BookDetailViewModel(book: book, coordinator: coordinator)
-        let viewController = BookDetailViewController(viewModel: viewModel)
-        return viewController
+        let repository = BookDetailRepositoryImpl()
+        let useCase = DefaultBookDetailUseCase(repository: repository)
+        let viewModel = BookDetailViewModel(book: book, coordinator: coordinator, useCase: useCase)
+        return BookDetailViewController(viewModel: viewModel)
     }
 }
+
