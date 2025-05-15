@@ -11,7 +11,7 @@ import Then
 
 class EmptyView: UIView {
     private let emptyIconImageView = UIImageView().then {
-        let configuration = UIImage.SymbolConfiguration(pointSize: 50)
+        let configuration = UIImage.SymbolConfiguration(pointSize: 44)
         $0.image = .init(systemName: "text.book.closed")
         $0.tintColor = .secondaryLabel
     }
@@ -46,7 +46,7 @@ private extension EmptyView {
     }
 
     func setStyle() {
-        backgroundColor = .systemBackground
+        backgroundColor = .clear
     }
 
     func setHierarchy() {
