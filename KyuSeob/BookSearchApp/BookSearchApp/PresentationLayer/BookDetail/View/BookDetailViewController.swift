@@ -95,6 +95,8 @@ private extension BookDetailViewController {
         setHierarchy()
         setConstraints()
         bind()
+
+        self.presentationController?.delegate = self
     }
 
     func setStyle() {
@@ -190,8 +192,13 @@ private extension BookDetailViewController {
             .subscribe(onNext: { [weak self] event in
                 guard let self else { return }
                 switch event {
-                case .cartBookSaved: self.dismiss(animated: true)
-                case .close: self.dismiss(animated: true)
+                case .cartBookSaved:
+                    self.dismiss(animated: true) {
+                        self.bookDetailViewModel.detailViewDismissed.accept(())
+                    }
+                case .close: self.dismiss(animated: true) {
+                    self.bookDetailViewModel.detailViewDismissed.accept(())
+                }
                 }
             }).disposed(by: disposeBag)
 
@@ -201,5 +208,14 @@ private extension BookDetailViewController {
                 print("CartBook event failed: \(error)")
                 self.showNoticeAlert(message: error.localizedDescription) // TODO: - 커스텀 에러 discription 정의 시 수정 필요
             }).disposed(by: disposeBag)
+
+        bookDetailViewModel.detailViewEntered
+            .accept(())
+    }
+}
+
+extension BookDetailViewController: UIAdaptivePresentationControllerDelegate {
+    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) { // 직접 드래그를 내려 페이지를 dismiss하는 경우
+        bookDetailViewModel.detailViewDismissed.accept(())
     }
 }

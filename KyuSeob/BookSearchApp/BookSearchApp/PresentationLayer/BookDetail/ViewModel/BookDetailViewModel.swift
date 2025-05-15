@@ -16,6 +16,7 @@ final class BookDetailViewModel {
     }
 
     private let cartBookUseCase: CartBookUseCaseProtocol
+    private let recentBookUseCase: RecentBooksUseCaseProtocol
     private let book: Book
     private let disposeBag = DisposeBag()
 
@@ -30,9 +31,13 @@ final class BookDetailViewModel {
     let didSuccessEvent = PublishRelay<BookDetailEvent>()
     let didFailedEvent = PublishRelay<Error>()
 
-    init(book: Book, cartBookUseCase: CartBookUseCaseProtocol) {
+    let detailViewEntered = PublishRelay<Void>()
+    let detailViewDismissed = PublishRelay<Void>()
+
+    init(book: Book, cartBookUseCase: CartBookUseCaseProtocol, recentBookUseCase: RecentBooksUseCaseProtocol) {
         self.book = book
         self.cartBookUseCase = cartBookUseCase
+        self.recentBookUseCase = recentBookUseCase
 
         self.title = .just(book.title).asDriver(onErrorJustReturn: "")
         self.authors = Observable.just(book.authors)
@@ -80,6 +85,16 @@ private extension BookDetailViewModel {
                 guard let self else { return }
                 print("closeButtonTapped")
                 self.didSuccessEvent.accept(.close)
+            }).disposed(by: disposeBag)
+
+        detailViewEntered
+            .subscribe(onNext: { [weak self] in
+                guard let self else { return }
+                do {
+                    try recentBookUseCase.addRecentBook(book: book)
+                } catch {
+                    print(error) // 최근 본 책 저장 안됐다고 alert 띄우면 안됨
+                }
             }).disposed(by: disposeBag)
     }
 }
