@@ -160,17 +160,32 @@ private extension MainViewController {
 
     func bind() {
         searchBar.rx.searchButtonClicked
+            .throttle(.seconds(2), scheduler: MainScheduler.instance)
             .withLatestFrom(searchBar.rx.text.orEmpty)
             .bind(onNext: { [weak self] query in
                 guard let self else { return }
-                self.viewModel.searchBooks(with: query)
+                self.viewModel.searchBooks(with: query, of: 1) // TODO: - Rx 방식으로 변경
             }).disposed(by: disposeBag)
 
         searchBar.rx.text.orEmpty
             .bind(onNext: { [weak self] text in
                 guard let self else { return }
                 if text.isEmpty {
-                    viewModel.searchResultBooks.accept([])
+                    self.viewModel.searchBooks(with: text, of: 1)
+                }
+            }).disposed(by: disposeBag)
+
+        resultCollectionView.rx.contentOffset
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] offset in
+                guard let self else { return }
+
+                let contentHeight = self.resultCollectionView.contentSize.height
+                let visibleHeight = self.resultCollectionView.frame.height
+                let yOffset = offset.y
+
+                if yOffset > contentHeight - visibleHeight - 100 {
+                    self.viewModel.searchTrigger.accept(())
                 }
             }).disposed(by: disposeBag)
 
