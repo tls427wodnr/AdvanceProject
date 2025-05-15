@@ -138,11 +138,21 @@ extension SearchViewController: UICollectionViewDelegate {
         }
     }
     
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let offsetY = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
+        let height = scrollView.frame.size.height
+        
+        if !viewModel.state.books.isEmpty, offsetY > contentHeight - height - 100 {
+            viewModel.action?(.onScrollEnd)
+        }
+    }
+    
     private func makeDetailViewController(book: Book) -> DetailViewController {
         let viewModel = DetailViewModel(book: book, cartRepository: viewModel.cartRepository, historyRepository: viewModel.historyRepository)
         let viewController = DetailViewController(viewModel: viewModel)
         viewController.onDismiss = { [weak self] in
-            self?.viewModel.action?(.onDismissDetailView)
+            self?.viewModel.action?(.onAppear)
         }
         
         return viewController

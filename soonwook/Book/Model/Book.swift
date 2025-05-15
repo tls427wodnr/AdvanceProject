@@ -7,10 +7,6 @@
 
 import Foundation
 
-struct BookResponse: Decodable {
-    let documents: [Book]
-}
-
 struct Book: Decodable {
     let isbn: String // id로 사용
     let title: String

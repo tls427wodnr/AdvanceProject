@@ -6,9 +6,11 @@
 //
 
 import Foundation
+import RxSwift
 
 protocol NetworkServiceProtocol {
     func fetchData<T: Decodable>(with request: URLRequest, completion: @escaping (Result<T, Error>) -> Void)
+    func fetchData<T: Decodable>(with request: URLRequest) -> Single<T>
 }
 
 enum NetworkError: Error {
@@ -48,5 +50,40 @@ final class NetworkService: NetworkServiceProtocol {
         }
         
         task.resume()
+    }
+    
+    func fetchData<T: Decodable>(with request: URLRequest) -> Single<T> {
+        return Single<T>.create { observer in
+            let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                if let error {
+                    observer(.failure(error))
+                    return
+                }
+                
+                let successRange = 200..<300
+                guard let response = response as? HTTPURLResponse,
+                      successRange.contains(response.statusCode)
+                else {
+                    observer(.failure(NetworkError.responseFailed))
+                    return
+                }
+                
+                guard let data else {
+                    observer(.failure(NetworkError.noData))
+                    return
+                }
+                
+                do {
+                    let response = try JSONDecoder().decode(T.self, from: data)
+                    observer(.success(response))
+                } catch {
+                    observer(.failure(NetworkError.parsingFailed))
+                }
+            }
+            
+            task.resume()
+            
+            return Disposables.create()
+        }
     }
 }

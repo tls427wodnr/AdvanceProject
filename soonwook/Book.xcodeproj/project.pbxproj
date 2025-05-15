@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5A4EC7AF2DD44C710021A79D /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 5A4EC7AE2DD44C710021A79D /* RxCocoa */; };
 		5A4FD0342DCCA52900540641 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 5A4FD0332DCCA52900540641 /* SnapKit */; };
 /* End PBXBuildFile section */
 
@@ -40,6 +41,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A4EC7AF2DD44C710021A79D /* RxCocoa in Frameworks */,
 				5A4FD0342DCCA52900540641 /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -84,6 +86,7 @@
 			name = Book;
 			packageProductDependencies = (
 				5A4FD0332DCCA52900540641 /* SnapKit */,
+				5A4EC7AE2DD44C710021A79D /* RxCocoa */,
 			);
 			productName = Book;
 			productReference = 5A4FCF0B2DCC9E6000540641 /* Book.app */;
@@ -115,6 +118,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				5A4FD0322DCCA52900540641 /* XCRemoteSwiftPackageReference "SnapKit" */,
+				5A4EC7AD2DD44C710021A79D /* XCRemoteSwiftPackageReference "RxSwift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5A4FCF0C2DCC9E6000540641 /* Products */;
@@ -348,6 +352,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		5A4EC7AD2DD44C710021A79D /* XCRemoteSwiftPackageReference "RxSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ReactiveX/RxSwift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.9.0;
+			};
+		};
 		5A4FD0322DCCA52900540641 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit";
@@ -359,6 +371,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		5A4EC7AE2DD44C710021A79D /* RxCocoa */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5A4EC7AD2DD44C710021A79D /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxCocoa;
+		};
 		5A4FD0332DCCA52900540641 /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 5A4FD0322DCCA52900540641 /* XCRemoteSwiftPackageReference "SnapKit" */;
