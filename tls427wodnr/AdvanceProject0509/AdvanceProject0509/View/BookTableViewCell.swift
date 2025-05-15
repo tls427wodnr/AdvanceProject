@@ -62,9 +62,10 @@ final class BookTableViewCell: UITableViewCell {
         
         NSLayoutConstraint.activate([
             bookImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
+            bookImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
             bookImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            bookImageView.widthAnchor.constraint(equalToConstant: 50),
-            bookImageView.heightAnchor.constraint(equalToConstant: 70),
+            bookImageView.widthAnchor.constraint(equalToConstant: 60),
+            bookImageView.heightAnchor.constraint(equalToConstant: 80),
             
             titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
             titleLabel.leadingAnchor.constraint(equalTo: bookImageView.trailingAnchor, constant: 12),
@@ -82,6 +83,7 @@ final class BookTableViewCell: UITableViewCell {
     func configure(with item: BookItem) {
         titleLabel.text = item.title
         authorLabel.text = item.author
+        bookImageView.image = nil
         
         if let url = URL(string: item.image) {
             URLSession.shared.dataTask(with: url) { data, _, _ in
