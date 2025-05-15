@@ -141,3 +141,14 @@ extension SearchViewController: UICollectionViewDelegate {
         }
     }
 }
+
+extension SearchViewController: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard scrollView == searchView.collectionView else { return }
+
+        let visibleIndexPaths = searchView.collectionView.indexPathsForVisibleItems
+        guard let maxIndex = visibleIndexPaths.map({ $0.item }).max() else { return }
+
+        viewModel.loadNextPageIfNeeded(currentIndex: maxIndex)
+    }
+}

@@ -17,7 +17,7 @@ final class BookAPIService {
         return "KakaoAK \(key)"
     }
 
-    func searchBooks(query: String) -> Single<[BookDTO]> {
+    func searchBooks(query: String, page: Int) -> Single<BookSearchResponseDTO> {
         return Single.create { [weak self] single in
             guard let self = self else {
                 single(.failure(NSError(domain: "BookAPIService", code: -1, userInfo: [NSLocalizedDescriptionKey: "Self deallocated"])))
@@ -25,7 +25,11 @@ final class BookAPIService {
             }
 
             var components = URLComponents(string: "https://dapi.kakao.com/v3/search/book")!
-            components.queryItems = [URLQueryItem(name: "query", value: query)]
+            components.queryItems = [
+                URLQueryItem(name: "query", value: query),
+                URLQueryItem(name: "page", value: "\(page)"),
+                URLQueryItem(name: "size", value: "15")
+            ]
 
             var request = URLRequest(url: components.url!)
             request.setValue(self.apiKey, forHTTPHeaderField: "Authorization")
@@ -43,7 +47,7 @@ final class BookAPIService {
 
                 do {
                     let result = try JSONDecoder().decode(BookSearchResponseDTO.self, from: data)
-                    single(.success(result.documents))
+                    single(.success(result))
                 } catch {
                     single(.failure(error))
                 }
@@ -54,4 +58,5 @@ final class BookAPIService {
             return Disposables.create { task.cancel() }
         }
     }
+
 }

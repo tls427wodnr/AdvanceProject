@@ -7,7 +7,7 @@
 import RxSwift
 
 protocol SearchBooksUseCase {
-    func execute(query: String) -> Single<[Book]>
+    func execute(query: String, page: Int) -> Single<BookSearchResponseDTO>
 }
 
 final class DefaultSearchBooksUseCase: SearchBooksUseCase {
@@ -17,7 +17,8 @@ final class DefaultSearchBooksUseCase: SearchBooksUseCase {
         self.repository = repository
     }
 
-    func execute(query: String) -> Single<[Book]> {
-        return repository.searchBooks(query: query)
+    func execute(query: String, page: Int) -> Single<BookSearchResponseDTO> {
+        return repository.searchBooks(query: query, page: page)
     }
 }
+
