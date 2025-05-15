@@ -9,7 +9,7 @@ import UIKit
 import RxSwift
 
 class SearchResultCollectionViewCell: UICollectionViewCell {
-    static let identifier = "SearchResultTableViewCell"
+    static let identifier = "SearchResultCollectionViewCell"
     private let disposeBag = DisposeBag()
 
     private let titleLabel = UILabel().then {
