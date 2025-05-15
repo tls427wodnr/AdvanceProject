@@ -1,4 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="1" systemVersion="11A491" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="false" userDefinedModelVersionIdentifier="">
-    <elements/>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23788" systemVersion="24E263" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="BookEntity" representedClassName="BookEntity" syncable="YES">
+        <attribute name="authors" optional="YES" attributeType="String"/>
+        <attribute name="contents" optional="YES" attributeType="String"/>
+        <attribute name="salePrice" optional="YES" attributeType="String"/>
+        <attribute name="thumbnailURL" optional="YES" attributeType="String"/>
+        <attribute name="title" optional="YES" attributeType="String"/>
+    </entity>
+    <entity name="RecentBookEntity" representedClassName="RecentBookEntity" syncable="YES">
+        <attribute name="authors" optional="YES" attributeType="String"/>
+        <attribute name="contents" optional="YES" attributeType="String"/>
+        <attribute name="salePrice" optional="YES" attributeType="String"/>
+        <attribute name="thumbnailURL" optional="YES" attributeType="String"/>
+        <attribute name="title" optional="YES" attributeType="String"/>
+        <attribute name="viewedDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <fetchIndex name="byPropertyIndex">
+            <fetchIndexElement property="viewedDate" type="Binary" order="ascending"/>
+        </fetchIndex>
+    </entity>
 </model>
