@@ -8,6 +8,9 @@
 import Foundation
 import CoreData
 import UIKit
+import DataLayer
+import DomainLayer
+import PresentationLayer
 
 struct DIContainer {
     let bookRepository: BookRepositoryProtocol
