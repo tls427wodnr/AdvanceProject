@@ -11,14 +11,33 @@ import RxCocoa
 
 class MainViewModel {
     private let searchBooksUseCase: SearchBooksUseCaseProtocol
+    private let recentBooksUseCase: RecentBooksUseCaseProtocol
 
-    let searchResultBooks = PublishRelay<[Book]>()
+    let searchResultBooks = BehaviorRelay<[Book]>(value: [])
+    let recentBooks = BehaviorRelay<[RecentBook]>(value: [])
     let didFailedEvent = PublishRelay<Error>()
+    let fetchRecentBooks = PublishRelay<Void>()
 
     private let disposeBag = DisposeBag()
 
-    init(searchBooksUseCase: SearchBooksUseCaseProtocol) {
+    var sections: Observable<[BookSection]> {
+        Observable.combineLatest(recentBooks, searchResultBooks)
+            .map { recentBooks, searchBooks -> [BookSection] in
+                return [
+                    .recent(recentBooks.map { BookSectionItem.recent($0) }),
+                    .search(searchBooks.map { BookSectionItem.search($0) })
+                ]
+            }
+    }
+
+    init(
+        searchBooksUseCase: SearchBooksUseCaseProtocol,
+        recentBooksUseCase: RecentBooksUseCaseProtocol
+    ) {
         self.searchBooksUseCase = searchBooksUseCase
+        self.recentBooksUseCase = recentBooksUseCase
+
+        bind()
     }
 }
 
@@ -29,9 +48,22 @@ extension MainViewModel {
             .subscribe(onSuccess: { [weak self] result in
                 guard let self else { return }
                 self.searchResultBooks.accept(result)
-                print("검색 결과: \(result)")
             }, onFailure: { error in
                 self.didFailedEvent.accept(error)
+            }).disposed(by: disposeBag)
+    }
+
+    func bind() {
+        fetchRecentBooks
+            .subscribe(onNext: { [weak self] _ in
+                guard let self else { return }
+                do {
+                    let recentBooks = try self.recentBooksUseCase.fetchRecentBooks()
+                    print("최근 본 책 개수: \(recentBooks.count)")
+                    self.recentBooks.accept(recentBooks)
+                } catch {
+                    print(error)
+                }
             }).disposed(by: disposeBag)
     }
 }
