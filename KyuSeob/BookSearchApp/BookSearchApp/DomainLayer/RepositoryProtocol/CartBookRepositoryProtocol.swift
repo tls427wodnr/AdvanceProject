@@ -8,7 +8,7 @@
 import Foundation
 
 protocol CartBookRepositoryProtocol: AnyObject {
-    func saveCartBook(book: Book) throws
+    func addCartBook(book: Book) throws
     func fetchCartBooks() throws -> [CartBook]
     func deleteAllCartBooks() throws
     func deleteCartBook(createdAt: Date) throws

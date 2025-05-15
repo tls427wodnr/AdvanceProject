@@ -30,4 +30,5 @@ struct Document: Codable {
     let thumbnail: String
     let authors: [String]
     let price: Int
+    let isbn: String
 }

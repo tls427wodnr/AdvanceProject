@@ -20,6 +20,7 @@ final class BookRepository: BookRepositoryProtocol {
             .map { response in
                 response.documents.map { doc in
                     Book(
+                        isbn: doc.isbn,
                         title: doc.title,
                         authors: doc.authors,
                         thumbnail: doc.thumbnail,
