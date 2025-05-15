@@ -218,12 +218,16 @@ final class SearchViewController: UIViewController {
 
     // MARK: - Layout Builders
 
-    private func createLayout() -> UICollectionViewLayout {
+    private func createLayout() -> UICollectionViewCompositionalLayout {
         return UICollectionViewCompositionalLayout { sectionIndex, _ in
-            switch sectionIndex {
-            case 0: return self.createRecentBooksSectionLayout()
-            case 1: return self.createSearchResultsSectionLayout()
-            default: return nil
+            guard sectionIndex < self.dataSource.sectionModels.count else { return nil }
+            let section = self.dataSource.sectionModels[sectionIndex]
+
+            switch section {
+            case .recent:
+                return self.createRecentBooksSectionLayout()
+            case .search:
+                return self.createSearchResultsSectionLayout()
             }
         }
     }
