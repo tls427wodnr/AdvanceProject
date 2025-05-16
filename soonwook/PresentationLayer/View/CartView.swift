@@ -11,7 +11,7 @@ internal import SnapKit
 class CartView: UIView {
     let tableView: UITableView = {
         let tableView = UITableView()
-        tableView.register(CartCell.self, forCellReuseIdentifier: CartCell.reuseIdentifier)
+        tableView.register(CartItemCell.self, forCellReuseIdentifier: CartItemCell.reuseIdentifier)
         tableView.separatorStyle = .none
         return tableView
     }()

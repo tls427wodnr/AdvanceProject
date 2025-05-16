@@ -9,12 +9,12 @@ import UIKit
 internal import SnapKit
 
 enum Section: Int {
-    case history
+    case recentBook
     case searchResult
     
     var title: String {
         switch self {
-        case .history:
+        case .recentBook:
             return "최근 본 책"
         case .searchResult:
             return "검색 결과"
@@ -36,8 +36,8 @@ class SearchView: UIView {
         )
         // "최근 본 책" 셀
         collectionView.register(
-            HistoryCell.self,
-            forCellWithReuseIdentifier: HistoryCell.reuseIdentifier
+            RecentBookCell.self,
+            forCellWithReuseIdentifier: RecentBookCell.reuseIdentifier
         )
         // "검색 결과" 셀
         collectionView.register(
@@ -46,9 +46,9 @@ class SearchView: UIView {
         )
         // 헤더 뷰
         collectionView.register(
-            SearchHeader.self,
+            SearchBookHeader.self,
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-            withReuseIdentifier: SearchHeader.reuseIdentifier
+            withReuseIdentifier: SearchBookHeader.reuseIdentifier
         )
         return collectionView
     }()
@@ -87,7 +87,7 @@ class SearchView: UIView {
         let layout = UICollectionViewCompositionalLayout { [weak self] index, _ in
             let section = Section(rawValue: index)!
             switch section {
-            case .history:
+            case .recentBook:
                 return self?.makeHistoryLayoutSection()
             case .searchResult:
                 return self?.makeSearchResultLayoutSection()

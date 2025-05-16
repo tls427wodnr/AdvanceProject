@@ -46,12 +46,12 @@ final class DetailViewModel: ViewModelProtocol {
     
     private let book: Book
     private let cartItemUseCase: CartItemUseCaseProtocol
-    private let historyUseCase: HistoryUseCaseProtocol
+    private let recentBookUseCase: RecentBookUseCaseProtocol
     
-    init(book: Book, cartItemUseCase: CartItemUseCaseProtocol, historyUseCase: HistoryUseCaseProtocol) {
+    init(book: Book, cartItemUseCase: CartItemUseCaseProtocol, recentBookUseCase: RecentBookUseCaseProtocol) {
         self.book = book
         self.cartItemUseCase = cartItemUseCase
-        self.historyUseCase = historyUseCase
+        self.recentBookUseCase = recentBookUseCase
         
         // prepareAction()
         bindInput()
@@ -64,7 +64,7 @@ final class DetailViewModel: ViewModelProtocol {
 //            switch action {
 //            case .onAppear:
 //                state.book = self.book
-//                recordHistory() // search view의 '최근 본 책' 업데이트를 위해 데이터 저장
+//                saveBook() // search view의 '최근 본 책' 업데이트를 위해 데이터 저장
 //            case .addToCart:
 //                guard !cartItemUseCase.isItemInCart(isbn: book.isbn) else {
 //                    onError?("장바구니에 있는 상품입니다.")
@@ -83,7 +83,7 @@ final class DetailViewModel: ViewModelProtocol {
                 switch input {
                 case .onAppear:
                     output.book.accept(book)
-                    recordHistory()
+                    saveBook()
                 case .addToCart:
                     guard !cartItemUseCase.isItemInCart(isbn: book.isbn) else {
                         output.error.accept("장바구니에 있는 상품입니다.")
@@ -103,7 +103,7 @@ final class DetailViewModel: ViewModelProtocol {
 //        self.onError = onError
 //    }
     
-    private func recordHistory() {
-        historyUseCase.recordHistory(book: book)
+    private func saveBook() {
+        recentBookUseCase.saveBook(book)
     }
 }

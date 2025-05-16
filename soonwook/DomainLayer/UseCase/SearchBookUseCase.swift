@@ -1,5 +1,5 @@
 //
-//  BookUseCase.swift
+//  SearchBookUseCase.swift
 //  Book
 //
 //  Created by 권순욱 on 5/14/25.
@@ -8,14 +8,14 @@
 import Foundation
 import RxSwift
 
-public protocol BookUseCaseProtocol {
+public protocol SearchBookUseCaseProtocol {
     func searchBook(searchText: String, page: Int) -> Single<(books: [Book], meta: Meta)>
 }
 
-public struct BookUseCase: BookUseCaseProtocol {
-    private let bookRepository: BookRepositoryProtocol
+public struct SearchBookUseCase: SearchBookUseCaseProtocol {
+    private let bookRepository: SearchBookRepositoryProtocol
     
-    public init(bookRepository: BookRepositoryProtocol) {
+    public init(bookRepository: SearchBookRepositoryProtocol) {
         self.bookRepository = bookRepository
     }
     

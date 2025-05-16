@@ -80,18 +80,7 @@ class CartViewController: UIViewController {
         
         navigationItem.rightBarButtonItem?.rx.tap
             .subscribe { [weak self] _ in
-                guard let self else { return }
-                
-                if let tabBarController {
-                    tabBarController.selectedIndex = 0
-                    
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        if let navigationController = tabBarController.viewControllers?.first as? UINavigationController,
-                           let searchViewController = navigationController.topViewController as? SearchViewController {
-                            searchViewController.searchView.searchBar.becomeFirstResponder()
-                        }
-                    }
-                }
+                self?.moveToSearchView()
             }
             .disposed(by: disposeBag)
     }
@@ -114,6 +103,20 @@ class CartViewController: UIViewController {
 //            }
 //        }
 //    }
+    
+    // search view로 이동하고, search bar 포커싱
+    private func moveToSearchView() {
+        if let tabBarController {
+            tabBarController.selectedIndex = 0
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                if let navigationController = tabBarController.viewControllers?.first as? UINavigationController,
+                   let searchViewController = navigationController.topViewController as? SearchViewController {
+                    searchViewController.searchView.searchBar.becomeFirstResponder()
+                }
+            }
+        }
+    }
 }
 
 extension CartViewController: UITableViewDataSource {
@@ -123,7 +126,7 @@ extension CartViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: CartCell.reuseIdentifier, for: indexPath) as! CartCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: CartItemCell.reuseIdentifier, for: indexPath) as! CartItemCell
         // cell.update(with: viewModel.state.items[indexPath.row])
         cell.update(with: viewModel.output.items.value[indexPath.row])
         return cell

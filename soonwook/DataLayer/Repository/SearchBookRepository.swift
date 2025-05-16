@@ -1,5 +1,5 @@
 //
-//  BookRepository.swift
+//  SearchBookRepository.swift
 //  Book
 //
 //  Created by 권순욱 on 5/9/25.
@@ -9,7 +9,7 @@ import Foundation
 import RxSwift
 import DomainLayer
 
-public final class BookRepository: BookRepositoryProtocol {
+public final class SearchBookRepository: SearchBookRepositoryProtocol {
     public let networkService: NetworkServiceProtocol
     
     public init(networkService: NetworkServiceProtocol = NetworkService()) {
@@ -49,7 +49,7 @@ public final class BookRepository: BookRepositoryProtocol {
     }
     
     // 무한 스크롤 구현 후: book 데이터와 meta 데이터 수신, page 쿼리 가능, RxSwift 이용
-    public func searchBook(searchText: String, page: Int) -> Single<(books: [DomainLayer.Book], meta: DomainLayer.Meta)> {
+    public func searchBook(searchText: String, page: Int) -> Single<(books: [Book], meta: Meta)> {
         let APIKey = Bundle.main.infoDictionary?["APIKey"] as! String
         
         // URL Components
@@ -62,7 +62,7 @@ public final class BookRepository: BookRepositoryProtocol {
             URLQueryItem(name: "page", value: String(page))
         ]
         
-        return Single<(books: [DomainLayer.Book], meta: DomainLayer.Meta)>.create { [weak self] observer in
+        return Single<(books: [Book], meta: Meta)>.create { [weak self] observer in
             guard let url = components.url else {
                 observer(.failure(NetworkError.wrongURL))
                 return Disposables.create()
@@ -77,8 +77,8 @@ public final class BookRepository: BookRepositoryProtocol {
             self?.networkService.fetchData(with: request) { (result: Result<BookResponse, Error>) in
                 switch result {
                 case .success(let response):
-                    let books: [DomainLayer.Book] = response.documents
-                    let meta: DomainLayer.Meta = response.meta
+                    let books = response.documents
+                    let meta = response.meta
                     observer(.success((books: books, meta: meta)))
                 case .failure(let error):
                     observer(.failure(error))

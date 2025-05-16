@@ -16,9 +16,9 @@ public protocol CartItemUseCaseProtocol {
 }
 
 public struct CartItemUseCase: CartItemUseCaseProtocol {
-    private let cartRepository: CartRepositoryProtocol
+    private let cartRepository: CartItemRepositoryProtocol
     
-    public init(cartRepository: CartRepositoryProtocol) {
+    public init(cartRepository: CartItemRepositoryProtocol) {
         self.cartRepository = cartRepository
     }
     
