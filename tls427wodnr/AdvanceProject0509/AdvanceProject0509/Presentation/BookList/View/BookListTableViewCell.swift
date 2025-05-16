@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SDWebImage
 
 // MARK: - BookListTableViewCell
 
@@ -40,6 +41,7 @@ final class BookListTableViewCell: UITableViewCell {
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 4
+        imageView.tintColor = .lightGray
         return imageView
     }()
     
@@ -82,21 +84,36 @@ final class BookListTableViewCell: UITableViewCell {
         ])
     }
     
+    // MARK: - Placeholder
+    
+    private static let placeholderImage: UIImage? = {
+        UIImage(systemName: "book")?.withRenderingMode(.alwaysTemplate)
+    }()
+    
+    // MARK: - Reuse
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        bookImageView.sd_cancelCurrentImageLoad()
+        bookImageView.image = Self.placeholderImage
+    }
+    
     // MARK: - Configuration
 
     func configure(with item: BookItem) {
         titleLabel.text = item.title
         authorLabel.text = item.author
         bookImageView.image = nil
-        
+
         if let url = URL(string: item.image) {
-            URLSession.shared.dataTask(with: url) { data, _, _ in
-                if let data = data, let image = UIImage(data: data) {
-                    DispatchQueue.main.async {
-                        self.bookImageView.image = image
-                    }
-                }
-            }.resume()
+            bookImageView.sd_setImage(
+                with: url,
+                placeholderImage: Self.placeholderImage,
+                options: [.retryFailed, .scaleDownLargeImages],
+                completed: nil
+            )
+        } else {
+            bookImageView.image = Self.placeholderImage
         }
     }
 }
