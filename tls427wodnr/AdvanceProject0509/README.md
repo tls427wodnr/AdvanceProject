@@ -14,6 +14,7 @@
 - ✅ **MVVM → 클린 아키텍처로 리팩토링**
 - ✅ **메모리 누수 분석 및 관리**
 - ✅ **Coordinator Pattern**을 통한 화면 전환 및 흐름 관리
+- ✅ **SDWebImage**를 이용한 이미지 캐싱 
 
 ## 주요 기능
 
@@ -120,5 +121,9 @@ AdvanceProject0509/
 ```
 
 ## 시연 영상
-https://github.com/user-attachments/assets/383729cf-8b85-4857-bbc0-7eafc9936b56
 
+https://github.com/user-attachments/assets/7722bf8a-294a-40ae-8871-dbf7bb2aa389
+
+## SDWebImage를 통한 성능 개선
+
+https://tlswodnr427.tistory.com/131
