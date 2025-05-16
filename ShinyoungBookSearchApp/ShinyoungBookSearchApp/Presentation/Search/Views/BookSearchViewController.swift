@@ -268,7 +268,7 @@ final class BookSearchViewController: UIViewController {
     private func createSearchResultSection() -> NSCollectionLayoutSection {
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .estimated(40)
+            heightDimension: .absolute(40)
         )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
         
