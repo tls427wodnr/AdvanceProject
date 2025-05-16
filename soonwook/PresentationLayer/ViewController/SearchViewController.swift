@@ -6,6 +6,7 @@
 //
 
 import UIKit
+internal import RxSwift
 import DomainLayer
 
 class SearchViewController: UIViewController {
@@ -35,7 +36,8 @@ class SearchViewController: UIViewController {
         
         bindViewModel()
         
-        viewModel.action?(.onAppear)
+        // viewModel.action?(.onAppear)
+        viewModel.input.accept(.onAppear)
     }
     
     private func setDelegate() {
@@ -45,26 +47,65 @@ class SearchViewController: UIViewController {
         searchView.searchBar.delegate = self
     }
     
+//    private func bindViewModel() {
+//        // book 데이터가 바뀌면 컬렉션 뷰 리로드
+//        viewModel.bindBook { [weak self] books in
+//            DispatchQueue.main.async {
+//                self?.searchView.collectionView.reloadData()
+//            }
+//        }
+//        
+//        // history 데이터가 바뀌면 컬렉션 뷰 리로드
+//        viewModel.bindHistory { [weak self] histories in
+//            DispatchQueue.main.async {
+//                self?.searchView.collectionView.reloadData()
+//            }
+//        }
+//        
+//        viewModel.bindError { [weak self] error in
+//            if let error {
+//                self?.showAlert(title: "Error", message: error.localizedDescription)
+//            }
+//        }
+//    }
+    
+    private let disposeBag = DisposeBag()
+    
     private func bindViewModel() {
-        // book 데이터가 바뀌면 컬렉션 뷰 리로드
-        viewModel.bindBook { [weak self] books in
-            DispatchQueue.main.async {
-                self?.searchView.collectionView.reloadData()
+        viewModel.output.books
+            .subscribe { [weak self] books in
+                DispatchQueue.main.async {
+                    self?.searchView.collectionView.reloadData()
+                }
             }
-        }
+            .disposed(by: disposeBag)
         
-        // history 데이터가 바뀌면 컬렉션 뷰 리로드
-        viewModel.bindHistory { [weak self] histories in
-            DispatchQueue.main.async {
-                self?.searchView.collectionView.reloadData()
+        viewModel.output.histories
+            .subscribe { [weak self] histories in
+                DispatchQueue.main.async {
+                    self?.searchView.collectionView.reloadData()
+                }
             }
-        }
+            .disposed(by: disposeBag)
         
-        viewModel.bindError { [weak self] error in
-            if let error {
+        viewModel.output.error
+            .subscribe { [weak self] error in
                 self?.showAlert(title: "Error", message: error.localizedDescription)
             }
-        }
+            .disposed(by: disposeBag)
+        
+        searchView.collectionView.rx.contentOffset
+            .filter { [weak self] offset in
+                guard let self else { return false }
+                let contentHeight = searchView.collectionView.contentSize.height
+                let height = searchView.collectionView.frame.size.height
+                return !viewModel.output.books.value.isEmpty && offset.y > contentHeight - height - 100
+            }
+            .distinctUntilChanged() // 동일 위치에서 중복 요청 방지
+            .subscribe { [weak self] _ in
+                self?.viewModel.input.accept(.onScrollEnd)
+            }
+            .disposed(by: disposeBag)
     }
 }
 
@@ -73,9 +114,11 @@ extension SearchViewController: UICollectionViewDataSource {
         let section = Section(rawValue: section)
         switch section {
         case .history:
-            return viewModel.state.histories.count
+            // return viewModel.state.histories.count
+            return viewModel.output.histories.value.count
         case .searchResult:
-            return viewModel.state.books.count
+            // return viewModel.state.books.count
+            return viewModel.output.books.value.count
         case .none:
             return 0
         }
@@ -90,14 +133,16 @@ extension SearchViewController: UICollectionViewDataSource {
                 withReuseIdentifier: HistoryCell.reuseIdentifier,
                 for: indexPath
             ) as! HistoryCell
-            cell.update(with: viewModel.state.histories[indexPath.item])
+            // cell.update(with: viewModel.state.histories[indexPath.item])
+            cell.update(with: viewModel.output.histories.value[indexPath.item])
             return cell
         case .searchResult:
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: SearchResultCell.reuseIdentifier,
                 for: indexPath
             ) as! SearchResultCell
-            cell.update(with: viewModel.state.books[indexPath.item])
+            // cell.update(with: viewModel.state.books[indexPath.item])
+            cell.update(with: viewModel.output.books.value[indexPath.item])
             return cell
         }
     }
@@ -126,12 +171,14 @@ extension SearchViewController: UICollectionViewDelegate {
         
         switch section {
         case .history:
-            let history = viewModel.state.histories[indexPath.item]
+            // let history = viewModel.state.histories[indexPath.item]
+            let history = viewModel.output.histories.value[indexPath.item]
             let book = Book(isbn: history.isbn, title: history.title, authors: history.authors, price: history.price, contents: history.contents, thumbnail: history.thumbnail)
             let viewController = makeDetailViewController(book: book)
             present(viewController, animated: true)
         case .searchResult:
-            let book = viewModel.state.books[indexPath.item]
+            // let book = viewModel.state.books[indexPath.item]
+            let book = viewModel.output.books.value[indexPath.item]
             let viewController = makeDetailViewController(book: book)
             present(viewController, animated: true)
         case .none:
@@ -139,21 +186,25 @@ extension SearchViewController: UICollectionViewDelegate {
         }
     }
     
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let offsetY = scrollView.contentOffset.y
-        let contentHeight = scrollView.contentSize.height
-        let height = scrollView.frame.size.height
-        
-        if !viewModel.state.books.isEmpty, offsetY > contentHeight - height - 100 {
-            viewModel.action?(.onScrollEnd)
-        }
-    }
+//    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+//        let offsetY = scrollView.contentOffset.y
+//        let contentHeight = scrollView.contentSize.height
+//        let height = scrollView.frame.size.height
+//        
+////        if !viewModel.state.books.isEmpty, offsetY > contentHeight - height - 100 {
+////            viewModel.action?(.onScrollEnd)
+////        }
+//        if !viewModel.output.books.value.isEmpty, offsetY > contentHeight - height - 100 {
+//            viewModel.input.accept(.onScrollEnd)
+//        }
+//    }
     
     private func makeDetailViewController(book: Book) -> DetailViewController {
         let viewModel = DetailViewModel(book: book, cartItemUseCase: viewModel.cartItemUseCase, historyUseCase: viewModel.historyUseCase)
         let viewController = DetailViewController(viewModel: viewModel)
         viewController.onDismiss = { [weak self] in
-            self?.viewModel.action?(.onAppear)
+            // self?.viewModel.action?(.onAppear)
+            self?.viewModel.input.accept(.onAppear)
         }
         
         return viewController
@@ -162,6 +213,7 @@ extension SearchViewController: UICollectionViewDelegate {
 
 extension SearchViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        viewModel.action?(.searchBook(searchText))
+        // viewModel.action?(.searchBook(searchText))
+        viewModel.input.accept(.searchBook(searchText))
     }
 }

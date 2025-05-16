@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import SnapKit
+internal import SnapKit
 
 // 책 정보 검색 뷰와 장바구니 뷰에서 공통 사용됨.
 class BookStackView: UIStackView {

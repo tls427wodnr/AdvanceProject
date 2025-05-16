@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import SnapKit
+internal import SnapKit
 
 class CartView: UIView {
     let tableView: UITableView = {
