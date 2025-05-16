@@ -215,7 +215,7 @@
 		D18EAE6B2DCD97550087FE97 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = D18EAE572DCD97540087FE97 /* AdvanceProject0509 */;
-			baseConfigurationReferenceRelativePath = Configuration/API.xcconfig;
+			baseConfigurationReferenceRelativePath = App/Configuration/API.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -280,7 +280,7 @@
 		D18EAE6C2DCD97550087FE97 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = D18EAE572DCD97540087FE97 /* AdvanceProject0509 */;
-			baseConfigurationReferenceRelativePath = Configuration/API.xcconfig;
+			baseConfigurationReferenceRelativePath = App/Configuration/API.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
