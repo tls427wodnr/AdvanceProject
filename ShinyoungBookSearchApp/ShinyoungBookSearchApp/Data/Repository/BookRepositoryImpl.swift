@@ -9,6 +9,10 @@ import Foundation
 import RxSwift
 
 final class BookRepositoryImpl: BookRepository {
+    func fetchRecentBooks() -> Single<[Book]> {
+        return CoreDataService.shared.fetchRecentBooks()
+    }
+    
     func searchBooks(query: String, page: Int) -> Single<BookSearchResponse> {
         var components = URLComponents(string: "https://dapi.kakao.com/v3/search/book")
         components?.queryItems = [

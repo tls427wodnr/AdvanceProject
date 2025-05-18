@@ -88,8 +88,9 @@ final class BookSearchViewController: UIViewController {
     
     private let viewModel: BookSearchViewModel = {
         let repository = BookRepositoryImpl()
-        let useCase = DefaultBookSearchUseCase(repository: repository)
-        return BookSearchViewModel(bookSearchUseCase: useCase)
+        let searchUseCase = DefaultBookSearchUseCase(repository: repository)
+        let recentUseCase = DefaultFetchRecentBooksUseCase(repository: repository)
+        return BookSearchViewModel(bookSearchUseCase: searchUseCase, fetchRecentBooksUseCase: recentUseCase)
     }()
     
     private let disposeBag = DisposeBag()

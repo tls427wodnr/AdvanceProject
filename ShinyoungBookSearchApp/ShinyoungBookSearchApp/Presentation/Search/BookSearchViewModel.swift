@@ -21,6 +21,7 @@ final class BookSearchViewModel {
     }
     
     private let bookSearchUseCase: BookSearchUseCase
+    private let fetchRecentBooksUseCase: FetchRecentBooksUseCase
     
     private let bookSearchResults = BehaviorRelay<[Book]>(value: [])
     private let recentBooks = BehaviorRelay<[Book]>(value: [])
@@ -33,8 +34,12 @@ final class BookSearchViewModel {
     
     private let disposeBag = DisposeBag()
     
-    init(bookSearchUseCase: BookSearchUseCase) {
+    init(
+        bookSearchUseCase: BookSearchUseCase,
+        fetchRecentBooksUseCase: FetchRecentBooksUseCase
+    ) {
         self.bookSearchUseCase = bookSearchUseCase
+        self.fetchRecentBooksUseCase = fetchRecentBooksUseCase
     }
     
     func transform(input: Input) -> Output {
@@ -115,7 +120,7 @@ final class BookSearchViewModel {
     }
     
     func fetchRecentBooks() {
-        CoreDataService.shared.fetchRecentBooks()
+        fetchRecentBooksUseCase.execute()
             .observe(on: MainScheduler.instance)
             .subscribe(
                 onSuccess: { [weak self] books in
