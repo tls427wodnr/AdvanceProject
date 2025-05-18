@@ -13,6 +13,7 @@ import RxDataSources
 
 class MainViewController: UIViewController {
     private let viewModel: MainViewModel
+    private let diContainer: DIContainer
     private let disposeBag = DisposeBag()
 
     private let searchBar = UISearchBar().then {
@@ -87,8 +88,9 @@ class MainViewController: UIViewController {
         $0.configure(with: "검색 결과가 없어요")
     }
 
-    init(viewModel: MainViewModel) {
+    init(viewModel: MainViewModel, diContainer: DIContainer) {
         self.viewModel = viewModel
+        self.diContainer = diContainer
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -224,22 +226,8 @@ private extension MainViewController {
                         book = recentBook.book
                     }
 
-                    let detailBookViewModel = BookDetailViewModel(
-                        book: book,
-                        cartBookUseCase: CartBookUseCase(
-                            cartBookRepository: CartBookRepository(
-                                coreDataStorage: CoreDataStorage()
-                            )
-                        ),
-                        recentBookUseCase: RecentBooksUseCase(
-                            recentBookRepository: RecentBookRepository(
-                                coreDataStorage: CoreDataStorage()
-                            )
-                        )
-                    )
-
-                    let detailVC = BookDetailViewController(bookDetailViewModel: detailBookViewModel)
-                    detailBookViewModel.detailViewDismissed
+                    let (detailVC, detailVM) = diContainer.makeBookDetailViewController(book: book)
+                    detailVM.detailViewDismissed
                         .subscribe(onNext: { [weak self] in
                             guard let self else { return }
                             self.viewModel.fetchRecentBooks.accept(())
