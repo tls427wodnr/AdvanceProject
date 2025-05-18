@@ -22,4 +22,12 @@ final class BookRepositoryImpl: BookRepository {
         
         return NetworkService.shared.fetch(url: url)
     }
+    
+    func saveFavorite(book: Book) -> Single<Void> {
+        return CoreDataService.shared.saveFavorite(book: book)
+    }
+    
+    func saveRecent(book: Book) -> Single<Void> {
+        return CoreDataService.shared.saveRecent(book: book)
+    }
 }
