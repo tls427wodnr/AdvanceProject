@@ -11,4 +11,7 @@ protocol BookRepository {
     func searchBooks(query: String, page: Int) -> Single<BookSearchResponse>
     func saveFavorite(book: Book) -> Single<Void>
     func saveRecent(book: Book) -> Single<Void>
+    func fetchFavoriteBooks() -> Single<[Book]>
+    func deleteAllBooks() -> Single<Void>
+    func deleteBook(isbn: String) -> Single<Void>
 }

@@ -40,6 +40,7 @@ final class CoreDataService {
             newBook.thumbnailURL = book.thumbnailURL
             newBook.salePrice = book.salePrice
             newBook.contents = book.contents
+            newBook.isbn = book.isbn
             
             do {
                 try self.context.save()

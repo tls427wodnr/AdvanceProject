@@ -30,4 +30,16 @@ final class BookRepositoryImpl: BookRepository {
     func saveRecent(book: Book) -> Single<Void> {
         return CoreDataService.shared.saveRecent(book: book)
     }
+    
+    func fetchFavoriteBooks() -> Single<[Book]> {
+        CoreDataService.shared.fetchFavoriteBooks()
+    }
+    
+    func deleteAllBooks() -> Single<Void> {
+        CoreDataService.shared.deleteAllBooks()
+    }
+    
+    func deleteBook(isbn: String) -> Single<Void> {
+        CoreDataService.shared.deleteBook(isbn: isbn)
+    }
 }

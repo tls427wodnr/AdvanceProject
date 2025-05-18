@@ -22,7 +22,19 @@ final class TabBarController: UITabBarController {
         self.delegate = self
         
         let bookSearchVC = BookSearchViewController()
-        let savedBooksVC = SavedBooksViewController()
+//        let savedBooksVC = SavedBooksViewController()
+        
+        let repository = BookRepositoryImpl()
+
+//        let bookSearchUseCase = DefaultBookSearchUseCase(repository: repository)
+        let savedBooksUseCase = DefaultSavedBooksUseCase(repository: repository)
+
+//        let bookSearchVM = BookSearchViewModel(bookSearchUseCase: bookSearchUseCase)
+        let savedBooksVM = SavedBooksViewModel(savedBooksUseCase: savedBooksUseCase)
+
+//        let bookSearchVC = BookSearchViewController(viewModel: bookSearchVM)
+        let savedBooksVC = SavedBooksViewController(viewModel: savedBooksVM)
+
         
         bookSearchVC.tabBarItem = UITabBarItem(
             title: "검색",
