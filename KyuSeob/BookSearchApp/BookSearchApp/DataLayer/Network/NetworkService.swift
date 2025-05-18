@@ -30,7 +30,6 @@ final class NetworkService: NetworkServiceProtocol {
 
             var request = URLRequest(url: url)
             request.addValue("KakaoAK \(API_KEY)", forHTTPHeaderField: "Authorization")
-            print("🚀 [Request Headers]: \(request.allHTTPHeaderFields ?? [:])")
 
             let task = URLSession.shared.dataTask(with: request) { data, response, error in
                 if let error {
