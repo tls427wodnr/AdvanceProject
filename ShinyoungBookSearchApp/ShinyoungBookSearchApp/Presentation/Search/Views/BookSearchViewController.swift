@@ -30,6 +30,7 @@ extension BookSectionModel: SectionModelType {
 }
 
 final class BookSearchViewController: UIViewController {
+    private let container = AppDIContainer()
     private let bookSearchBar = BookSearchBar()
     
     private let searchTriggerRelay = PublishRelay<String>()
@@ -86,15 +87,20 @@ final class BookSearchViewController: UIViewController {
         }
     )
     
-    private let viewModel: BookSearchViewModel = {
-        let repository = BookRepositoryImpl()
-        let searchUseCase = DefaultBookSearchUseCase(repository: repository)
-        let recentUseCase = DefaultFetchRecentBooksUseCase(repository: repository)
-        return BookSearchViewModel(bookSearchUseCase: searchUseCase, fetchRecentBooksUseCase: recentUseCase)
-    }()
+    private let viewModel: BookSearchViewModel
     
     private let disposeBag = DisposeBag()
-
+    
+    init(viewModel: BookSearchViewModel) {
+        self.viewModel = viewModel
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -175,7 +181,7 @@ final class BookSearchViewController: UIViewController {
             .bind(onNext: { [weak self] selectedBook in
                 guard let self else { return }
                 
-                let detailVC = BookDetailViewController(book: selectedBook)
+                let detailVC = BookDetailViewController(book: selectedBook, viewModel: container.makeBookDetailViewModel(book: selectedBook))
                 detailVC.modalPresentationStyle = .pageSheet
                 detailVC.onDismiss = { [weak detailVC] in
                     self.viewModel.fetchRecentBooks()

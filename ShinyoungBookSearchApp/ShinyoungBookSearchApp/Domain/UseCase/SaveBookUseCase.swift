@@ -12,7 +12,7 @@ protocol SaveBookUseCase {
     func executeSaveRecent(book: Book) -> Single<Void>
 }
 
-final class DefaultSaveBookUserCase: SaveBookUseCase {
+final class DefaultSaveBookUseCase: SaveBookUseCase {
     private let repository: BookRepository
     
     init(repository: BookRepository) {

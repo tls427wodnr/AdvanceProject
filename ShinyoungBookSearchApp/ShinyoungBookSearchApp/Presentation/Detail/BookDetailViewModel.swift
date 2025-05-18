@@ -61,7 +61,6 @@ final class BookDetailViewModel {
         onSuccess: @escaping () -> Void,
         onFailure: @escaping (Error) -> Void
     ) {
-//        CoreDataService.shared.saveFavorite(book: book)
         saveBookUseCase.executeSaveFavorite(book: book)
             .observe(on: MainScheduler.instance)
             .subscribe(
@@ -72,7 +71,6 @@ final class BookDetailViewModel {
     }
     
     func saveRecentBook() {
-//        CoreDataService.shared.saveRecent(book: book)
         saveBookUseCase.executeSaveRecent(book: book)
             .subscribe(onFailure: { error in
                     print("최근 본 책 저장 실패: \(error)")

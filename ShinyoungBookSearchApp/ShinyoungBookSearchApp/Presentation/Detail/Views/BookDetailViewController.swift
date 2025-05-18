@@ -25,12 +25,9 @@ final class BookDetailViewController: UIViewController, UIAdaptivePresentationCo
     private let viewDidLoadTrigger = PublishRelay<Void>()
     private let saveButtonTappedTrigger = PublishRelay<Void>()
     
-    init(book: Book) {
+    init(book: Book, viewModel: BookDetailViewModel) {
         self.book = book
-        
-        let repository = BookRepositoryImpl()
-        let useCase = DefaultSaveBookUserCase(repository: repository)
-        self.viewModel = BookDetailViewModel(book: book, saveBookUseCase: useCase)
+        self.viewModel = viewModel
         
         super.init(nibName: nil, bundle: nil)
     }

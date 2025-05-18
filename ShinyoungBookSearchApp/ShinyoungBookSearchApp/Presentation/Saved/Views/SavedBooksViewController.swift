@@ -45,9 +45,6 @@ class SavedBooksViewController: UIViewController {
 
         setupViews()
         setupConstraints()
-//        bindSavedBooks()
-//        bindAddButton()
-//        bindDeleteAllButton()
         bindViewModel()
         bindButtons()
     }
@@ -55,7 +52,6 @@ class SavedBooksViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-//        viewModel.fetchSavedBooks()
         viewWillAppearRelay.accept(())
     }
     
@@ -118,36 +114,6 @@ class SavedBooksViewController: UIViewController {
             .bind(to: deleteAllRelay)
             .disposed(by: disposeBag)
     }
-    
-//    private func bindSavedBooks() {
-//        viewModel.savedBooksDriver
-//            .drive(onNext: { [weak self] books in
-//                self?.books = books
-//                self?.savedBooksTableView.reloadData()
-//            })
-//            .disposed(by: disposeBag)
-//    }
-//    
-//    private func bindAddButton() {
-//        savedBooksHeader.addButton.rx.tap
-//            .bind(onNext: { [weak self] in
-//                self?.tabBarController?.selectedIndex = 0
-//                
-//                if let searchVC = self?.tabBarController?.viewControllers?.first as? UINavigationController,
-//                   let bookSearchVC = searchVC.viewControllers.first as? BookSearchViewController {
-//                    bookSearchVC.focusSearchBar()
-//                }
-//            })
-//            .disposed(by: disposeBag)
-//    }
-//    
-//    private func bindDeleteAllButton() {
-//        savedBooksHeader.deleteAllBooksButton.rx.tap
-//            .bind(onNext: { [weak self] in
-//                self?.viewModel.deleteAllBooks()
-//            })
-//            .disposed(by: disposeBag)
-//    }
 }
 
 extension SavedBooksViewController: UITableViewDataSource {
@@ -180,7 +146,6 @@ extension SavedBooksViewController: UITableViewDelegate {
             guard let self = self else { return }
             
             let book = self.books[indexPath.row]
-//            self.viewModel.deleteBook(isbn: book.isbn)
             self.swipeToDeleteRelay.accept(book.isbn)
             completion(true)
         }

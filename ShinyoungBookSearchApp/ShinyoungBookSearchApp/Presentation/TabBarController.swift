@@ -14,6 +14,7 @@ protocol ScrollToTopCapable {
 }
 
 final class TabBarController: UITabBarController {
+    private let container = AppDIContainer()
     private let disposeBag = DisposeBag()
     private let tabReselected = PublishRelay<Int>()
     
@@ -21,19 +22,8 @@ final class TabBarController: UITabBarController {
         super.viewDidLoad()
         self.delegate = self
         
-        let bookSearchVC = BookSearchViewController()
-//        let savedBooksVC = SavedBooksViewController()
-        
-        let repository = BookRepositoryImpl()
-
-//        let bookSearchUseCase = DefaultBookSearchUseCase(repository: repository)
-        let savedBooksUseCase = DefaultSavedBooksUseCase(repository: repository)
-
-//        let bookSearchVM = BookSearchViewModel(bookSearchUseCase: bookSearchUseCase)
-        let savedBooksVM = SavedBooksViewModel(savedBooksUseCase: savedBooksUseCase)
-
-//        let bookSearchVC = BookSearchViewController(viewModel: bookSearchVM)
-        let savedBooksVC = SavedBooksViewController(viewModel: savedBooksVM)
+        let bookSearchVC = BookSearchViewController(viewModel: container.makeBookSearchViewModel())
+        let savedBooksVC = SavedBooksViewController(viewModel: container.makeSavedBooksViewModel())
 
         
         bookSearchVC.tabBarItem = UITabBarItem(
