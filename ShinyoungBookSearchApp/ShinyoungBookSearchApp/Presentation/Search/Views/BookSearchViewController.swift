@@ -32,6 +32,9 @@ extension BookSectionModel: SectionModelType {
 final class BookSearchViewController: UIViewController {
     private let bookSearchBar = BookSearchBar()
     
+    private let searchTriggerRelay = PublishRelay<String>()
+    private let reachedBottomRelay = PublishRelay<Void>()
+    
     private lazy var bookSearchResultCollectionView: UICollectionView = {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
         cv.register(
@@ -83,20 +86,33 @@ final class BookSearchViewController: UIViewController {
         }
     )
     
-    private let viewModel = BookSearchViewModel()
+//    private let viewModel = BookSearchViewModel()
+    private let viewModel: BookSearchViewModel = {
+        let repository = BookRepositoryImpl()
+        let useCase = DefaultBookSearchUseCase(repository: repository)
+        return BookSearchViewModel(bookSearchUseCase: useCase)
+    }()
+    
     private let disposeBag = DisposeBag()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let input = BookSearchViewModel.Input(
+            searchTrigger: searchTriggerRelay.asObservable(),
+            reachedBottomTrigger: reachedBottomRelay.asObservable()
+        )
+        
+        let output = viewModel.transform(input: input)
+        
         setupViews()
         setupConstraints()
-        bindSectionedBooks()
+        bindSectionedBooks(with: output)
         bindSearchBar()
         bindBookSelection()
         bindPagination()
         bindCancelButton()
-        bindErrorMessage()
+        bindErrorMessage(with: output)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -127,8 +143,10 @@ final class BookSearchViewController: UIViewController {
         }
     }
     
-    private func bindSectionedBooks() {
-        viewModel.sectionedBooksDriver
+//    private func bindSectionedBooks() {
+    private func bindSectionedBooks(with output: BookSearchViewModel.Output) {
+//        viewModel.sectionedBooksDriver
+        output.sectionedBooks
             .drive(bookSearchResultCollectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
     }
@@ -138,9 +156,14 @@ final class BookSearchViewController: UIViewController {
             .withLatestFrom(bookSearchBar.searchBar.rx.text.orEmpty)
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
+//            .bind(onNext: { [weak self] query in
+//                self?.viewModel.queryRelay.accept(query)
+//                self?.viewModel.searchBooks(isPaging: false)
+//                self?.bookSearchBar.searchBar.resignFirstResponder()
+//                self?.bookSearchBar.setCancelButtonVisible(false)
+//            })
             .bind(onNext: { [weak self] query in
-                self?.viewModel.queryRelay.accept(query)
-                self?.viewModel.searchBooks(isPaging: false)
+                self?.searchTriggerRelay.accept(query)
                 self?.bookSearchBar.searchBar.resignFirstResponder()
                 self?.bookSearchBar.setCancelButtonVisible(false)
             })
@@ -184,14 +207,18 @@ final class BookSearchViewController: UIViewController {
                 let sectionType = self.dataSource.sectionModels[indexPath.section].type
                 guard sectionType == .searchResult else { return }
                 
-                let sectionItems = try? self.viewModel.bookSearchResultsSubject.value()
-                let itemCount = sectionItems?.count ?? 0
-                
-                if indexPath.item >= itemCount - 3,
-                   self.viewModel.hasNextPage,
-                   !self.viewModel.isLoading {
-
-                    self.viewModel.searchBooks(isPaging: true)
+//                let sectionItems = try? self.viewModel.bookSearchResultsSubject.value()
+//                let itemCount = sectionItems?.count ?? 0
+//                
+//                if indexPath.item >= itemCount - 3,
+//                   self.viewModel.hasNextPage,
+//                   !self.viewModel.isLoading {
+//
+//                    self.viewModel.searchBooks(isPaging: true)
+//                }
+                let itemCount = self.dataSource.sectionModels[indexPath.section].items.count
+                if indexPath.item >= itemCount - 3 {
+                    self.reachedBottomRelay.accept(())
                 }
             })
             .disposed(by: disposeBag)
@@ -207,12 +234,17 @@ final class BookSearchViewController: UIViewController {
             .disposed(by: disposeBag)
     }
     
-    private func bindErrorMessage() {
-        viewModel.errorMessageRelay
-            .bind(onNext: { [weak self] message in
-                let alert = UIAlertController(title: "에러", message: message, preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "확인", style: .default))
-                self?.present(alert, animated: true)
+//    private func bindErrorMessage() {
+    private func bindErrorMessage(with output: BookSearchViewModel.Output) {
+//        viewModel.errorMessageRelay
+//            .bind(onNext: { [weak self] message in
+//                let alert = UIAlertController(title: "에러", message: message, preferredStyle: .alert)
+//                alert.addAction(UIAlertAction(title: "확인", style: .default))
+//                self?.present(alert, animated: true)
+//            })
+        output.errorMessage
+            .emit(onNext: { [weak self] message in
+                self?.showAlert(message: message)
             })
             .disposed(by: disposeBag)
     }
@@ -305,5 +337,20 @@ extension BookSearchViewController: ScrollToTopCapable {
     func scrollToTop() {
         let offset = CGPoint(x: 0, y: -bookSearchResultCollectionView.contentInset.top)
         bookSearchResultCollectionView.setContentOffset(offset, animated: true)
+    }
+}
+
+extension UIViewController {
+    func showAlert(
+        title: String = "알림",
+        message: String,
+        buttonTitle: String = "확인",
+        handler: (() -> Void)? = nil
+    ) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: buttonTitle, style: .default) { _ in
+            handler?()
+        })
+        present(alert, animated: true)
     }
 }
