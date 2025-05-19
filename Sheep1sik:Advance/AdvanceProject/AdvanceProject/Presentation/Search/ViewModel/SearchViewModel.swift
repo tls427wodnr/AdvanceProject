@@ -103,4 +103,8 @@ final class SearchViewModel {
         recentBooksUseCase.save(book: book)
         fetchRecentBooks()
     }
+    
+    deinit {
+        print("deinitialized")
+    }
 }

@@ -113,7 +113,7 @@ final class BookCell: UICollectionViewCell {
 
         shadowContainerView.snp.makeConstraints {
             $0.width.equalTo(60)
-            $0.height.equalTo(90)
+            $0.height.equalTo(100)
         }
 
         separatorView.snp.makeConstraints {

@@ -41,6 +41,7 @@ final class StoredBooksViewModel {
         guard books.value.indices.contains(index) else { return nil }
         return books.value[index]
     }
+    
 }
 
 

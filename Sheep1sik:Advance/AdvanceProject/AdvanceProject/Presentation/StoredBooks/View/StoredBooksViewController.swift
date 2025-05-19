@@ -112,6 +112,10 @@ final class StoredBooksViewController: UIViewController {
             searchVC.focusSearchBar()
         }
     }
+    
+    deinit {
+        print("deinitialized")
+    }
 }
 
 // MARK: - UITableViewDataSource

@@ -28,6 +28,10 @@ final class BookDetailViewModel {
     func didTapClose() {
         coordinator?.dismiss()
     }
+    
+    deinit {
+        print("deinitialized")
+    }
 }
 
 
