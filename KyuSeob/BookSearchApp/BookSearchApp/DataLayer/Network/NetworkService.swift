@@ -21,8 +21,6 @@ final class NetworkService: NetworkServiceProtocol {
                 URLQueryItem(name: "page", value: String(page))
             ]
 
-            print(components?.url)
-
             guard let url = components?.url else {
                 single(.failure(NetworkError.invalidURL))
                 return Disposables.create()
@@ -33,7 +31,7 @@ final class NetworkService: NetworkServiceProtocol {
 
             let task = URLSession.shared.dataTask(with: request) { data, response, error in
                 if let error {
-                    single(.failure(error))
+                    single(.failure(NetworkError.unknown))
                     return
                 }
 
@@ -47,7 +45,7 @@ final class NetworkService: NetworkServiceProtocol {
                     print(result)
                     single(.success(result))
                 } catch {
-                    single(.failure(error))
+                    single(.failure(NetworkError.unknown))
                 }
             }
 
