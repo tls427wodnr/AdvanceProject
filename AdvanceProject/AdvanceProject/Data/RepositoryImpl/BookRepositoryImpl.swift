@@ -14,8 +14,8 @@ final class BookRepositoryImpl: BookRepository {
         self.service = service
     }
 
-    func searchBooks(query: String) -> Single<[Book]> {
-        return service.searchBooks(query: query)
-            .map { $0.map { $0.toEntity() } }
+    func searchBooks(query: String, page: Int) -> Single<BookSearchResponseDTO> {
+        return service.searchBooks(query: query, page: page)
     }
 }
+

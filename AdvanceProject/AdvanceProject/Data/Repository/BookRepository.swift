@@ -8,5 +8,5 @@
 import RxSwift
 
 protocol BookRepository {
-    func searchBooks(query: String) -> Single<[Book]>
+    func searchBooks(query: String, page: Int) -> Single<BookSearchResponseDTO>
 }
