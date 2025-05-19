@@ -147,7 +147,7 @@ https://github.com/user-attachments/assets/957f2e3e-589a-44d4-90c2-a98c713d3f1a
 1. 프로젝트 클론
 ```bash
 https://github.com/Sparta-bootcamp-master-4team/AdvanceProject/tree/feat/sheep1sik
-
+```
 + KAKAO API KEY가 필요합니다.
 
 ---
