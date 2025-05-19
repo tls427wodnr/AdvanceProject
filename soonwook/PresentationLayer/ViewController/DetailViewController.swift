@@ -6,6 +6,8 @@
 //
 
 import UIKit
+internal import RxSwift
+internal import RxRelay
 
 class DetailViewController: UIViewController {
     private let detailView = DetailView()
@@ -31,7 +33,8 @@ class DetailViewController: UIViewController {
         
         bindViewModel()
         
-        viewModel.action?(.onAppear)
+        // viewModel.action?(.onAppear)
+        viewModel.input.accept(.onAppear)
         
         detailView.delegate = self
     }
@@ -42,15 +45,31 @@ class DetailViewController: UIViewController {
         onDismiss?()
     }
     
+//    private func bindViewModel() {
+//        viewModel.bindBook { [weak self] book in
+//            guard let self, let book else { return }
+//            detailView.configure(with: book)
+//        }
+//        
+//        viewModel.bindError { [weak self] message in
+//            self?.showAlert(title: "오류", message: message)
+//        }
+//    }
+    
+    private let disposeBag = DisposeBag()
+    
     private func bindViewModel() {
-        viewModel.bindBook { [weak self] book in
-            guard let self, let book else { return }
-            detailView.configure(with: book)
-        }
+        viewModel.output.book
+            .subscribe { [weak self] book in
+                self?.detailView.configure(with: book)
+            }
+            .disposed(by: disposeBag)
         
-        viewModel.bindError { [weak self] message in
-            self?.showAlert(title: "오류", message: message)
-        }
+        viewModel.output.error
+            .subscribe { [weak self] message in
+                self?.showAlert(title: "오류", message: message)
+            }
+            .disposed(by: disposeBag)
     }
 }
 
@@ -60,7 +79,8 @@ extension DetailViewController: DetailViewDelegate {
     }
     
     func addButtonTapped() {
-        viewModel.action?(.addToCart)
+        // viewModel.action?(.addToCart)
+        viewModel.input.accept(.addToCart)
         showAlert(title: "완료", message: "장바구니에 추가되었습니다.")
     }
 }

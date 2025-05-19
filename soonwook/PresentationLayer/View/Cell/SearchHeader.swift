@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import SnapKit
+internal import SnapKit
 
 // section에 따라 "최근 본 책" 또는 "검색 결과"
 class SearchHeader: UICollectionReusableView {

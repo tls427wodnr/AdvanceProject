@@ -6,59 +6,86 @@
 //
 
 import Foundation
-import RxSwift
+internal import RxSwift
+internal import RxRelay
 import DomainLayer
 
+//protocol ViewModelProtocol {
+//    associatedtype Action
+//    associatedtype State
+//    
+//    var action: ((Action) -> Void)? { get }
+//    var state: State { get }
+//}
+
 protocol ViewModelProtocol {
-    associatedtype Action
-    associatedtype State
+    associatedtype Input
+    associatedtype Output
     
-    var action: ((Action) -> Void)? { get }
-    var state: State { get }
+    var disposeBag: DisposeBag { get }
 }
 
 final class SearchViewModel: ViewModelProtocol {
-    enum Action {
+//    enum Action {
+//        case onAppear
+//        case searchBook(String)
+//        case onScrollEnd
+//    }
+//    
+//    struct State {
+//        var books: [Book] = [] {
+//            didSet {
+//                onChange?(books)
+//            }
+//        }
+//        
+//        var histories: [History] = [] {
+//            didSet {
+//                onHistoryChange?(histories)
+//            }
+//        }
+//        
+//        var error: Error? {
+//            didSet {
+//                onError?(error)
+//            }
+//        }
+//        
+//        var searchText = ""
+//        var meta: Meta? // API 수신 메타 데이터
+//        
+//        var onChange: (([Book]) -> Void)?
+//        var onHistoryChange: (([History]) -> Void)?
+//        var onError: ((Error?) -> Void)?
+//    }
+//    
+//    var action: ((Action) -> Void)?
+//    var state = State()
+    
+    enum Input {
         case onAppear
         case searchBook(String)
         case onScrollEnd
     }
     
-    struct State {
-        var books: [Book] = [] {
-            didSet {
-                onChange?(books)
-            }
-        }
+    struct Output {
+        var books = BehaviorRelay<[Book]>(value: [])
+        var histories = BehaviorRelay<[History]>(value: [])
+        var error = PublishRelay<Error>()
         
-        var histories: [History] = [] {
-            didSet {
-                onHistoryChange?(histories)
-            }
-        }
-        
-        var error: Error? {
-            didSet {
-                onError?(error)
-            }
-        }
-        
-        var searchText = ""
-        var meta: Meta? // API 수신 메타 데이터
-        
-        var onChange: (([Book]) -> Void)?
-        var onHistoryChange: (([History]) -> Void)?
-        var onError: ((Error?) -> Void)?
+        var searchText = BehaviorRelay(value: "")
+        var meta = BehaviorRelay<Meta?>(value: nil)
     }
     
-    var action: ((Action) -> Void)?
-    var state = State()
+    let disposeBag = DisposeBag()
+    var input = PublishRelay<Input>()
+    var output = Output()
     
     private let bookUseCase: BookUseCaseProtocol
     let cartItemUseCase: CartItemUseCaseProtocol
     let historyUseCase: HistoryUseCaseProtocol
     
-    private let disposeBag = DisposeBag()
+    // private let disposeBag = DisposeBag()
     private var currentPage = 1
     private var isLoading = false
     
@@ -67,35 +94,62 @@ final class SearchViewModel: ViewModelProtocol {
         self.cartItemUseCase = cartItemUseCase
         self.historyUseCase = historyUseCase
         
-        prepareAction()
+        // prepareAction()
+        bindInput()
     }
     
-    private func prepareAction() {
-        action = { [weak self] action in
-            guard let self else { return }
-            
-            switch action {
-            case .onAppear:
-                fetchHistories()
-            case .searchBook(let searchText):
-                resetSearchState()
+//    private func prepareAction() {
+//        action = { [weak self] action in
+//            guard let self else { return }
+//            
+//            switch action {
+//            case .onAppear:
+//                fetchHistories()
+//            case .searchBook(let searchText):
+//                resetSearchState()
+//                
+//                state.searchText = searchText
+//                searchBook(searchText: searchText, page: currentPage)
+//            case .onScrollEnd:
+//                guard let meta = state.meta else { return }
+//                
+//                if !meta.isEnd {
+//                    currentPage += 1
+//                    searchBook(searchText: state.searchText, page: currentPage)
+//                }
+//            }
+//        }
+//    }
+    
+    private func bindInput() {
+        input
+            .subscribe { [weak self] input in
+                guard let self else { return }
                 
-                state.searchText = searchText
-                searchBook(searchText: searchText, page: currentPage)
-            case .onScrollEnd:
-                guard let meta = state.meta else { return }
-                
-                if !meta.isEnd {
-                    currentPage += 1
-                    searchBook(searchText: state.searchText, page: currentPage)
+                switch input {
+                case .onAppear:
+                    fetchHistories()
+                case .searchBook(let searchText):
+                    resetSearchState()
+                    
+                    output.searchText.accept(searchText)
+                    searchBook(searchText: searchText, page: currentPage)
+                case .onScrollEnd:
+                    guard let isEnd = output.meta.value?.isEnd else { return }
+                    
+                    if !isEnd {
+                        currentPage += 1
+                        searchBook(searchText: output.searchText.value, page: currentPage)
+                    }
                 }
             }
-        }
+            .disposed(by: disposeBag)
     }
     
     private func fetchHistories(){
         let histories = historyUseCase.fetchHistories()
-        state.histories = sortHistories(histories)
+        // state.histories = sortHistories(histories)
+        output.histories.accept(sortHistories(histories))
     }
     
     private func sortHistories(_ histories: [History]) -> [History] {
@@ -104,7 +158,8 @@ final class SearchViewModel: ViewModelProtocol {
     
     private func resetSearchState() {
         currentPage = 1
-        state.meta = nil
+        // state.meta = nil
+        output.meta.accept(nil)
     }
     
     // 무한 스크롤 구현 전: book 데이터만 수신, page 쿼리 불가
@@ -130,27 +185,32 @@ final class SearchViewModel: ViewModelProtocol {
                 guard let self else { return }
                 
                 if currentPage == 1 {
-                    state.books = response.books
+                    // state.books = response.books
+                    output.books.accept(response.books)
                 } else {
-                    state.books += response.books
+                    // state.books += response.books
+                    let books = output.books.value + response.books
+                    output.books.accept(books)
                 }
-                state.meta = response.meta
+                // state.meta = response.meta
+                output.meta.accept(response.meta)
                 isLoading = false
             } onFailure: { [weak self] error in
-                self?.state.error = error
+                // self?.state.error = error
+                self?.output.error.accept(error)
             }
             .disposed(by: disposeBag)
     }
     
-    func bindBook(_ onChange: @escaping ([Book]) -> Void) {
-        state.onChange = onChange
-    }
-    
-    func bindHistory(_ onChange: @escaping ([History]) -> Void) {
-        state.onHistoryChange = onChange
-    }
-    
-    func bindError(_ onError: @escaping (Error?) -> Void) {
-        state.onError = onError
-    }
+//    func bindBook(_ onChange: @escaping ([Book]) -> Void) {
+//        state.onChange = onChange
+//    }
+//    
+//    func bindHistory(_ onChange: @escaping ([History]) -> Void) {
+//        state.onHistoryChange = onChange
+//    }
+//    
+//    func bindError(_ onError: @escaping (Error?) -> Void) {
+//        state.onError = onError
+//    }
 }

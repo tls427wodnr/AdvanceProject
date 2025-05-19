@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import SnapKit
+internal import SnapKit
 import DomainLayer
 
 class HistoryCell: UICollectionViewCell {
