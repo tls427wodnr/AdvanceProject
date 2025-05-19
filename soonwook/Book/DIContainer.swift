@@ -13,21 +13,21 @@ import DomainLayer
 import PresentationLayer
 
 struct DIContainer {
-    let bookRepository: BookRepositoryProtocol
-    let cartRepository: CartRepositoryProtocol
-    let historyRepository: HistoryRepositoryProtocol
+    let searchBookRepository: SearchBookRepositoryProtocol
+    let cartRepository: CartItemRepositoryProtocol
+    let recentBookRepository: RecentBookRepositoryProtocol
     
     init(context: NSManagedObjectContext) {
-        bookRepository = BookRepository()
-        cartRepository = CartRepository(context: context)
-        historyRepository = HistoryRepository(context: context)
+        searchBookRepository = SearchBookRepository()
+        cartRepository = CartItemRepository(context: context)
+        recentBookRepository = RecentBookRepository(context: context)
     }
     
     func makeTabBarController() -> UITabBarController {
-        let bookUseCase = BookUseCase(bookRepository: bookRepository)
+        let searchBookUseCase = SearchBookUseCase(bookRepository: searchBookRepository)
         let cartItemUseCase = CartItemUseCase(cartRepository: cartRepository)
-        let historyUseCase = HistoryUseCase(historyRepository: historyRepository)
+        let recentBookUseCase = RecentBookUseCase(recentBookRepository: recentBookRepository)
         
-        return TabBarController(bookUseCase: bookUseCase, cartItemUseCase: cartItemUseCase, historyUseCase: historyUseCase)
+        return TabBarController(searchBookUseCase: searchBookUseCase, cartItemUseCase: cartItemUseCase, recentBookUseCase: recentBookUseCase)
     }
 }

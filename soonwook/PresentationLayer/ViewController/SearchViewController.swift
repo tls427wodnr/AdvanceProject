@@ -55,8 +55,8 @@ class SearchViewController: UIViewController {
 //            }
 //        }
 //        
-//        // history 데이터가 바뀌면 컬렉션 뷰 리로드
-//        viewModel.bindHistory { [weak self] histories in
+//        // recentBook 데이터가 바뀌면 컬렉션 뷰 리로드
+//        viewModel.bindRecentBook { [weak self] books in
 //            DispatchQueue.main.async {
 //                self?.searchView.collectionView.reloadData()
 //            }
@@ -80,7 +80,7 @@ class SearchViewController: UIViewController {
             }
             .disposed(by: disposeBag)
         
-        viewModel.output.histories
+        viewModel.output.recentBooks
             .subscribe { [weak self] histories in
                 DispatchQueue.main.async {
                     self?.searchView.collectionView.reloadData()
@@ -113,9 +113,9 @@ extension SearchViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let section = Section(rawValue: section)
         switch section {
-        case .history:
-            // return viewModel.state.histories.count
-            return viewModel.output.histories.value.count
+        case .recentBook:
+            // return viewModel.state.recentBooks.count
+            return viewModel.output.recentBooks.value.count
         case .searchResult:
             // return viewModel.state.books.count
             return viewModel.output.books.value.count
@@ -128,13 +128,13 @@ extension SearchViewController: UICollectionViewDataSource {
         let section = Section(rawValue: indexPath.section)!
         
         switch section {
-        case .history:
+        case .recentBook:
             let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: HistoryCell.reuseIdentifier,
+                withReuseIdentifier: RecentBookCell.reuseIdentifier,
                 for: indexPath
-            ) as! HistoryCell
-            // cell.update(with: viewModel.state.histories[indexPath.item])
-            cell.update(with: viewModel.output.histories.value[indexPath.item])
+            ) as! RecentBookCell
+            // cell.update(with: viewModel.state.recentBooks[indexPath.item])
+            cell.update(with: viewModel.output.recentBooks.value[indexPath.item])
             return cell
         case .searchResult:
             let cell = collectionView.dequeueReusableCell(
@@ -154,9 +154,9 @@ extension SearchViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let headerView = collectionView.dequeueReusableSupplementaryView(
             ofKind: kind,
-            withReuseIdentifier: SearchHeader.reuseIdentifier,
+            withReuseIdentifier: SearchBookHeader.reuseIdentifier,
             for: indexPath
-        ) as! SearchHeader
+        ) as! SearchBookHeader
         
         let section = Section(rawValue: indexPath.section)!
         headerView.configure(with: section.title)
@@ -170,10 +170,10 @@ extension SearchViewController: UICollectionViewDelegate {
         let section = Section(rawValue: indexPath.section)
         
         switch section {
-        case .history:
-            // let history = viewModel.state.histories[indexPath.item]
-            let history = viewModel.output.histories.value[indexPath.item]
-            let book = Book(isbn: history.isbn, title: history.title, authors: history.authors, price: history.price, contents: history.contents, thumbnail: history.thumbnail)
+        case .recentBook:
+            // let recentBook = viewModel.state.recentBooks[indexPath.item]
+            let recentBook = viewModel.output.recentBooks.value[indexPath.item]
+            let book = Book(isbn: recentBook.isbn, title: recentBook.title, authors: recentBook.authors, price: recentBook.price, contents: recentBook.contents, thumbnail: recentBook.thumbnail)
             let viewController = makeDetailViewController(book: book)
             present(viewController, animated: true)
         case .searchResult:
@@ -200,7 +200,7 @@ extension SearchViewController: UICollectionViewDelegate {
 //    }
     
     private func makeDetailViewController(book: Book) -> DetailViewController {
-        let viewModel = DetailViewModel(book: book, cartItemUseCase: viewModel.cartItemUseCase, historyUseCase: viewModel.historyUseCase)
+        let viewModel = DetailViewModel(book: book, cartItemUseCase: viewModel.cartItemUseCase, recentBookUseCase: viewModel.recentBookUseCase)
         let viewController = DetailViewController(viewModel: viewModel)
         viewController.onDismiss = { [weak self] in
             // self?.viewModel.action?(.onAppear)

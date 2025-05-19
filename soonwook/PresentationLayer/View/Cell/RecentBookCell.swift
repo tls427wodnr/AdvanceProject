@@ -1,5 +1,5 @@
 //
-//  HistoryCell.swift
+//  RecentBookCell.swift
 //  Book
 //
 //  Created by 권순욱 on 5/8/25.
@@ -9,8 +9,8 @@ import UIKit
 internal import SnapKit
 import DomainLayer
 
-class HistoryCell: UICollectionViewCell {
-    static let reuseIdentifier = "HistoryCell"
+class RecentBookCell: UICollectionViewCell {
+    static let reuseIdentifier = "RecentBookCell"
     
     // 책 이미지
     let imageView: UIImageView = {
@@ -35,9 +35,9 @@ class HistoryCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func update(with history: History) {
+    func update(with book: Book) {
         DispatchQueue.global().async { [weak self] in
-            if let url = URL(string: history.thumbnail),
+            if let url = URL(string: book.thumbnail),
                let data = try? Data(contentsOf: url),
                let image = UIImage(data: data) {
                 DispatchQueue.main.sync {

@@ -39,9 +39,9 @@ final class SearchViewModel: ViewModelProtocol {
 //            }
 //        }
 //        
-//        var histories: [History] = [] {
+//        var recentBooks: [Book] = [] {
 //            didSet {
-//                onHistoryChange?(histories)
+//                onRecentBookChange?(recentBooks)
 //            }
 //        }
 //        
@@ -55,7 +55,7 @@ final class SearchViewModel: ViewModelProtocol {
 //        var meta: Meta? // API 수신 메타 데이터
 //        
 //        var onChange: (([Book]) -> Void)?
-//        var onHistoryChange: (([History]) -> Void)?
+//        var onRecentBookChange: (([Book]) -> Void)?
 //        var onError: ((Error?) -> Void)?
 //    }
 //    
@@ -70,7 +70,7 @@ final class SearchViewModel: ViewModelProtocol {
     
     struct Output {
         var books = BehaviorRelay<[Book]>(value: [])
-        var histories = BehaviorRelay<[History]>(value: [])
+        var recentBooks = BehaviorRelay<[Book]>(value: [])
         var error = PublishRelay<Error>()
         
         var searchText = BehaviorRelay(value: "")
@@ -81,18 +81,17 @@ final class SearchViewModel: ViewModelProtocol {
     var input = PublishRelay<Input>()
     var output = Output()
     
-    private let bookUseCase: BookUseCaseProtocol
+    private let searchBookUseCase: SearchBookUseCaseProtocol
     let cartItemUseCase: CartItemUseCaseProtocol
-    let historyUseCase: HistoryUseCaseProtocol
+    let recentBookUseCase: RecentBookUseCaseProtocol
     
-    // private let disposeBag = DisposeBag()
     private var currentPage = 1
     private var isLoading = false
     
-    init(bookUseCase: BookUseCaseProtocol, cartItemUseCase: CartItemUseCaseProtocol, historyUseCase: HistoryUseCaseProtocol) {
-        self.bookUseCase = bookUseCase
+    init(searchBookUseCase: SearchBookUseCaseProtocol, cartItemUseCase: CartItemUseCaseProtocol, recentBookUseCase: RecentBookUseCaseProtocol) {
+        self.searchBookUseCase = searchBookUseCase
         self.cartItemUseCase = cartItemUseCase
-        self.historyUseCase = historyUseCase
+        self.recentBookUseCase = recentBookUseCase
         
         // prepareAction()
         bindInput()
@@ -104,7 +103,7 @@ final class SearchViewModel: ViewModelProtocol {
 //            
 //            switch action {
 //            case .onAppear:
-//                fetchHistories()
+//                fetchBook()
 //            case .searchBook(let searchText):
 //                resetSearchState()
 //                
@@ -128,7 +127,7 @@ final class SearchViewModel: ViewModelProtocol {
                 
                 switch input {
                 case .onAppear:
-                    fetchHistories()
+                    fetchBook()
                 case .searchBook(let searchText):
                     resetSearchState()
                     
@@ -146,14 +145,14 @@ final class SearchViewModel: ViewModelProtocol {
             .disposed(by: disposeBag)
     }
     
-    private func fetchHistories(){
-        let histories = historyUseCase.fetchHistories()
-        // state.histories = sortHistories(histories)
-        output.histories.accept(sortHistories(histories))
+    private func fetchBook(){
+        let recentBooks = recentBookUseCase.fetchBook()
+        // state.recentBooks = sortBook(recentBooks)
+        output.recentBooks.accept(sortBook(recentBooks))
     }
     
-    private func sortHistories(_ histories: [History]) -> [History] {
-        histories.sorted(by: { $0.timestamp > $1.timestamp })
+    private func sortBook(_ books: [Book]) -> [Book] {
+        books.sorted(by: { $0.timestamp! > $1.timestamp! })
     }
     
     private func resetSearchState() {
@@ -164,7 +163,7 @@ final class SearchViewModel: ViewModelProtocol {
     
     // 무한 스크롤 구현 전: book 데이터만 수신, page 쿼리 불가
 //    private func searchBook(searchText: String) {
-//        bookRepository.searchBook(searchText: searchText) { [weak self] result in
+//        searchBookRepository.searchBook(searchText: searchText) { [weak self] result in
 //            guard let self else { return }
 //            switch result {
 //            case .success(let books):
@@ -180,7 +179,7 @@ final class SearchViewModel: ViewModelProtocol {
         guard !isLoading else { return }
         isLoading = true
         
-        bookUseCase.searchBook(searchText: searchText, page: page)
+        searchBookUseCase.searchBook(searchText: searchText, page: page)
             .subscribe { [weak self] response in
                 guard let self else { return }
                 
@@ -206,8 +205,8 @@ final class SearchViewModel: ViewModelProtocol {
 //        state.onChange = onChange
 //    }
 //    
-//    func bindHistory(_ onChange: @escaping ([History]) -> Void) {
-//        state.onHistoryChange = onChange
+//    func bindRecentBook(_ onChange: @escaping ([Book]) -> Void) {
+//        state.onRecentBookChange = onChange
 //    }
 //    
 //    func bindError(_ onError: @escaping (Error?) -> Void) {

@@ -12,11 +12,3 @@ struct BookResponse: Decodable {
     let documents: [Book]
     let meta: Meta
 }
-
-//struct Meta: Decodable {
-//    let isEnd: Bool
-//    
-//    enum CodingKeys: String, CodingKey {
-//        case isEnd = "is_end"
-//    }
-//}

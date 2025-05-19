@@ -1,5 +1,5 @@
 //
-//  CartCell.swift
+//  CartItemCell.swift
 //  Book
 //
 //  Created by 권순욱 on 5/9/25.
@@ -8,8 +8,8 @@
 import UIKit
 import DomainLayer
 
-class CartCell: UITableViewCell {
-    static let reuseIdentifier = "CartCell"
+class CartItemCell: UITableViewCell {
+    static let reuseIdentifier = "CartItemCell"
     
     // 책 정보(책 제목, 저자, 가격)
     let stackView = BookStackView()

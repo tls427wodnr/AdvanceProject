@@ -1,5 +1,5 @@
 //
-//  CartRepository.swift
+//  CartItemRepository.swift
 //  Book
 //
 //  Created by 권순욱 on 5/13/25.
@@ -9,7 +9,7 @@ import Foundation
 import CoreData
 import DomainLayer
 
-public final class CartRepository: CartRepositoryProtocol {
+public final class CartItemRepository: CartItemRepositoryProtocol {
     private let context: NSManagedObjectContext
     
     public init(context: NSManagedObjectContext) {

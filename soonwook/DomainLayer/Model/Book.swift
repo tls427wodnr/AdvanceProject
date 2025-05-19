@@ -14,14 +14,16 @@ public struct Book: Decodable {
     public let price: Int
     public let contents: String
     public let thumbnail: String
+    public let timestamp: Date?
     
-    public init(isbn: String, title: String, authors: [String], price: Int, contents: String, thumbnail: String) {
+    public init(isbn: String, title: String, authors: [String], price: Int, contents: String, thumbnail: String, timestamp: Date? = nil) {
         self.isbn = isbn
         self.title = title
         self.authors = authors
         self.price = price
         self.contents = contents
         self.thumbnail = thumbnail
+        self.timestamp = timestamp
     }
 }
 

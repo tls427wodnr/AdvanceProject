@@ -1,5 +1,5 @@
 //
-//  SearchHeader.swift
+//  SearchBookHeader.swift
 //  Book
 //
 //  Created by 권순욱 on 5/9/25.
@@ -9,8 +9,8 @@ import UIKit
 internal import SnapKit
 
 // section에 따라 "최근 본 책" 또는 "검색 결과"
-class SearchHeader: UICollectionReusableView {
-    static let reuseIdentifier = "SearchHeader"
+class SearchBookHeader: UICollectionReusableView {
+    static let reuseIdentifier = "SearchBookHeader"
     
     let label: UILabel = {
         let label = UILabel()

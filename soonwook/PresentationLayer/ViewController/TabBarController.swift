@@ -9,14 +9,14 @@ import UIKit
 import DomainLayer
 
 public class TabBarController: UITabBarController {
-    let bookUseCase: BookUseCaseProtocol
+    let searchBookUseCase: SearchBookUseCaseProtocol
     let cartItemUseCase: CartItemUseCaseProtocol
-    let historyUseCase: HistoryUseCaseProtocol
+    let recentBookUseCase: RecentBookUseCaseProtocol
     
-    public init(bookUseCase: BookUseCaseProtocol, cartItemUseCase: CartItemUseCaseProtocol, historyUseCase: HistoryUseCaseProtocol) {
-        self.bookUseCase = bookUseCase
+    public init(searchBookUseCase: SearchBookUseCaseProtocol, cartItemUseCase: CartItemUseCaseProtocol, recentBookUseCase: RecentBookUseCaseProtocol) {
+        self.searchBookUseCase = searchBookUseCase
         self.cartItemUseCase = cartItemUseCase
-        self.historyUseCase = historyUseCase
+        self.recentBookUseCase = recentBookUseCase
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -28,7 +28,7 @@ public class TabBarController: UITabBarController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        let searchViewModel = SearchViewModel(bookUseCase: bookUseCase, cartItemUseCase: cartItemUseCase, historyUseCase: historyUseCase)
+        let searchViewModel = SearchViewModel(searchBookUseCase: searchBookUseCase, cartItemUseCase: cartItemUseCase, recentBookUseCase: recentBookUseCase)
         let searchViewController = UINavigationController(rootViewController: SearchViewController(viewModel: searchViewModel))
         searchViewController.tabBarItem = UITabBarItem(title: "검색", image: UIImage(systemName: "magnifyingglass"), tag: 0)
         
