@@ -17,8 +17,8 @@ protocol CoreDataStorageProtocol {
 }
 
 final class CoreDataStorage: CoreDataStorageProtocol {
-    lazy var persistentContainer: NSPersistentContainer = {
-        let container = NSPersistentContainer(name: "BookSearchApp")
+    var persistentContainer: NSPersistentContainer = {
+        let container = NSPersistentContainer(name: "BookSearchModel")
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
                 fatalError("Unresolved error \(error), \(error.userInfo)")
@@ -55,20 +55,10 @@ final class CoreDataStorage: CoreDataStorageProtocol {
         } catch {
             throw CoreDataError.deleteError(error)
         }
-        do {
-            try saveContext(context)
-        } catch {
-            throw CoreDataError.saveError(error)
-        }
     }
 
     func delete(_ object: NSManagedObject, in context: NSManagedObjectContext) throws {
         context.delete(object)
-        do {
-            try saveContext(context)
-        } catch {
-            throw CoreDataError.saveError(error)
-        }
     }
 
 }

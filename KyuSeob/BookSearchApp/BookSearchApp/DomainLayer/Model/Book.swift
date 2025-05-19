@@ -8,6 +8,7 @@
 import Foundation
 
 struct Book {
+    let isbn: String
     let title: String
     let authors: [String]
     let thumbnail: String

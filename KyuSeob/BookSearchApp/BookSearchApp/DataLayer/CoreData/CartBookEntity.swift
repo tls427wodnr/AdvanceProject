@@ -8,8 +8,11 @@
 import Foundation
 import CoreData
 
-@objc(CartBookEntity)
+@objc(CartBookEntity) // TODO: - troubleshooting
 public class CartBookEntity: NSManagedObject {
+//    public override var description: String {
+//        return "BookSearchApp.CartBookEntity"
+//    } // TODO: - troubleshooting
     @NSManaged public var createdAt: Date
     @NSManaged public var book: BookEntity
 }

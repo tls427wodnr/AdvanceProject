@@ -15,7 +15,7 @@ final class CartBookRepository: CartBookRepositoryProtocol {
         self.coreDataStorage = coreDataStorage
     }
 
-    func saveCartBook(book: Book) throws {
+    func addCartBook(book: Book) throws {
         let context = coreDataStorage.viewContext
         guard let bookEntityDescription = NSEntityDescription.entity(forEntityName: "BookEntity", in: context) else {
             fatalError("BookEntity EntityDescription not found")
@@ -32,6 +32,20 @@ final class CartBookRepository: CartBookRepositoryProtocol {
         try coreDataStorage.saveContext(context)
     }
 
+//    func addCartBook(book: Book) throws {
+//        let context = coreDataStorage.viewContext
+//
+//        let modelURL = Bundle.main.url(forResource: "BookSearchModel", withExtension: "momd")
+//        print("🔍 CoreData model URL: \(modelURL?.absoluteString ?? "nil")")
+//        let bookEntity = BookEntity(context: context)
+//        bookEntity.configure(from: book)
+//
+//        let cartBookEntity = CartBookEntity(context: context)
+//        cartBookEntity.configure(book: bookEntity)
+//
+//        try coreDataStorage.saveContext(context)
+//    }
+
     func fetchCartBooks() throws -> [CartBook] {
         // 타입캐스팅하지 않으면 <NSFetchRequestResult>로 에러 발생.
         let request = NSFetchRequest<CartBookEntity>(entityName: "CartBookEntity")
@@ -39,6 +53,7 @@ final class CartBookRepository: CartBookRepositoryProtocol {
         let cartBooks: [CartBook] = cartBookEntities.map { entity in
             let cartBook = CartBook(
                 book: Book(
+                    isbn: entity.book.isbn ?? "",
                     title: entity.book.title ?? "",
                     authors: entity.book.authors ?? [],
                     thumbnail: entity.book.thumbnail ?? "",
@@ -71,5 +86,7 @@ final class CartBookRepository: CartBookRepositoryProtocol {
         }
 
         try coreDataStorage.delete(target, in: context)
+
+        try coreDataStorage.saveContext(context)
     }
 }

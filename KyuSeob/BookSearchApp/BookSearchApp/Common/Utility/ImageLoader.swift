@@ -14,6 +14,7 @@ final class ImageLoader {
     func load(from url: String) -> Single<UIImage?> {
         return Single<UIImage?>.create { single in
             guard let url = URL(string: url) else {
+                single(.failure(NetworkError.invalidURL))
                 return Disposables.create()
             }
 

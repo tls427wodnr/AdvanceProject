@@ -12,6 +12,8 @@
 		9520E3D72DD0AAF000B92EA2 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9520E3D62DD0AAF000B92EA2 /* SnapKit */; };
 		9520E3DA2DD0AAF900B92EA2 /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 9520E3D92DD0AAF900B92EA2 /* Then */; };
 		9520E54B2DD0C73900B92EA2 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 9520E54A2DD0C73900B92EA2 /* Config.xcconfig */; };
+		9554BBC32DD4E77B00ADB2AD /* Differentiator in Frameworks */ = {isa = PBXBuildFile; productRef = 9554BBC22DD4E77B00ADB2AD /* Differentiator */; };
+		9554BBC52DD4E77B00ADB2AD /* RxDataSources in Frameworks */ = {isa = PBXBuildFile; productRef = 9554BBC42DD4E77B00ADB2AD /* RxDataSources */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,17 +25,29 @@
 		9520E3A92DD07B2300B92EA2 /* Exceptions for "BookSearchApp" folder in "BookSearchApp" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				DataLayer/CoreData/Base/BookSearchModel.xcdatamodeld,
 				Resources/Info.plist,
 			);
 			target = 9520E3932DD07B2200B92EA2 /* BookSearchApp */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		9554B9CD2DD4AB9600ADB2AD /* Exceptions for "BookSearchApp" folder in "Copy Bundle Resources" phase from "BookSearchApp" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = 9520E3922DD07B2200B92EA2 /* Resources */;
+			membershipExceptions = (
+				DataLayer/CoreData/Base/BookSearchModel.xcdatamodeld,
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		9520E3962DD07B2200B92EA2 /* BookSearchApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				9520E3A92DD07B2300B92EA2 /* Exceptions for "BookSearchApp" folder in "BookSearchApp" target */,
+				9554B9CD2DD4AB9600ADB2AD /* Exceptions for "BookSearchApp" folder in "Copy Bundle Resources" phase from "BookSearchApp" target */,
 			);
 			path = BookSearchApp;
 			sourceTree = "<group>";
@@ -46,7 +60,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				9520E3D72DD0AAF000B92EA2 /* SnapKit in Frameworks */,
+				9554BBC32DD4E77B00ADB2AD /* Differentiator in Frameworks */,
 				9520E3D42DD0AAE400B92EA2 /* RxRelay in Frameworks */,
+				9554BBC52DD4E77B00ADB2AD /* RxDataSources in Frameworks */,
 				9520E3D22DD0AAE400B92EA2 /* RxCocoa in Frameworks */,
 				9520E3DA2DD0AAF900B92EA2 /* Then in Frameworks */,
 			);
@@ -96,6 +112,8 @@
 				9520E3D32DD0AAE400B92EA2 /* RxRelay */,
 				9520E3D62DD0AAF000B92EA2 /* SnapKit */,
 				9520E3D92DD0AAF900B92EA2 /* Then */,
+				9554BBC22DD4E77B00ADB2AD /* Differentiator */,
+				9554BBC42DD4E77B00ADB2AD /* RxDataSources */,
 			);
 			productName = BookSearchApp;
 			productReference = 9520E3942DD07B2200B92EA2 /* BookSearchApp.app */;
@@ -129,6 +147,7 @@
 				9520E3D02DD0AAE400B92EA2 /* XCRemoteSwiftPackageReference "RxSwift" */,
 				9520E3D52DD0AAF000B92EA2 /* XCRemoteSwiftPackageReference "SnapKit" */,
 				9520E3D82DD0AAF900B92EA2 /* XCRemoteSwiftPackageReference "Then" */,
+				9554BBC12DD4E77B00ADB2AD /* XCRemoteSwiftPackageReference "RxDataSources" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 9520E3952DD07B2200B92EA2 /* Products */;
@@ -387,6 +406,14 @@
 				minimumVersion = 3.0.0;
 			};
 		};
+		9554BBC12DD4E77B00ADB2AD /* XCRemoteSwiftPackageReference "RxDataSources" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RxSwiftCommunity/RxDataSources";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -409,6 +436,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9520E3D82DD0AAF900B92EA2 /* XCRemoteSwiftPackageReference "Then" */;
 			productName = Then;
+		};
+		9554BBC22DD4E77B00ADB2AD /* Differentiator */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9554BBC12DD4E77B00ADB2AD /* XCRemoteSwiftPackageReference "RxDataSources" */;
+			productName = Differentiator;
+		};
+		9554BBC42DD4E77B00ADB2AD /* RxDataSources */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9554BBC12DD4E77B00ADB2AD /* XCRemoteSwiftPackageReference "RxDataSources" */;
+			productName = RxDataSources;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -22,7 +22,7 @@ final class CartBookUseCase: CartBookUseCaseProtocol {
     }
 
     func save(book: Book) throws {
-        try cartBookRepository.saveCartBook(book: book)
+        try cartBookRepository.addCartBook(book: book)
     }
 
     func fetchCartBooks() throws -> [CartBook] {

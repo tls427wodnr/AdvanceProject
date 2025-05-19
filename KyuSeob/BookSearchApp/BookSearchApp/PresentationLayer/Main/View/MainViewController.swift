@@ -9,12 +9,11 @@ import UIKit
 import RxSwift
 import SnapKit
 import Then
+import RxDataSources
 
 class MainViewController: UIViewController {
     private let viewModel: MainViewModel
     private let disposeBag = DisposeBag()
-
-    private var searchResultBooks = [Book]()
 
     private let searchBar = UISearchBar().then {
         $0.placeholder = "책 제목을 입력해주세요"
@@ -23,13 +22,14 @@ class MainViewController: UIViewController {
     }
 
     private lazy var resultCollectionView: UICollectionView = {
-        let layout = createCollectionViewLayout()
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.dataSource = self
-        collectionView.delegate = self
+        let collectionView = UICollectionView.withCompositionalLayout()
         collectionView.register(
             SearchResultCollectionViewCell.self,
             forCellWithReuseIdentifier: SearchResultCollectionViewCell.identifier
+        )
+        collectionView.register(
+            RecentBookCollectionViewCell.self,
+            forCellWithReuseIdentifier: RecentBookCollectionViewCell.identifier
         )
         collectionView.register(
             SectionHeaderView.self,
@@ -40,7 +40,50 @@ class MainViewController: UIViewController {
         return collectionView
     }()
 
-    private lazy var emptyView = EmptyView().then {
+    typealias BookSectionDataSource = RxCollectionViewSectionedReloadDataSource<BookSection>
+
+    let dataSource = BookSectionDataSource (
+        configureCell: {_, collectionView, indexPath, item in
+            print("📦 section[\(indexPath.section)] item[\(indexPath.item)] = \(item)")
+            switch item {
+            case .recent(let recentBook):
+                guard let cell = collectionView.dequeueReusableCell(
+                    withReuseIdentifier: RecentBookCollectionViewCell.identifier,
+                    for: indexPath
+                ) as? RecentBookCollectionViewCell else { return UICollectionViewCell() }
+                cell.configure(with: recentBook.book.thumbnail)
+                return cell
+            case .search(let book):
+                guard let cell = collectionView.dequeueReusableCell(
+                    withReuseIdentifier: SearchResultCollectionViewCell.identifier,
+                    for: indexPath
+                ) as? SearchResultCollectionViewCell else { return UICollectionViewCell() }
+                cell.configure(book: book)
+                return cell
+            }
+        },
+        configureSupplementaryView: { dataSource, collectionView, kind, indexPath in
+            guard let header = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind,
+                withReuseIdentifier: SectionHeaderView.identifier,
+                for: indexPath
+            ) as? SectionHeaderView else { return UICollectionReusableView() }
+
+            let title: String
+            switch dataSource.sectionModels[indexPath.section] {
+            case .recent: title = "최근 본 책"
+            case .search: title = "검색 결과"
+            }
+            header.configure(with: title)
+            return header
+        }
+    )
+
+    private lazy var recentEmptyView = EmptyView().then {
+        $0.configure(with: "최근 본 책이 없어요")
+    }
+
+    private lazy var searchEmptyView = EmptyView().then {
         $0.configure(with: "검색 결과가 없어요")
     }
 
@@ -57,6 +100,13 @@ class MainViewController: UIViewController {
         super.viewDidLoad()
 
         configure()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        viewModel.fetchRecentBooks
+            .accept(())
     }
 
     func activateSearchBar() {
@@ -79,7 +129,7 @@ private extension MainViewController {
     }
 
     func setHierarchy() {
-        view.addSubviews(views: searchBar, resultCollectionView, emptyView)
+        view.addSubviews(views: searchBar, resultCollectionView, recentEmptyView, searchEmptyView)
     }
 
     func setConstraints() {
@@ -95,8 +145,14 @@ private extension MainViewController {
             $0.bottom.equalToSuperview()
         }
 
-        emptyView.snp.makeConstraints {
-            $0.top.equalTo(searchBar.snp.bottom)
+        recentEmptyView.snp.makeConstraints {
+            $0.top.equalTo(searchBar.snp.bottom).offset(54)
+            $0.directionalHorizontalEdges.equalTo(resultCollectionView)
+            $0.height.equalTo(120)
+        }
+
+        searchEmptyView.snp.makeConstraints {
+            $0.top.equalTo(searchBar.snp.bottom).offset(174) // 첫번째 섹션 높이만큼 띄움
             $0.directionalHorizontalEdges.equalTo(resultCollectionView)
             $0.bottom.equalTo(view.safeAreaLayoutGuide)
         }
@@ -108,23 +164,26 @@ private extension MainViewController {
             .bind(onNext: { [weak self] query in
                 guard let self else { return }
                 self.viewModel.searchBooks(with: query)
-                self.resultCollectionView.reloadData()
             }).disposed(by: disposeBag)
 
         searchBar.rx.text.orEmpty
             .bind(onNext: { [weak self] text in
                 guard let self else { return }
                 if text.isEmpty {
-                    self.searchResultBooks = []
-                    self.resultCollectionView.reloadData()
+                    viewModel.searchResultBooks.accept([])
                 }
             }).disposed(by: disposeBag)
 
         viewModel.searchResultBooks
             .subscribe(onNext: { [weak self] books in
                 guard let self else { return }
-                self.searchResultBooks = books
-                self.resultCollectionView.reloadData()
+                searchEmptyView.isHidden = !books.isEmpty
+            }).disposed(by: disposeBag)
+
+        viewModel.recentBooks
+            .subscribe(onNext: { [weak self] books in
+                guard let self else { return }
+                recentEmptyView.isHidden = !books.isEmpty
             }).disposed(by: disposeBag)
 
         viewModel.didFailedEvent
@@ -132,85 +191,47 @@ private extension MainViewController {
                 guard let self else { return }
                 self.showNoticeAlert(message: error.localizedDescription) // TODO: - 에러 메시지 정의
             }).disposed(by: disposeBag)
+
+        viewModel.sections
+            .bind(to: resultCollectionView.rx.items(dataSource: dataSource))
+            .disposed(by: disposeBag)
+
+        resultCollectionView.rx.modelSelected(BookSectionItem.self)
+            .subscribe(
+                onNext: { [weak self] item in
+                    guard let self else { return }
+                    let book: Book
+
+                    switch item {
+                    case .search(let searchBook):
+                        book = searchBook
+                    case .recent(let recentBook):
+                        book = recentBook.book
+                    }
+
+                    let detailBookViewModel = BookDetailViewModel(
+                        book: book,
+                        cartBookUseCase: CartBookUseCase(
+                            cartBookRepository: CartBookRepository(
+                                coreDataStorage: CoreDataStorage()
+                            )
+                        ),
+                        recentBookUseCase: RecentBooksUseCase(
+                            recentBookRepository: RecentBookRepository(
+                                coreDataStorage: CoreDataStorage()
+                            )
+                        )
+                    )
+
+                    let detailVC = BookDetailViewController(bookDetailViewModel: detailBookViewModel)
+                    detailBookViewModel.detailViewDismissed
+                        .subscribe(onNext: { [weak self] in
+                            guard let self else { return }
+                            self.viewModel.fetchRecentBooks.accept(())
+                        }).disposed(by: disposeBag)
+                    detailVC.modalPresentationStyle = .pageSheet
+                    self.present(detailVC, animated: true)
+                }).disposed(by: disposeBag)
     }
 
-    func createCollectionViewLayout() -> UICollectionViewLayout {
-        let itemSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0),
-            heightDimension: .fractionalHeight(1.0)
-        )
-
-        let item = NSCollectionLayoutItem(layoutSize: itemSize)
-
-        let groupSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0),
-            heightDimension: .absolute(150)
-        )
-
-        let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
-
-        let section = NSCollectionLayoutSection(group: group)
-        section.interGroupSpacing = 10
-        section.contentInsets = .init(top: 10, leading: 20, bottom: 20, trailing: 20)
-
-        let headerSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0),
-            heightDimension: .estimated(44)
-        )
-
-        let header = NSCollectionLayoutBoundarySupplementaryItem(
-            layoutSize: headerSize,
-            elementKind: UICollectionView.elementKindSectionHeader,
-            alignment: .top
-        )
-        section.boundarySupplementaryItems = [header]
-
-        return UICollectionViewCompositionalLayout(section: section)
-    }
-}
-
-extension MainViewController: UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let count = searchResultBooks.count
-        emptyView.isHidden = count != 0
-        return count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: SearchResultCollectionViewCell.identifier,
-            for: indexPath
-        ) as? SearchResultCollectionViewCell else {
-            return UICollectionViewCell()
-        }
-
-        cell.configure(book: searchResultBooks[indexPath.item])
-
-        return cell
-    }
-
-    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: SectionHeaderView.identifier, for: indexPath) as? SectionHeaderView else {
-            return UICollectionReusableView()
-        }
-        header.configure(with: "검색 결과")
-
-        return header
-    }
-}
-
-extension MainViewController: UICollectionViewDelegate {
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let detailBookViewModel = BookDetailViewModel(
-            book: searchResultBooks[indexPath.item],
-            cartBookUseCase: CartBookUseCase(
-                cartBookRepository: CartBookRepository(
-                    coreDataStorage: CoreDataStorage()
-                ) // TODO: - DIContainer 관리 필요
-            )
-        )
-        let detailViewController = BookDetailViewController(bookDetailViewModel: detailBookViewModel)
-        detailViewController.modalPresentationStyle = .pageSheet
-        self.present(detailViewController, animated: true)
-    }
 }

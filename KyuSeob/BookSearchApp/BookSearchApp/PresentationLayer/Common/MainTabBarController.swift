@@ -25,6 +25,10 @@ final class MainTabBarController: UITabBarController {
                     bookRepository: BookRepository(
                         networkService: NetworkService()
                     )
+                ), recentBooksUseCase: RecentBooksUseCase(
+                    recentBookRepository: RecentBookRepository(
+                        coreDataStorage: CoreDataStorage()
+                    )
                 )
             )
         )
