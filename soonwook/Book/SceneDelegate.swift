@@ -20,13 +20,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
-        let bookRepository = BookRepository()
         let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-        let cartRepository = CartRepository(context: context)
-        let historyRepository = HistoryRepository(context: context)
+        let diContainer = DIContainer(context: context)
         
         let window = UIWindow(windowScene: windowScene)
-        window.rootViewController = TabBarController(bookRepository: bookRepository, cartRepository: cartRepository, historyRepository: historyRepository)
+        window.rootViewController = diContainer.makeTabBarController()
         window.makeKeyAndVisible()
         self.window = window
     }
