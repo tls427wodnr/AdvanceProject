@@ -15,8 +15,8 @@ final class BookRepository: BookRepositoryProtocol {
         self.networkService = networkService
     }
 
-    func searchBooks(query: String) -> Single<[Book]> {
-        return networkService.fetchSearchResult(query: query)
+    func searchBooks(query: String, page: Int) -> Single<[Book]> {
+        return networkService.fetchSearchResult(query: query, page: page)
             .map { response in
                 response.documents.map { doc in
                     Book(

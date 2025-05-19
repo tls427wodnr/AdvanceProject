@@ -9,5 +9,5 @@ import Foundation
 import RxSwift
 
 protocol BookRepositoryProtocol: AnyObject {
-    func searchBooks(query: String) -> Single<[Book]>
+    func searchBooks(query: String, page: Int) -> Single<[Book]>
 }

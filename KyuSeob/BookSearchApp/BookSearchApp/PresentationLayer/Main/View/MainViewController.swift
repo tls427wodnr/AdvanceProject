@@ -13,6 +13,7 @@ import RxDataSources
 
 class MainViewController: UIViewController {
     private let viewModel: MainViewModel
+    private let diContainer: DIContainer
     private let disposeBag = DisposeBag()
 
     private let searchBar = UISearchBar().then {
@@ -87,8 +88,9 @@ class MainViewController: UIViewController {
         $0.configure(with: "검색 결과가 없어요")
     }
 
-    init(viewModel: MainViewModel) {
+    init(viewModel: MainViewModel, diContainer: DIContainer) {
         self.viewModel = viewModel
+        self.diContainer = diContainer
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -160,17 +162,32 @@ private extension MainViewController {
 
     func bind() {
         searchBar.rx.searchButtonClicked
+            .throttle(.seconds(2), scheduler: MainScheduler.instance)
             .withLatestFrom(searchBar.rx.text.orEmpty)
             .bind(onNext: { [weak self] query in
                 guard let self else { return }
-                self.viewModel.searchBooks(with: query)
+                self.viewModel.searchBooks(with: query, of: 1) // TODO: - Rx 방식으로 변경
             }).disposed(by: disposeBag)
 
         searchBar.rx.text.orEmpty
             .bind(onNext: { [weak self] text in
                 guard let self else { return }
                 if text.isEmpty {
-                    viewModel.searchResultBooks.accept([])
+                    self.viewModel.searchBooks(with: text, of: 1)
+                }
+            }).disposed(by: disposeBag)
+
+        resultCollectionView.rx.contentOffset
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] offset in
+                guard let self else { return }
+
+                let contentHeight = self.resultCollectionView.contentSize.height
+                let visibleHeight = self.resultCollectionView.frame.height
+                let yOffset = offset.y
+
+                if yOffset > contentHeight - visibleHeight - 100 {
+                    self.viewModel.searchTrigger.accept(())
                 }
             }).disposed(by: disposeBag)
 
@@ -209,22 +226,8 @@ private extension MainViewController {
                         book = recentBook.book
                     }
 
-                    let detailBookViewModel = BookDetailViewModel(
-                        book: book,
-                        cartBookUseCase: CartBookUseCase(
-                            cartBookRepository: CartBookRepository(
-                                coreDataStorage: CoreDataStorage()
-                            )
-                        ),
-                        recentBookUseCase: RecentBooksUseCase(
-                            recentBookRepository: RecentBookRepository(
-                                coreDataStorage: CoreDataStorage()
-                            )
-                        )
-                    )
-
-                    let detailVC = BookDetailViewController(bookDetailViewModel: detailBookViewModel)
-                    detailBookViewModel.detailViewDismissed
+                    let (detailVC, detailVM) = diContainer.makeBookDetailViewController(book: book)
+                    detailVM.detailViewDismissed
                         .subscribe(onNext: { [weak self] in
                             guard let self else { return }
                             self.viewModel.fetchRecentBooks.accept(())

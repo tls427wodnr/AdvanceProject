@@ -8,6 +8,7 @@
 import UIKit
 
 final class MainTabBarController: UITabBarController {
+    private let diContainer = DIContainer()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -19,30 +20,10 @@ final class MainTabBarController: UITabBarController {
         self.tabBar.tintColor = .label
         self.tabBar.unselectedItemTintColor = .init(hex: "999999")
 
-        let firstVC = MainViewController(
-            viewModel: MainViewModel(
-                searchBooksUseCase: SearchBooksUseCase(
-                    bookRepository: BookRepository(
-                        networkService: NetworkService()
-                    )
-                ), recentBooksUseCase: RecentBooksUseCase(
-                    recentBookRepository: RecentBookRepository(
-                        coreDataStorage: CoreDataStorage()
-                    )
-                )
-            )
-        )
+        let firstVC = diContainer.makeMainViewController()
         firstVC.tabBarItem = UITabBarItem(title: "검색", image: .init(systemName: "magnifyingglass"), tag: 0)
 
-        let secondVC = CartBookListViewController(
-            viewModel: CartBookListViewModel(
-                cartBookUseCase: CartBookUseCase(
-                    cartBookRepository: CartBookRepository(
-                        coreDataStorage: CoreDataStorage()
-                    )
-                )
-            )
-        )
+        let secondVC = diContainer.makeCartBookListViewController()
         secondVC.tabBarItem = UITabBarItem(title: "담은 책", image: .init(systemName: "list.bullet"), tag: 1)
 
         viewControllers = [
@@ -50,5 +31,4 @@ final class MainTabBarController: UITabBarController {
             UINavigationController(rootViewController: secondVC)
         ]
     }
-
 }
