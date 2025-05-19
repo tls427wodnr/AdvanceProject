@@ -3,6 +3,7 @@
     <entity name="BookEntity" representedClassName="BookEntity" syncable="YES">
         <attribute name="authors" optional="YES" attributeType="String"/>
         <attribute name="contents" optional="YES" attributeType="String"/>
+        <attribute name="isbn" optional="YES" attributeType="String"/>
         <attribute name="salePrice" optional="YES" attributeType="String"/>
         <attribute name="thumbnailURL" optional="YES" attributeType="String"/>
         <attribute name="title" optional="YES" attributeType="String"/>
@@ -10,6 +11,7 @@
     <entity name="RecentBookEntity" representedClassName="RecentBookEntity" syncable="YES">
         <attribute name="authors" optional="YES" attributeType="String"/>
         <attribute name="contents" optional="YES" attributeType="String"/>
+        <attribute name="isbn" optional="YES" attributeType="String"/>
         <attribute name="salePrice" optional="YES" attributeType="String"/>
         <attribute name="thumbnailURL" optional="YES" attributeType="String"/>
         <attribute name="title" optional="YES" attributeType="String"/>

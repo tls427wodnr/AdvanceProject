@@ -22,6 +22,7 @@ extension RecentBookEntity {
     @NSManaged public var contents: String?
     @NSManaged public var authors: String?
     @NSManaged public var viewedDate: Date?
+    @NSManaged public var isbn: String?
 
 }
 
@@ -34,7 +35,8 @@ extension RecentBookEntity {
             authors: self.authors ?? "",
             salePrice: self.salePrice ?? "",
             thumbnailURL: self.thumbnailURL ?? "",
-            contents: self.contents
+            contents: self.contents,
+            isbn: self.isbn ?? ""
         )
     }
 }

@@ -85,10 +85,10 @@ final class CoreDataService {
         }
     }
     
-    func deleteBook(title: String) -> Single<Void> {
+    func deleteBook(isbn: String) -> Single<Void> {
         return Single.create { observer in
             let request: NSFetchRequest<BookEntity> = BookEntity.fetchRequest()
-            request.predicate = NSPredicate(format: "title == %@", title)
+            request.predicate = NSPredicate(format: "isbn == %@", isbn)
             
             do {
                 let result = try self.context.fetch(request)
@@ -110,7 +110,7 @@ final class CoreDataService {
     func saveRecent(book: Book) -> Single<Void> {
         return Single.create { observer in
             let request: NSFetchRequest<RecentBookEntity> = RecentBookEntity.fetchRequest()
-            request.predicate = NSPredicate(format: "title == %@", book.title)
+            request.predicate = NSPredicate(format: "isbn == %@", book.isbn)
             
             do {
                 let existing = try self.context.fetch(request)
@@ -123,6 +123,7 @@ final class CoreDataService {
                 newBook.salePrice = book.salePrice
                 newBook.contents = book.contents
                 newBook.viewedDate = Date()
+                newBook.isbn = book.isbn
                 
                 try self.context.save()
                 observer(.success(()))

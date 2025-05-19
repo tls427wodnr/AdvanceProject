@@ -85,17 +85,22 @@ final class BookSearchViewController: UIViewController {
     
     private let viewModel = BookSearchViewModel()
     private let disposeBag = DisposeBag()
-    private var currentSectionTypes: [BookSectionType] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setupViews()
         setupConstraints()
-        bindViewModel()
+        bindSectionedBooks()
+        bindSearchBar()
+        bindBookSelection()
+        bindPagination()
+        bindCancelButton()
+        bindErrorMessage()
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         viewModel.fetchRecentBooks()
     }
     
@@ -122,20 +127,20 @@ final class BookSearchViewController: UIViewController {
         }
     }
     
-    private func bindViewModel() {
+    private func bindSectionedBooks() {
         viewModel.sectionedBooksDriver
-            .do(onNext: { [weak self] sections in
-                self?.currentSectionTypes = sections.map { $0.type }
-            })
             .drive(bookSearchResultCollectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
-        
+    }
+    
+    private func bindSearchBar() {
         bookSearchBar.searchBar.rx.searchButtonClicked
             .withLatestFrom(bookSearchBar.searchBar.rx.text.orEmpty)
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
             .bind(onNext: { [weak self] query in
-                self?.viewModel.searchBooks(with: query)
+                self?.viewModel.queryRelay.accept(query)
+                self?.viewModel.searchBooks(isPaging: false)
                 self?.bookSearchBar.searchBar.resignFirstResponder()
                 self?.bookSearchBar.setCancelButtonVisible(false)
             })
@@ -146,15 +151,9 @@ final class BookSearchViewController: UIViewController {
                 self?.bookSearchBar.setCancelButtonVisible(true)
             })
             .disposed(by: disposeBag)
-        
-        bookSearchBar.cancelButton.rx.tap
-            .bind(onNext: { [weak self] in
-                self?.bookSearchBar.searchBar.text = ""
-                self?.bookSearchBar.searchBar.resignFirstResponder()
-                self?.bookSearchBar.setCancelButtonVisible(false)
-            })
-            .disposed(by: disposeBag)
-        
+    }
+    
+    private func bindBookSelection() {
         bookSearchResultCollectionView.rx
             .modelSelected(Book.self)
             .bind(onNext: { [weak self] selectedBook in
@@ -175,16 +174,60 @@ final class BookSearchViewController: UIViewController {
             .disposed(by: disposeBag)
     }
     
+    private func bindPagination() {
+        bookSearchResultCollectionView.rx
+            .willDisplayCell
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] cell, indexPath in
+                guard let self else { return }
+                
+                let sectionType = self.dataSource.sectionModels[indexPath.section].type
+                guard sectionType == .searchResult else { return }
+                
+                let sectionItems = try? self.viewModel.bookSearchResultsSubject.value()
+                let itemCount = sectionItems?.count ?? 0
+                
+                if indexPath.item >= itemCount - 3,
+                   self.viewModel.hasNextPage,
+                   !self.viewModel.isLoading {
+
+                    self.viewModel.searchBooks(isPaging: true)
+                }
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func bindCancelButton() {
+        bookSearchBar.cancelButton.rx.tap
+            .bind(onNext: { [weak self] in
+                self?.bookSearchBar.searchBar.text = ""
+                self?.bookSearchBar.searchBar.resignFirstResponder()
+                self?.bookSearchBar.setCancelButtonVisible(false)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func bindErrorMessage() {
+        viewModel.errorMessageRelay
+            .bind(onNext: { [weak self] message in
+                let alert = UIAlertController(title: "에러", message: message, preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "확인", style: .default))
+                self?.present(alert, animated: true)
+            })
+            .disposed(by: disposeBag)
+    }
+    
     private func createLayout() -> UICollectionViewCompositionalLayout {
         return UICollectionViewCompositionalLayout { [weak self] sectionIndex, _ in
-            guard let sectionType = self?.currentSectionTypes[sectionIndex] else {
-                return nil
-            }
+            guard let self else { return nil }
+                
+            let sectionType = self.dataSource.sectionModels[sectionIndex].type
+            
             switch sectionType {
             case .recent:
-                return self?.createRecentSection()
+                return self.createRecentSection()
             case .searchResult:
-                return self?.createSearchResultSection()
+                return self.createSearchResultSection()
             }
         }
     }
@@ -255,5 +298,12 @@ final class BookSearchViewController: UIViewController {
     
     func focusSearchBar() {
         bookSearchBar.searchBar.becomeFirstResponder()
+    }
+}
+
+extension BookSearchViewController: ScrollToTopCapable {
+    func scrollToTop() {
+        let offset = CGPoint(x: 0, y: -bookSearchResultCollectionView.contentInset.top)
+        bookSearchResultCollectionView.setContentOffset(offset, animated: true)
     }
 }

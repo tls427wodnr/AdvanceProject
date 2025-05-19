@@ -10,7 +10,7 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
-final class BookDetailViewController: UIViewController {
+final class BookDetailViewController: UIViewController, UIAdaptivePresentationControllerDelegate {
     private let book: Book
     
     private let bookDetailView = BookDetailView()
@@ -37,8 +37,10 @@ final class BookDetailViewController: UIViewController {
         setupViews()
         setupConstraints()
         bookDetailView.configure(with: book)
-        bindViewModel()
         viewModel.saveRecentBook(with: book)
+        self.presentationController?.delegate = self
+        bindFavoriteSaveResult()
+        bindButtons()
     }
     
     private func setupViews() {
@@ -51,7 +53,7 @@ final class BookDetailViewController: UIViewController {
         }
     }
     
-    private func bindViewModel() {
+    private func bindFavoriteSaveResult() {
         viewModel.favoriteBookSaved
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] in
@@ -71,7 +73,9 @@ final class BookDetailViewController: UIViewController {
                 alert.addAction(UIAlertAction(title: "확인", style: .default))
                 self?.present(alert, animated: true)
             }).disposed(by: disposeBag)
-        
+    }
+    
+    private func bindButtons() {
         bookDetailView.saveButton.rx.tap
             .bind(onNext: { [weak self] in
                 guard let book = self?.book else { return }
@@ -92,5 +96,9 @@ final class BookDetailViewController: UIViewController {
     
     func wasBookSaved() -> Bool {
         return didSaveBook
+    }
+    
+    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+        onDismiss?()
     }
 }
