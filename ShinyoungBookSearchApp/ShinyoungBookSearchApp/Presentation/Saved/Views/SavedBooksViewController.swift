@@ -8,12 +8,18 @@
 import UIKit
 import SnapKit
 import RxSwift
+import RxCocoa
 
 class SavedBooksViewController: UIViewController {
     private let savedBooksHeader = SavedBooksHeaderView()
     private var books = [Book]()
     private let disposeBag = DisposeBag()
-    private let viewModel = SavedBooksViewModel()
+    private let viewModel: SavedBooksViewModel
+    
+    
+    private let viewWillAppearRelay = PublishRelay<Void>()
+    private let deleteAllRelay = PublishRelay<Void>()
+    private let swipeToDeleteRelay = PublishRelay<String>()
     
     private lazy var savedBooksTableView: UITableView = {
         let tv = UITableView()
@@ -23,21 +29,30 @@ class SavedBooksViewController: UIViewController {
         tv.separatorStyle = .none
         return tv
     }()
-
+    
+    init(viewModel: SavedBooksViewModel) {
+        self.viewModel = viewModel
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         setupViews()
         setupConstraints()
-        bindSavedBooks()
-        bindAddButton()
-        bindDeleteAllButton()
+        bindViewModel()
+        bindButtons()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        viewModel.fetchSavedBooks()
+        viewWillAppearRelay.accept(())
     }
     
     private func setupViews() {
@@ -60,16 +75,30 @@ class SavedBooksViewController: UIViewController {
         }
     }
     
-    private func bindSavedBooks() {
-        viewModel.savedBooksDriver
+    private func bindViewModel() {
+        let input = SavedBooksViewModel.Input(
+            viewWillAppear: viewWillAppearRelay.asObservable(),
+            deleteAllTaps: deleteAllRelay.asObservable(),
+            swipeToDelete: swipeToDeleteRelay.asObservable()
+        )
+        
+        let output = viewModel.transform(input: input)
+        
+        output.books
             .drive(onNext: { [weak self] books in
                 self?.books = books
                 self?.savedBooksTableView.reloadData()
             })
             .disposed(by: disposeBag)
+        
+        output.showError
+            .emit(onNext: { [weak self] message in
+                self?.showAlert(message: message)
+            })
+            .disposed(by: disposeBag)
     }
     
-    private func bindAddButton() {
+    private func bindButtons() {
         savedBooksHeader.addButton.rx.tap
             .bind(onNext: { [weak self] in
                 self?.tabBarController?.selectedIndex = 0
@@ -80,13 +109,9 @@ class SavedBooksViewController: UIViewController {
                 }
             })
             .disposed(by: disposeBag)
-    }
-    
-    private func bindDeleteAllButton() {
+        
         savedBooksHeader.deleteAllBooksButton.rx.tap
-            .bind(onNext: { [weak self] in
-                self?.viewModel.deleteAllBooks()
-            })
+            .bind(to: deleteAllRelay)
             .disposed(by: disposeBag)
     }
 }
@@ -121,7 +146,7 @@ extension SavedBooksViewController: UITableViewDelegate {
             guard let self = self else { return }
             
             let book = self.books[indexPath.row]
-            self.viewModel.deleteBook(isbn: book.isbn)
+            self.swipeToDeleteRelay.accept(book.isbn)
             completion(true)
         }
 

@@ -15,15 +15,20 @@ final class BookDetailViewController: UIViewController, UIAdaptivePresentationCo
     
     private let bookDetailView = BookDetailView()
     
-    private let viewModel = BookDetailViewModel()
+    private let viewModel: BookDetailViewModel
     
     private let disposeBag = DisposeBag()
     
     var onDismiss: (() -> Void)?
     private var didSaveBook = false
     
-    init(book: Book) {
+    private let viewDidLoadTrigger = PublishRelay<Void>()
+    private let saveButtonTappedTrigger = PublishRelay<Void>()
+    
+    init(book: Book, viewModel: BookDetailViewModel) {
         self.book = book
+        self.viewModel = viewModel
+        
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -37,10 +42,19 @@ final class BookDetailViewController: UIViewController, UIAdaptivePresentationCo
         setupViews()
         setupConstraints()
         bookDetailView.configure(with: book)
-        viewModel.saveRecentBook(with: book)
         self.presentationController?.delegate = self
-        bindFavoriteSaveResult()
+        
+        let input = BookDetailViewModel.Input(
+            viewDidLoad: viewDidLoadTrigger.asObservable(),
+            saveButtonTapped: saveButtonTappedTrigger.asObservable()
+        )
+        
+        let output = viewModel.transform(input: input)
+        
+        bindOutput(output)
         bindButtons()
+        
+        viewDidLoadTrigger.accept(())
     }
     
     private func setupViews() {
@@ -53,36 +67,26 @@ final class BookDetailViewController: UIViewController, UIAdaptivePresentationCo
         }
     }
     
-    private func bindFavoriteSaveResult() {
-        viewModel.favoriteBookSaved
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] in
+    private func bindOutput(_ output: BookDetailViewModel.Output) {
+        output.dismissWithSaveFlag
+            .emit(onNext: { [weak self] isSaved in
+                self?.didSaveBook = isSaved
                 self?.dismiss(animated: true, completion: {
                     self?.onDismiss?()
                 })
-            }).disposed(by: disposeBag)
+            })
+            .disposed(by: disposeBag)
         
-        viewModel.favoriteBookSaveFailed
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] error in
-                let alert = UIAlertController(
-                    title: "실패",
-                    message: "책 저장에 실패했습니다.",
-                    preferredStyle: .alert
-                )
-                alert.addAction(UIAlertAction(title: "확인", style: .default))
-                self?.present(alert, animated: true)
-            }).disposed(by: disposeBag)
+        output.showError
+            .emit(onNext: { [weak self] message in
+                self?.showAlert(message: message)
+            })
+            .disposed(by: disposeBag)
     }
     
     private func bindButtons() {
         bookDetailView.saveButton.rx.tap
-            .bind(onNext: { [weak self] in
-                guard let book = self?.book else { return }
-                
-                self?.didSaveBook = true
-                self?.viewModel.saveFavoriteBook(with: book)
-            })
+            .bind(to: saveButtonTappedTrigger)
             .disposed(by: disposeBag)
         
         bookDetailView.dismissButton.rx.tap

@@ -10,17 +10,53 @@ import RxSwift
 import RxCocoa
 
 final class BookSearchViewModel {
+    struct Input {
+        let searchTrigger: Observable<String>
+        let reachedBottomTrigger: Observable<Void>
+    }
+    
+    struct Output {
+        let sectionedBooks: Driver<[BookSectionModel]>
+        let errorMessage: Signal<String>
+    }
+    
+    private let bookSearchUseCase: BookSearchUseCase
+    private let fetchRecentBooksUseCase: FetchRecentBooksUseCase
+    
+    private let bookSearchResults = BehaviorRelay<[Book]>(value: [])
+    private let recentBooks = BehaviorRelay<[Book]>(value: [])
+    private let errorMessageRelay = PublishRelay<String>()
+    private let isLoadingRelay = BehaviorRelay<Bool>(value: false)
+    
+    private var currentQuery = ""
+    private var currentPage = 1
+    private var isEnd = false
+    
     private let disposeBag = DisposeBag()
     
-    let queryRelay = BehaviorRelay<String>(value: "")
+    init(
+        bookSearchUseCase: BookSearchUseCase,
+        fetchRecentBooksUseCase: FetchRecentBooksUseCase
+    ) {
+        self.bookSearchUseCase = bookSearchUseCase
+        self.fetchRecentBooksUseCase = fetchRecentBooksUseCase
+    }
     
-    let bookSearchResultsSubject = BehaviorSubject<[Book]>(value: [])
-    let recentBooksSubject = BehaviorSubject<[Book]>(value: [])
-    
-    let errorMessageRelay = PublishRelay<String>()
-    
-    var sectionedBooksDriver: Driver<[BookSectionModel]> {
-        Observable.combineLatest(recentBooksSubject, bookSearchResultsSubject)
+    func transform(input: Input) -> Output {
+        input.searchTrigger
+            .subscribe(onNext: { [weak self] query in
+                self?.startSearch(query: query)
+            })
+            .disposed(by: disposeBag)
+        
+        input.reachedBottomTrigger
+            .subscribe(onNext: { [weak self] in
+                self?.loadNextPage()
+            })
+            .disposed(by: disposeBag)
+        
+        let sectionedBooks = Observable
+            .combineLatest(recentBooks, bookSearchResults)
             .map { recent, search in
                 return [
                     BookSectionModel(type: .recent, header: "최근 본 책", items: recent),
@@ -28,70 +64,71 @@ final class BookSearchViewModel {
                 ]
             }
             .asDriver(onErrorJustReturn: [])
+        
+        return Output(
+            sectionedBooks: sectionedBooks,
+            errorMessage: errorMessageRelay.asSignal()
+        )
     }
     
-    private var currentPage = 1
-    private var isEnd = false
-    var hasNextPage: Bool {
-        return !isEnd
-    }
-    
-    let isLoadingRelay = BehaviorRelay<Bool>(value: false)
-    var isLoadingDriver: Driver<Bool> {
-        isLoadingRelay.asDriver()
-    }    
-    var isLoading: Bool {
-        return isLoadingRelay.value
-    }
-    
-    func searchBooks(isPaging: Bool = false) {
-        let query = queryRelay.value.trimmingCharacters(in: .whitespacesAndNewlines)
+    private func startSearch(query: String) {
         guard !query.isEmpty else { return }
         
         isLoadingRelay.accept(true)
-        currentPage = isPaging ? currentPage : 1
+        currentQuery = query
+        currentPage = 1
         
-        var components = URLComponents(string: "https://dapi.kakao.com/v3/search/book")
-        components?.queryItems = [
-            URLQueryItem(name: "query", value: query),
-            URLQueryItem(name: "page", value: "\(currentPage)")
-        ]
-        
-        guard let url = components?.url else {
-            errorMessageRelay.accept("유효하지 않은 검색 URL입니다.")
-            isLoadingRelay.accept(false)
-            return
-        }
-        
-        NetworkService.shared.fetch(url: url)
-            .subscribe(onSuccess: { [weak self] (response: BookSearchResponse) in
-                guard let self else { return }
-                
-                self.isEnd = response.meta?.isEnd ?? true
-                
-                let books = response.documents.map { $0.toDomain() }
-                
-                if isPaging {
-                    let current = (try? self.bookSearchResultsSubject.value()) ?? []
-                    self.bookSearchResultsSubject.onNext(current + books)
-                } else {
-                    self.bookSearchResultsSubject.onNext(books)
+        bookSearchUseCase.execute(query: query, page: currentPage)
+            .observe(on: MainScheduler.instance)
+            .subscribe(
+                onSuccess: { [weak self] books in
+                    guard let self else { return }
+                    self.bookSearchResults.accept(books)
+                    self.isEnd = books.isEmpty
+                    self.currentPage += 1
+                    self.isLoadingRelay.accept(false)
+                },
+                onFailure: { [weak self] error in
+                    self?.errorMessageRelay.accept("검색 실패: \(error.localizedDescription)")
+                    self?.isLoadingRelay.accept(false)
                 }
-                self.currentPage += 1
-                self.isLoadingRelay.accept(false)
-            }, onFailure: { [weak self] error in
-                self?.errorMessageRelay.accept("책 검색 실패: \(error.localizedDescription)")
-                self?.isLoadingRelay.accept(false)
-            }).disposed(by: disposeBag)
+            )
+            .disposed(by: disposeBag)
+    }
+    
+    private func loadNextPage() {
+        guard !isEnd, !isLoadingRelay.value else { return }
+        
+        isLoadingRelay.accept(true)
+        
+        bookSearchUseCase.execute(query: currentQuery, page: currentPage)
+            .observe(on: MainScheduler.instance)
+            .subscribe(
+                onSuccess: { [weak self] books in
+                    guard let self else { return }
+                    let current = self.bookSearchResults.value
+                    self.bookSearchResults.accept(current + books)
+                    self.isEnd = books.isEmpty
+                    self.currentPage += 1
+                    self.isLoadingRelay.accept(false)
+                }, onFailure: { [weak self] error in
+                    self?.errorMessageRelay.accept("페이지 로드 실패: \(error.localizedDescription)")
+                    self?.isLoadingRelay.accept(false)
+                }
+            )
+            .disposed(by: disposeBag)
     }
     
     func fetchRecentBooks() {
-        CoreDataService.shared.fetchRecentBooks()
+        fetchRecentBooksUseCase.execute()
             .observe(on: MainScheduler.instance)
-            .subscribe(onSuccess: { [weak self] books in
-                self?.recentBooksSubject.onNext(books)
-            }, onFailure: { [weak self] error in
-                self?.errorMessageRelay.accept("최근 본 책 로드 실패: \(error.localizedDescription)")
-            }).disposed(by: disposeBag)
+            .subscribe(
+                onSuccess: { [weak self] books in
+                    self?.recentBooks.accept(books)
+                }, onFailure: { [weak self] error in
+                    self?.errorMessageRelay.accept("최근 본 책 로드 실패: \(error.localizedDescription)")
+                }
+            )
+            .disposed(by: disposeBag)
     }
 }
