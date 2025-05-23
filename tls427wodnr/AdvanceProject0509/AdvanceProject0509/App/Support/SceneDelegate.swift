@@ -20,7 +20,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let window = UIWindow(windowScene: windowScene)
         self.window = window
 
-        let container = AppDIContainer()
+        let container = AppDIContainer(networkService: NetworkService())
         let coordinator = AppCoordinator(window: window, container: container)
         self.appCoordinator = coordinator
         coordinator.start()                             

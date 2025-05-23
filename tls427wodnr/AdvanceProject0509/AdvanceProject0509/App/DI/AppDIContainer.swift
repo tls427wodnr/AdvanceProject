@@ -11,7 +11,12 @@ final class AppDIContainer {
 
     // MARK: - Dependencies
     
-    private let networkService: NetworkServiceProtocol = NetworkService()
+    private let networkService: NetworkServiceProtocol
+    
+    // MARK: - Initializer
+    init(networkService: NetworkServiceProtocol) {
+        self.networkService = networkService
+    }
 
     // MARK: - DIContainers
     
