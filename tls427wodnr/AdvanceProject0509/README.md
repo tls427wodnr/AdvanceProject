@@ -15,6 +15,8 @@
 - ✅ **메모리 누수 분석 및 관리**
 - ✅ **Coordinator Pattern**을 통한 화면 전환 및 흐름 관리
 - ✅ **SDWebImage**를 이용한 이미지 캐싱 
+- ✅ **XCTest**, **RxBlocking**을 이용한 UseCase 테스팅 
+
 
 ## 주요 기능
 
