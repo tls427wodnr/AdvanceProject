@@ -14,10 +14,23 @@
 		D18EAEB72DCDB2670087FE97 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = D18EAEB62DCDB2670087FE97 /* RxSwift */; };
 		D1A0FBE62DD6D5E700B95DF5 /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = D1A0FBE52DD6D5E700B95DF5 /* SDWebImage */; };
 		D1A0FBE82DD6D5E700B95DF5 /* SDWebImageMapKit in Frameworks */ = {isa = PBXBuildFile; productRef = D1A0FBE72DD6D5E700B95DF5 /* SDWebImageMapKit */; };
+		D1BA68172DE420F7009D93AC /* RxBlocking in Frameworks */ = {isa = PBXBuildFile; productRef = D1BA68162DE420F7009D93AC /* RxBlocking */; };
+		D1BA68192DE420F7009D93AC /* RxTest in Frameworks */ = {isa = PBXBuildFile; productRef = D1BA68182DE420F7009D93AC /* RxTest */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		D1BA680E2DE41FA6009D93AC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D18EAE4D2DCD97530087FE97 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D18EAE542DCD97540087FE97;
+			remoteInfo = AdvanceProject0509;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		D18EAE552DCD97540087FE97 /* AdvanceProject0509.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AdvanceProject0509.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D1BA680A2DE41FA6009D93AC /* AdvanceProject0509Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AdvanceProject0509Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -39,6 +52,11 @@
 			path = AdvanceProject0509;
 			sourceTree = "<group>";
 		};
+		D1BA680B2DE41FA6009D93AC /* AdvanceProject0509Tests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = AdvanceProject0509Tests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +74,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D1BA68072DE41FA6009D93AC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D1BA68192DE420F7009D93AC /* RxTest in Frameworks */,
+				D1BA68172DE420F7009D93AC /* RxBlocking in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -63,6 +90,7 @@
 			isa = PBXGroup;
 			children = (
 				D18EAE572DCD97540087FE97 /* AdvanceProject0509 */,
+				D1BA680B2DE41FA6009D93AC /* AdvanceProject0509Tests */,
 				D18EAE562DCD97540087FE97 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -71,6 +99,7 @@
 			isa = PBXGroup;
 			children = (
 				D18EAE552DCD97540087FE97 /* AdvanceProject0509.app */,
+				D1BA680A2DE41FA6009D93AC /* AdvanceProject0509Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -107,6 +136,31 @@
 			productReference = D18EAE552DCD97540087FE97 /* AdvanceProject0509.app */;
 			productType = "com.apple.product-type.application";
 		};
+		D1BA68092DE41FA6009D93AC /* AdvanceProject0509Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D1BA68122DE41FA6009D93AC /* Build configuration list for PBXNativeTarget "AdvanceProject0509Tests" */;
+			buildPhases = (
+				D1BA68062DE41FA6009D93AC /* Sources */,
+				D1BA68072DE41FA6009D93AC /* Frameworks */,
+				D1BA68082DE41FA6009D93AC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D1BA680F2DE41FA6009D93AC /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				D1BA680B2DE41FA6009D93AC /* AdvanceProject0509Tests */,
+			);
+			name = AdvanceProject0509Tests;
+			packageProductDependencies = (
+				D1BA68162DE420F7009D93AC /* RxBlocking */,
+				D1BA68182DE420F7009D93AC /* RxTest */,
+			);
+			productName = AdvanceProject0509Tests;
+			productReference = D1BA680A2DE41FA6009D93AC /* AdvanceProject0509Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -119,6 +173,10 @@
 				TargetAttributes = {
 					D18EAE542DCD97540087FE97 = {
 						CreatedOnToolsVersion = 16.3;
+					};
+					D1BA68092DE41FA6009D93AC = {
+						CreatedOnToolsVersion = 16.3;
+						TestTargetID = D18EAE542DCD97540087FE97;
 					};
 				};
 			};
@@ -142,12 +200,20 @@
 			projectRoot = "";
 			targets = (
 				D18EAE542DCD97540087FE97 /* AdvanceProject0509 */,
+				D1BA68092DE41FA6009D93AC /* AdvanceProject0509Tests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		D18EAE532DCD97540087FE97 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D1BA68082DE41FA6009D93AC /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -164,7 +230,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D1BA68062DE41FA6009D93AC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D1BA680F2DE41FA6009D93AC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D18EAE542DCD97540087FE97 /* AdvanceProject0509 */;
+			targetProxy = D1BA680E2DE41FA6009D93AC /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		D18EAE692DCD97550087FE97 /* Debug */ = {
@@ -342,6 +423,40 @@
 			};
 			name = Release;
 		};
+		D1BA68102DE41FA6009D93AC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.AdvanceProject0509Tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AdvanceProject0509.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/AdvanceProject0509";
+			};
+			name = Debug;
+		};
+		D1BA68112DE41FA6009D93AC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.AdvanceProject0509Tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AdvanceProject0509.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/AdvanceProject0509";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -359,6 +474,15 @@
 			buildConfigurations = (
 				D18EAE692DCD97550087FE97 /* Debug */,
 				D18EAE6A2DCD97550087FE97 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D1BA68122DE41FA6009D93AC /* Build configuration list for PBXNativeTarget "AdvanceProject0509Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D1BA68102DE41FA6009D93AC /* Debug */,
+				D1BA68112DE41FA6009D93AC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -427,6 +551,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = D1A0FBE42DD6D5E700B95DF5 /* XCRemoteSwiftPackageReference "SDWebImage" */;
 			productName = SDWebImageMapKit;
+		};
+		D1BA68162DE420F7009D93AC /* RxBlocking */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D18EAEB12DCDB2670087FE97 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxBlocking;
+		};
+		D1BA68182DE420F7009D93AC /* RxTest */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D18EAEB12DCDB2670087FE97 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxTest;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
